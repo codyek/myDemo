@@ -15,6 +15,7 @@ else {
 <!DOCTYPE html>
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>404 - 页面不存在</title>
 	<%@include file="/WEB-INF/views/include/head.jsp" %>
 </head>
