@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.inter.InterfacesDao">
+    
+	<sql id="interfacesColumns">
+		a.id AS "id",
+		a.platform AS "platform",
+		a.type AS "type",
+		a.code AS "code",
+		a.url AS "url",
+		a.describe AS "describe",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interfacesJoins">
+	</sql>
+    
+	<select id="get" resultType="Interfaces">
+		SELECT 
+			<include refid="interfacesColumns"/>
+		FROM bit_interface a
+		<include refid="interfacesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Interfaces">
+		SELECT 
+			<include refid="interfacesColumns"/>
+		FROM bit_interface a
+		<include refid="interfacesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="platform != null and platform != ''">
+				AND a.platform = #{platform}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Interfaces">
+		SELECT 
+			<include refid="interfacesColumns"/>
+		FROM bit_interface a
+		<include refid="interfacesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_interface(
+			id,
+			platform,
+			type,
+			code,
+			url,
+			describe,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{platform},
+			#{type},
+			#{code},
+			#{url},
+			#{describe},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_interface SET 	
+			platform = #{platform},
+			type = #{type},
+			code = #{code},
+			url = #{url},
+			describe = #{describe},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_interface SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
