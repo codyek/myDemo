@@ -19,7 +19,7 @@ public class Interfaces extends DataEntity<Interfaces> {
 	private String type;		// 类型
 	private String code;		// 编码
 	private String url;		// 接口地址
-	private String describe;		// 接口描述
+	private String describes;		// 接口描述
 	
 	public Interfaces() {
 		super();
@@ -56,7 +56,7 @@ public class Interfaces extends DataEntity<Interfaces> {
 		this.code = code;
 	}
 	
-	@Length(min=1, max=100, message="接口地址长度必须介于 1 和 100 之间")
+	@Length(min=1, max=200, message="接口地址长度必须介于 1 和200 之间")
 	public String getUrl() {
 		return url;
 	}
@@ -65,13 +65,13 @@ public class Interfaces extends DataEntity<Interfaces> {
 		this.url = url;
 	}
 	
-	@Length(min=0, max=100, message="接口描述长度必须介于 0 和 100 之间")
-	public String getDescribe() {
-		return describe;
+	@Length(min=0, max=300, message="接口描述长度必须介于 0 和300 之间")
+	public String getDescribes() {
+		return describes;
 	}
 
-	public void setDescribe(String describe) {
-		this.describe = describe;
+	public void setDescribes(String describes) {
+		this.describes = describes;
 	}
 	
 }

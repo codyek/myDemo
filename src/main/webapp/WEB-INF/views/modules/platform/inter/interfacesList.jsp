@@ -28,13 +28,13 @@
 			<li><label>平台：</label>
 				<form:select path="platform" class="input-medium">
 					<form:option value="" label=""/>
-					<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					<form:options items="${fns:getDictList('bit_platform')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li><label>类型：</label>
 				<form:select path="type" class="input-medium">
 					<form:option value="" label=""/>
-					<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					<form:options items="${fns:getDictList('bit_inter_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li><label>编码：</label>
@@ -54,7 +54,7 @@
 				<th>编码</th>
 				<th>接口地址</th>
 				<th>接口描述</th>
-				<th>创建时间</th>
+			<!-- <th>创建时间</th>  -->	
 				<th>更新时间</th>
 				<shiro:hasPermission name="platform:inter:interfaces:edit"><th>操作</th></shiro:hasPermission>
 			</tr>
@@ -66,10 +66,10 @@
 					${interfaces.id}
 				</a></td>
 				<td>
-					${fns:getDictLabel(interfaces.platform, '', '')}
+					${fns:getDictLabel(interfaces.platform, 'bit_platform', '')}
 				</td>
 				<td>
-					${fns:getDictLabel(interfaces.type, '', '')}
+					${fns:getDictLabel(interfaces.type, 'bit_inter_type', '')}
 				</td>
 				<td>
 					${interfaces.code}
@@ -78,11 +78,13 @@
 					${interfaces.url}
 				</td>
 				<td>
-					${interfaces.describe}
+					${interfaces.describes}
 				</td>
+				<!--
 				<td>
 					<fmt:formatDate value="${interfaces.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
+			 	 -->	
 				<td>
 					<fmt:formatDate value="${interfaces.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>

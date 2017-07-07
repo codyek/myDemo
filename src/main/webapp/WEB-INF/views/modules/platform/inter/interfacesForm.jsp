@@ -38,7 +38,7 @@
 			<div class="controls">
 				<form:select path="platform" class="input-xlarge required">
 					<form:option value="" label=""/>
-					<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					<form:options items="${fns:getDictList('bit_platform')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
@@ -48,7 +48,7 @@
 			<div class="controls">
 				<form:select path="type" class="input-xlarge required">
 					<form:option value="" label=""/>
-					<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					<form:options items="${fns:getDictList('bit_inter_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
@@ -70,7 +70,7 @@
 		<div class="control-group">
 			<label class="control-label">接口描述：</label>
 			<div class="controls">
-				<form:input path="describe" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+				<form:input path="describes" htmlEscape="false" maxlength="100" class="input-xlarge "/>
 			</div>
 		</div>
 		<div class="control-group">
