@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.common.utils;
 
 import java.io.UnsupportedEncodingException;
@@ -389,6 +386,24 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     	}
     	result.append(val.substring(1));
     	return result.toString();
+    }
+    
+    /**
+     * 
+    * @Title: hideKey
+    * @Description:  加*号隐藏key信息
+    * @param @param key
+    * @param @return
+    * @return String
+    * @throws
+     */
+    public static String hideKey(String key){
+    	if(StringUtils.isEmpty(key) || key.length() < 5){
+    		return key;
+    	}
+    	String ret = key.substring(0, 4);
+    	ret += "******"; 
+    	return ret;
     }
     
 }

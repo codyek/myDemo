@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.modules.platform.web.inter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +16,6 @@ import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.platform.constants.inter.InterConstants;
 import com.thinkgem.jeesite.modules.platform.entity.inter.Interfaces;
 import com.thinkgem.jeesite.modules.platform.service.inter.InterfacesService;
 

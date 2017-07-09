@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.apiauthor.APIAuthorizeDao">
+    
+	<sql id="aPIAuthorizeColumns">
+		a.id AS "id",
+		a.platform AS "platform",
+		a.user_id AS "user.id",
+		a.appkey AS "appkey",
+		a.secretkey AS "secretkey",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="aPIAuthorizeJoins">
+	</sql>
+    
+	<select id="get" resultType="APIAuthorize">
+		SELECT 
+			<include refid="aPIAuthorizeColumns"/>
+		FROM bit_authorize a
+		<include refid="aPIAuthorizeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByUserId" resultType="APIAuthorize">
+		SELECT 
+			<include refid="aPIAuthorizeColumns"/>
+		FROM bit_authorize a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+			AND a.platform = #{platform}
+			AND a.user_id = #{user.id}
+	</select>
+	
+	<select id="findList" resultType="APIAuthorize">
+		SELECT 
+			<include refid="aPIAuthorizeColumns"/>
+		FROM bit_authorize a
+		<include refid="aPIAuthorizeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="platform != null and platform != ''">
+				AND a.platform = #{platform}
+			</if>
+			<if test="appkey != null and appkey != ''">
+				AND a.appkey = #{appkey}
+			</if>
+			<if test="user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="APIAuthorize">
+		SELECT 
+			<include refid="aPIAuthorizeColumns"/>
+		FROM bit_authorize a
+		<include refid="aPIAuthorizeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_authorize(
+			id,
+			platform,
+			user_id,
+			appkey,
+			secretkey,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{platform},
+			#{user.id},
+			#{appkey},
+			#{secretkey},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_authorize SET 	
+			appkey = #{appkey},
+			secretkey = #{secretkey},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_authorize SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

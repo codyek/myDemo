@@ -438,12 +438,13 @@ public class HttpUtils {
 	 * @return List<NameValuePair>
 	 */
 	private static final List<NameValuePair> convertMap2PostParams(Map<String,String> params){
+		List<NameValuePair>  data = new LinkedList<NameValuePair>();
 		List<String> keys = new ArrayList<String>(params.keySet());
 		if(keys.isEmpty()){
-			return null;
+			return data;
 		}
 		int keySize = keys.size();
-		List<NameValuePair>  data = new LinkedList<NameValuePair>() ;
+		
 		for(int i=0;i<keySize;i++){
 			String key = keys.get(i);
 			String value = params.get(key);
