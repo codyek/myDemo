@@ -10,9 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.utils.BitMD5Util;
 import com.thinkgem.jeesite.common.utils.HttpUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.platform.callback.OkexReturnCode;
 import com.thinkgem.jeesite.modules.platform.entity.apiauthor.APIAuthorize;
 import com.thinkgem.jeesite.modules.platform.service.apiauthor.APIAuthorizeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -53,6 +56,14 @@ public abstract class OkexBaseService {
 			return null;
 		}
 		logger.debug(">> post result = " + result);
+		JSONObject json = JSONObject.parseObject(result);
+		Object rlt = json.get("result");
+		if(null != rlt){
+			String str_rlt = String.valueOf(rlt);
+			if("false".equals(str_rlt)){
+				OkexReturnCode.HOLDER.getErrorMsgByCode(1);
+			}
+		}
 		return result;
 	}
 }
