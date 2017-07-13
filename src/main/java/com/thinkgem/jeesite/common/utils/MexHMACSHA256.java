@@ -36,26 +36,5 @@ public class MexHMACSHA256 {
 	    return hs.toString();
 	}
 	
-	public static void main(String[] args) {
-		String apiKey = "LAqUlngMIQkIUjXMUreyu3qn";
-		String apiSecret = "chNOOS4KvNXR_Xq4k4c9qsfoKWvnDecLATCRlcBwyKDYnWgO";
-		
-		//String verb = "GET";
-		//String path = "/api/v1/instrument?filter=%7B%22symbol%22%3A+%22XBTM15%22%7D";
-		//String nonce = "1429631577690";
-		//String data = "";
-		
-		String verb = "POST";
-		String path = "/api/v1/order";
-		String nonce = "1429631577995";  //13位
-		String data = "{\"symbol\":\"XBTM15\",\"price\":219.0,\"clOrdID\":\"mm_bitmex_1a/oemUeQ4CAJZgP3fjHsA\",\"orderQty\":98}";
-		
-		String msg = verb+path+nonce+data;
-		
-		System.out.println("time ="+ System.currentTimeMillis());
-		String signature = "";
-		signature = MexHMACSHA256.HMACSHA256(msg.getBytes(),apiSecret.getBytes());
-		
-		System.out.println(">> signature = "+signature);
-	}
+	
 }
