@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.utils.BitMD5Util;
 import com.thinkgem.jeesite.common.utils.HttpUtils;
@@ -21,6 +20,12 @@ import com.thinkgem.jeesite.modules.platform.service.apiauthor.APIAuthorizeServi
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
+/**
+ * 
+* @ClassName: OkexBaseService 
+* @author EK huangzf 
+*
+ */
 @Transactional(readOnly = true)
 public abstract class OkexBaseService {
 	protected Logger logger = LoggerFactory.getLogger(getClass());

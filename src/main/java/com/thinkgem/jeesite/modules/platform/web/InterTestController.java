@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.platform.service.AccountInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.InfoInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.OrderInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.okex.InfoInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 
 /**
  * inter测试Controller
@@ -126,5 +128,46 @@ public class InterTestController extends BaseController {
 		}
 		return "post okkkkk!";
 	}
+	
+	// --------------------------------------------------------------------
+	
+	@Autowired
+	private MexOrderInterfaceService mexOrderService;
+	
+	@Autowired
+	private MexAccountInterfaceService mexAccountService;
+	
+
+	@RequestMapping(value = {"mex", ""})
+	@ResponseBody
+	public String testMex(HttpServletRequest request, HttpServletResponse response, Model model) {
+		String symbol = "XBTUSD";
+		
+		String ret = "";
+		try {
+			 
+			//// ---------------------------- order 
+			
+			System.out.println("11. start ------------- get_order");
+			ret = mexOrderService.get_order(symbol, 50D);
+			
+			System.out.println("22. start ------------- post_order");
+			ret = mexOrderService.post_order(symbol, "Limit", 2020D, 1D, "Sell", "my_order");
+			
+			System.out.println("33. start ------------- get_orderBookL2");
+			ret = mexOrderService.get_orderBookL2(symbol, 0D);
+			
+			System.out.println("44. start ------------- get_user_margin");
+			ret = mexAccountService.get_user_margin("XBt");
+			
+			
+			System.out.println("-----mex ret = "+ret);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "mex okkkkk!";
+	}
+	
 			
 }

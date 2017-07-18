@@ -11,15 +11,14 @@ import com.thinkgem.jeesite.modules.platform.service.inter.InterfacesService;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 
 /**
- * 接口信息常量类
-* @ClassName: InterConstants 
-* @Description: TODO
+ * okex接口信息常量类
+* @ClassName: OkexInterConstants 
 * @author EK huangone 
 * @date 2017-7-6 下午9:34:12 
 *
  */
-public class InterConstants {
-	protected static Logger logger = LoggerFactory.getLogger(InterConstants.class);
+public class OkexInterConstants {
+	protected static Logger logger = LoggerFactory.getLogger(OkexInterConstants.class);
 	
 	/** 交易平台  */
 	private final static String PLATFORM_CODE = "okex";

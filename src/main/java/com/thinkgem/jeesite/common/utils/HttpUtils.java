@@ -49,6 +49,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class HttpUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(HttpUtils.class);
@@ -448,6 +450,28 @@ public class HttpUtils {
 		for(int i=0;i<keySize;i++){
 			String key = keys.get(i);
 			String value = params.get(key);
+			data.add(new BasicNameValuePair(key,value));
+		}
+		return data;
+	}
+	
+	/**
+	 * 封装JSONObject格式的参数到NameValuePair中
+	 * 
+	 * @param paramsMap
+	 * @return List<NameValuePair>
+	 */
+	public static final List<NameValuePair> convertJson2PostParams(JSONObject params){
+		List<NameValuePair>  data = new LinkedList<NameValuePair>();
+		List<String> keys = new ArrayList<String>(params.keySet());
+		if(keys.isEmpty()){
+			return data;
+		}
+		int keySize = keys.size();
+		
+		for(int i=0;i<keySize;i++){
+			String key = keys.get(i);
+			String value = params.get(key)+"";
 			data.add(new BasicNameValuePair(key,value));
 		}
 		return data;

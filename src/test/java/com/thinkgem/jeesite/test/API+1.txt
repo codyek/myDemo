@@ -1,0 +1,659 @@
+
+Announcement : Public Announcements 
+公告：公开公告
+ 
+ 
+APIKey : Persistent API Keys for Developers 
+APIKey：开发人员的持久API密钥
+ 
+ 
+Chat : Trollbox Data 
+聊天：Trollbox数据
+ 
+ 
+Execution : Raw Order and Balance Data 
+执行：原始订单和余额数据
+{
+	get /execution 获取您帐户的所有原始执行。
+
+	get /execution/tradeHistory  获得所有影响到影响力的执行。 这包括每笔交易，保险费和结算。
+ }
+
+
+Funding : Swap Funding History 
+资金：交换资金历史
+ {
+	GET /funding	Get funding history. 获得资金历史。
+} 
+
+ 
+Instrument : Tradeable Contracts, Indices, and History 
+合约：可交易合同，指数和历史
+ {
+	Get /instrument				Get instruments.  获取合约。
+
+	GET /instrument/active			Get all active instruments and instruments that have expired in <24hrs.
+						获取所有在<24小时内已过期的有效仪器和仪器。
+	GET /instrument/activeAndIndices	Helper method. Gets all active instruments and all indices. This is a join of the result of /indices and /active.
+						助手法。 获取所有活跃的乐器和所有指标。 这是/ indices和/ active结果的连接。
+	GET /instrument/activeIntervals		Return all active contract series and interval pairs.
+						返回所有活动合同系列和间隔对。
+	GET /instrument/compositeIndex		Show constituent parts of an index.
+						显示索引的组成部分。
+	GET /instrument/indices			Get all price indices. 获取所有价格指数。
+	
+ }
+ 
+Insurance : Insurance Fund Data 
+保险：保险基金数据
+	get /insurance		Get insurance fund history
+ 
+
+Leaderboard : Information on Top Users 
+排行榜：热门用户信息
+ 
+ 
+Liquidation : Active Liquidations 
+清算：积极清算
+	GET /liquidation	Get liquidation orders.  获得清盘令。
+ 
+Notification : Account Notifications 
+通知：帐户通知
+ 
+ 
+Order : Placement, Cancellation, Amending, and History 
+订单：安置，取消，修改和历史
+ {
+	 get /order		Get your orders.  
+	得到你的订单
+
+
+	put /order		Amend the quantity or price of an open order.
+	修改公开订单的数量或价格。
+
+	post /order		Create a new order. 创建新订单。
+
+
+	delete /order 
+	Cancel order(s). Send multiple order IDs to cancel in bulk. 取消订单。 发送多个订单ID批量取消。
+
+
+	delete /order/all	Cancels all of your orders. 取消您的所有订单。
+
+
+
+	put /order/bulk		Amend multiple orders for the same symbol.  修改相同符号的多个订单。
+
+
+	post /order/bulk	Create multiple new orders for the same symbol. 为同一符号创建多个新订单。
+
+
+	post /order/cancelAllAfter 
+	Automatically cancel all your orders after a specified timeout. 在指定的超时后自动取消所有订单。
+
+
+	post /order/closePosition 
+	Close a position. [Deprecated, use POST /order with execInst: 'Close']  关闭一个位置 [不建议使用POST / order with execInst：'Close']
+ }
+ 
+	
+OrderBook : Level 2 Book Data 
+订单：2级图书数据
+ {
+	 get /orderBook 
+	Get current orderbook [deprecated, use /orderBook/L2]. 获取当前订单[已弃用，使用/ orderBook / L2]。
+
+
+	get /orderBook/L2 
+	Get current orderbook in vertical format. 以垂直格式获取当前订单。
+ }
+ 
+ 
+Position : Summary of Open and Closed Positions 
+职位：公开和封闭职位的总结
+ {
+	GET /position			Get your positions.	得到你的职位
+
+	POST /position/isolate		Enable isolated margin or cross margin per-position.
+					启用每个位置的隔离边距或交叉边。
+
+	POST /position/leverage		Choose leverage for a position. 选择一个职位的杠杆。
+
+	POST /position/riskLimit	Update your risk limit.  更新您的风险限额。
+
+	POST /position/transferMargin	Transfer equity in or out of a position.	将股权转入或退出头寸。
+
+ }
+ 
+Quote : Best Bid/Offer Snapshots & Historical Bins 
+报价：最佳投标/优惠快照和历史仓
+ {
+	GET /quote		Get Quotes. 获取行情。
+
+	GET /quote/bucketed	Get previous quotes in time buckets. 在时间桶中获取以前的引用。
+
+ }
+ 
+Schema : Dynamic Schemata for Developers 
+模式：开发人员的动态模式
+ {
+	GET /schema			Get model schemata for data objects returned by this API.
+					获取此API返回的数据对象的模型模式。
+
+	GET /schema/websocketHelp	Returns help text & subject list for websocket usage.
+					返回帮助文本和主题列表的websocket使用。
+ }
+ 
+Settlement : Historical Settlement Data 
+结算：历史结算数据
+
+	GET /settlement		Get settlement history.		获得结算历史记录。
+ 
+Stats : Exchange Statistics 
+统计：交易统计
+ {
+	Get /stats		Get exchange-wide and per-series turnover and volume statistics.
+				获取交换范围和每个系列的营业额和数量统计。
+
+	GET /stats/history	Get historical exchange-wide and per-series turnover and volume statistics.
+				获取历史的交换和每个系列的营业额和数量统计。
+ }
+ 
+Trade : Individual & Bucketed Trades 
+贸易：个人和商业行业
+ {
+	GET /trade		Get Trades. 获得交易
+
+	GET /trade/bucketed	Get previous trades in time buckets. 获取以前的交易时间桶。
+ }
+ 
+User : Account Operations 
+用户：帐户操作
+{
+	get /user 
+	Get your user model.
+	获取您的用户模型。
+
+	put /user 
+	Update your password, name, and other attributes.
+	更新您的密码，名称和其他属性。
+
+	get /user/affiliateStatus 
+	Get your current affiliate/referral status.
+	获取您当前的联属/推荐状态。
+
+	post /user/cancelWithdrawal 
+	Cancel a withdrawal.
+	取消提款。
+
+	get /user/checkReferralCode 
+	Check if a referral code is valid.
+	检查推荐代码是否有效。
+
+	get /user/commission  佣金
+	Get your account's commission status.
+	获取您帐户的佣金状态。
+
+	post /user/confirmEmail 
+	Confirm your email address with a token.
+	使用令牌确认您的电子邮件地址。
+
+	post /user/confirmEnableTFA 
+	Confirm two-factor auth for this account. If using a Yubikey, simply send a token to this endpoint.
+	确认此帐户的双因素身份验证。如果使用Yubikey，只需将令牌发送到此端点。
+
+	post /user/confirmWithdrawal 
+	Confirm a withdrawal.
+	确认提款。
+
+	get /user/depositAddress 
+	Get a deposit address.
+	取得存款地址。
+
+	post /user/disableTFA 
+	Disable two-factor auth for this account.
+	禁用此帐户的双因素身份验证。
+
+	post /user/logout 
+	Log out of BitMEX.
+	注销BitMEX。
+
+	post /user/logoutAll 
+	Log all systems out of BitMEX. This will revoke all of your account's access tokens, logging you out on all devices.
+	将所有系统从BitMEX记录下来。这将会撤消所有帐户的访问令牌，并将其注销到所有设备上。
+
+	get /user/margin 
+	Get your account's margin status. Send a currency of "all" to receive an array of all supported currencies.
+	获取您帐户的保证金状态。发送“全部”的货币以接收所有支持货币的数组。
+
+	get /user/minWithdrawalFee 
+	Get the minimum withdrawal fee for a currency.
+	获得货币的最低提款费。
+
+	post /user/preferences 
+	Save user preferences.
+	保存用户首选项。
+
+	post /user/requestEnableTFA 
+	Get secret key for setting up two-factor auth.
+	获取设置双因素身份验证的密钥。
+
+	post /user/requestWithdrawal 
+	Request a withdrawal to an external wallet.
+	请求提款到外部钱包。
+
+	get /user/wallet 
+	Get your current wallet information.
+	获取您当前的钱包信息。
+
+
+	get /user/walletHistory 
+	Get a history of all of your wallet transactions (deposits, withdrawals, PNL).
+	获取所有钱包交易（存款，取款，PNL）的历史记录。
+
+	get /user/walletSummary 
+	Get a summary of all of your wallet transactions (deposits, withdrawals, PNL).
+	获取所有钱包交易（存款，取款，PNL）的摘要。
+
+}
+
+
+
+
+附一：
+
+API 返回类型：
+{
+  "Affiliate": {
+    "keys": [],
+    "types": {}
+  },
+  "Announcement": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "link": "string",
+      "title": "string",
+      "content": "string",
+      "date": "timestamp"
+    }
+  },
+  "APIKey": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "string",
+      "secret": "string",
+      "name": "string",
+      "nonce": "integer",
+      "cidr": "string",
+      "permissions": [
+        "any"
+      ],
+      "enabled": "boolean",
+      "userId": "integer",
+      "created": "timestamp"
+    }
+  },
+  "Broker": {
+    "keys": [],
+    "types": {}
+  },
+  "Chat": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "date": "timestamp",
+      "user": "string",
+      "message": "string",
+      "html": "string",
+      "fromBot": "boolean"
+    }
+  },
+  "ChatChannel": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "name": "string"
+    }
+  },
+  "ConnectedUsers": {
+    "keys": [],
+    "types": {
+      "users": "integer",
+      "bots": "integer"
+    }
+  },
+  "Error": {
+    "keys": [
+      "error"
+    ],
+    "types": {
+      "error": {
+        "message": "string",
+        "name": "string"
+      }
+    }
+  },
+  "Execution": {
+    "keys": [],
+    "types": {}
+  },
+  "Funding": {
+    "keys": [],
+    "types": {}
+  },
+  "IndexComposite": {
+    "keys": [
+      "timestamp"
+    ],
+    "types": {
+      "timestamp": "timestamp",
+      "symbol": "string",
+      "indexSymbol": "string",
+      "reference": "string",
+      "lastPrice": "integer",
+      "weight": "integer",
+      "logged": "timestamp"
+    }
+  },
+  "Instrument": {
+    "keys": [],
+    "types": {}
+  },
+  "InstrumentInterval": {
+    "keys": [],
+    "types": {
+      "intervals": [
+        "string"
+      ],
+      "symbols": [
+        "string"
+      ]
+    }
+  },
+  "Insurance": {
+    "keys": [],
+    "types": {}
+  },
+  "Leaderboard": {
+    "keys": [
+      "name"
+    ],
+    "types": {
+      "name": "string",
+      "isRealName": "boolean",
+      "isMe": "boolean",
+      "profit": "integer"
+    }
+  },
+  "Liquidation": {
+    "keys": [],
+    "types": {}
+  },
+  "LiquidationOrder": {
+    "keys": [],
+    "types": {
+      "symbol": "string",
+      "side": "string",
+      "qty": "integer",
+      "price": "integer"
+    }
+  },
+  "LoginRecord": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "date": "timestamp",
+      "userId": "integer",
+      "ip": "string"
+    }
+  },
+  "Margin": {
+    "keys": [],
+    "types": {}
+  },
+  "Notification": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "date": "timestamp",
+      "title": "string",
+      "body": "string",
+      "ttl": "integer",
+      "type": "string",
+      "closable": "boolean",
+      "persist": "boolean",
+      "waitForVisibility": "boolean",
+      "sound": "string"
+    }
+  },
+  "Order": {
+    "keys": [],
+    "types": {}
+  },
+  "OrderBook": {
+    "keys": [],
+    "types": {}
+  },
+  "OrderBookL2": {
+    "keys": [],
+    "types": {}
+  },
+  "Position": {
+    "keys": [],
+    "types": {}
+  },
+  "Quote": {
+    "keys": [],
+    "types": {}
+  },
+  "Role": {
+    "keys": [],
+    "types": {}
+  },
+  "Secret": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "key": "string",
+      "value": "string",
+      "created": "timestamp",
+      "ttl": "integer"
+    }
+  },
+  "Settlement": {
+    "keys": [],
+    "types": {}
+  },
+  "Stats": {
+    "keys": [
+      "rootSymbol"
+    ],
+    "types": {
+      "rootSymbol": "string",
+      "currency": "string",
+      "volume24h": "integer",
+      "turnover24h": "integer",
+      "openInterest": "integer",
+      "openValue": "integer"
+    }
+  },
+  "StatsHistory": {
+    "keys": [
+      "date",
+      "rootSymbol"
+    ],
+    "types": {
+      "date": "timestamp",
+      "rootSymbol": "string",
+      "currency": "string",
+      "volume": "integer",
+      "turnover": "integer"
+    }
+  },
+  "Trade": {
+    "keys": [],
+    "types": {}
+  },
+  "TradeBin": {
+    "keys": [],
+    "types": {}
+  },
+  "Transaction": {
+    "keys": [],
+    "types": {}
+  },
+  "User": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "ownerId": "integer",
+      "firstname": "string",
+      "lastname": "string",
+      "username": "string",
+      "email": "string",
+      "phone": "string",
+      "created": "timestamp",
+      "lastUpdated": "timestamp",
+      "preferences": "UserPreferences",
+      "TFAEnabled": "string",
+      "affiliateID": "string",
+      "pgpPubKey": "string",
+      "country": "string"
+    }
+  },
+  "UserCommission": {
+    "keys": [],
+    "types": {
+      "makerFee": "integer",
+      "takerFee": "integer",
+      "settlementFee": "integer",
+      "maxFee": "integer"
+    }
+  },
+  "UserPreferences": {
+    "keys": [],
+    "types": {
+      "animationsEnabled": "boolean",
+      "announcementsLastSeen": "timestamp",
+      "chatChannelID": "integer",
+      "colorTheme": "string",
+      "currency": "string",
+      "debug": "boolean",
+      "disableEmails": [
+        "string"
+      ],
+      "hideConfirmDialogs": [
+        "string"
+      ],
+      "hideConnectionModal": "boolean",
+      "hideFromLeaderboard": "boolean",
+      "hideNameFromLeaderboard": "boolean",
+      "hideNotifications": [
+        "string"
+      ],
+      "locale": "string",
+      "msgsSeen": [
+        "string"
+      ],
+      "orderBookBinning": "object",
+      "orderBookType": "string",
+      "orderControlsPlusMinus": "boolean",
+      "sounds": [
+        "string"
+      ],
+      "strictIPCheck": "boolean",
+      "strictTimeout": "boolean",
+      "tickerGroup": "string",
+      "tickerPinned": "boolean",
+      "tradeLayout": "string"
+    }
+  },
+  "Wallet": {
+    "keys": [],
+    "types": {}
+  },
+  "Webhook": {
+    "keys": [
+      "id"
+    ],
+    "types": {
+      "id": "integer",
+      "created": "timestamp",
+      "userId": "integer",
+      "ownerId": "integer",
+      "url": "string"
+    }
+  }
+}
+
+
+附二 websocket API
+
+{
+  "info": "See https://www.bitmex.com/app/wsAPI and https://www.bitmex.com/explorer for more documentation.",
+  "usage": "Send a message in the format: {\"op\": string, \"args\": Array<string>}",
+  "ops": [
+    "authKey",
+    "authLogin",
+    "authToken",
+    "cancelAllAfter",
+    "subscribe"
+  ],
+  "subscribe": "To subscribe, send: {\"op\": \"subscribe\", \"args\": [subscriptionTopic, ...]}.",
+  "subscriptionSubjects": {
+    "authenticationRequired": [
+      "privateNotifications",
+      "account",
+      "wallet",
+      "affiliate",
+      "margin",
+      "position",
+      "transact",
+      "order",
+      "execution"
+    ],
+    "public": [
+      "announcement",
+      "connected",
+      "chat",
+      "publicNotifications",
+      "instrument",
+      "settlement",
+      "funding",
+      "insurance",
+      "liquidation",
+      "orderBookL2",
+      "orderBook",
+      "orderBook25",
+      "orderBook10",
+      "quote",
+      "trade",
+      "quoteBin1m",
+      "quoteBin5m",
+      "quoteBin1h",
+      "quoteBin1d",
+      "tradeBin1m",
+      "tradeBin5m",
+      "tradeBin1h",
+      "tradeBin1d"
+    ]
+  }
+}
+

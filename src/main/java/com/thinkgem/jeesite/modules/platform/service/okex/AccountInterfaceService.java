@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.platform.service;
+package com.thinkgem.jeesite.modules.platform.service.okex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.thinkgem.jeesite.modules.platform.constants.inter.InterConstants;
+import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
+import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
 
 
 /**
@@ -26,7 +27,7 @@ public class AccountInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_userinfo() throws Exception{
-		String url = InterConstants.PFUTURE_USERINFO_URL;
+		String url = OkexInterConstants.PFUTURE_USERINFO_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		return doPost(url, params);
 	}
@@ -39,7 +40,7 @@ public class AccountInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_position(String symbol, String contractType) throws Exception{
-		String url = InterConstants.PFUTURE_POSITION_URL;
+		String url = OkexInterConstants.PFUTURE_POSITION_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);
@@ -55,7 +56,7 @@ public class AccountInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_trades_history(String symbol, String date, Long since) throws Exception{
-		String url = InterConstants.PFUTURE_TRADES_HISTORY_URL;
+		String url = OkexInterConstants.PFUTURE_TRADES_HISTORY_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("date", date);
@@ -69,7 +70,7 @@ public class AccountInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_userinfo_4fix() throws Exception{
-		String url = InterConstants.PFUTURE_USERINFO_4FIX_URL;
+		String url = OkexInterConstants.PFUTURE_USERINFO_4FIX_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		return doPost(url, params);
 	}
@@ -83,7 +84,7 @@ public class AccountInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_position_4fix(String symbol, String contractType, String type) throws Exception{
-		String url = InterConstants.PFUTURE_POSITION_4FIX_URL;
+		String url = OkexInterConstants.PFUTURE_POSITION_4FIX_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);

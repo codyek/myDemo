@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.platform.service;
+package com.thinkgem.jeesite.modules.platform.service.okex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.thinkgem.jeesite.modules.platform.constants.inter.InterConstants;
+import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
+import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
 
 
 /**
@@ -35,7 +36,7 @@ public class OrderInterfaceService extends OkexBaseService{
 	public String future_trade(String symbol, String contractType,
 			String price, String amount, String type, String match_price,
 			String lever_rate) throws Exception {
-		String url = InterConstants.PFUTURE_TRADE_URL;
+		String url = OkexInterConstants.PFUTURE_TRADE_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);
@@ -65,7 +66,7 @@ public class OrderInterfaceService extends OkexBaseService{
 	 */
 	public String future_batch_trade(String symbol, String contractType,
 			String orders_data, String lever_rate) throws Exception {
-		String url = InterConstants.PFUTURE_BATCH_TRADE_URL;
+		String url = OkexInterConstants.PFUTURE_BATCH_TRADE_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);
@@ -83,7 +84,7 @@ public class OrderInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_cancel(String symbol, String contractType, String order_id) throws Exception{
-		String url = InterConstants.PFUTURE_CANCEL_URL;
+		String url = OkexInterConstants.PFUTURE_CANCEL_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);
@@ -104,7 +105,7 @@ public class OrderInterfaceService extends OkexBaseService{
 	 */
 	public String future_order_info(String symbol, String contractType,
 			String order_id, String status, String current_page, String page_length) throws Exception {
-		String url = InterConstants.PFUTURE_ORDER_INFO_URL;
+		String url = OkexInterConstants.PFUTURE_ORDER_INFO_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);
@@ -124,7 +125,7 @@ public class OrderInterfaceService extends OkexBaseService{
 	* @throws Exception
 	 */
 	public String future_orders_info(String symbol, String contractType, String order_id) throws Exception{
-		String url = InterConstants.PFUTURE_ORDERS_INFO_URL;
+		String url = OkexInterConstants.PFUTURE_ORDERS_INFO_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);
@@ -147,7 +148,7 @@ public class OrderInterfaceService extends OkexBaseService{
 			String status, Integer current_page, Integer page_number,
 			Integer page_length) throws Exception {
 		
-		String url = InterConstants.PFUTURE_EXPLOSIVE_URL;
+		String url = OkexInterConstants.PFUTURE_EXPLOSIVE_URL;
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("symbol", symbol);
 		params.put("contract_type", contractType);

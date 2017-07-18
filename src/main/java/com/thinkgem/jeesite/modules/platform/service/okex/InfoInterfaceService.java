@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.platform.service;
+package com.thinkgem.jeesite.modules.platform.service.okex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.thinkgem.jeesite.common.utils.HttpUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.platform.constants.inter.InterConstants;
+import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
+import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
 
 /**
  * 
@@ -41,7 +42,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (StringUtils.isNotEmpty(contractType)) {
 			params.put("contract_type", contractType);
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_TICKER_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_TICKER_URL, params);
 		System.out.println(result);
 		return result;
 	}
@@ -76,7 +77,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (null != merge) {
 			params.put("merge", String.valueOf(merge));
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_DEPTH_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_DEPTH_URL, params);
 		System.out.println(result);
 		return result;
 	}
@@ -100,7 +101,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (StringUtils.isNotEmpty(contractType)) {
 			params.put("contract_type", contractType);
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_TRADES_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_TRADES_URL, params);
 		System.out.println(result);
 		return result;
 	}
@@ -119,7 +120,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (StringUtils.isNotEmpty(symbol)) {
 			params.put("symbol", symbol);
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_INDEX_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_INDEX_URL, params);
 		System.out.println(result);
 		return result;
 	}
@@ -131,7 +132,7 @@ public class InfoInterfaceService extends OkexBaseService {
     */
     public String exchange_rate() throws Exception{
     	Map<String, String> params = new HashMap<String, String>();
-		String result = HttpUtils.httpsGet(InterConstants.GEXCHANGE_RATE_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GEXCHANGE_RATE_URL, params);
 		System.out.println(result);
 		return result;
     }
@@ -148,7 +149,7 @@ public class InfoInterfaceService extends OkexBaseService {
     	if (StringUtils.isNotEmpty(symbol)) {
 			params.put("symbol", symbol);
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_ESTIMATED_PRICE_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_ESTIMATED_PRICE_URL, params);
 		System.out.println(result);
 		return result;
     }
@@ -187,7 +188,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (null != since) {
 			params.put("merge", String.valueOf(since));
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_KLINE_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_KLINE_URL, params);
 		System.out.println(result);
 		return result;
     }
@@ -207,7 +208,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (StringUtils.isNotEmpty(contractType)) {
 			params.put("contract_type", contractType);
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_HOLD_AMOUNT_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_HOLD_AMOUNT_URL, params);
 		System.out.println(result);
 		return result;
     }
@@ -227,7 +228,7 @@ public class InfoInterfaceService extends OkexBaseService {
 		if (StringUtils.isNotEmpty(contractType)) {
 			params.put("contract_type", contractType);
 		}
-		String result = HttpUtils.httpsGet(InterConstants.GFUTURE_PRICE_LIMIT_URL, params);
+		String result = HttpUtils.httpsGet(OkexInterConstants.GFUTURE_PRICE_LIMIT_URL, params);
 		System.out.println(result);
 		return result;
     }
