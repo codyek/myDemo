@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>WebSocket Test</title>
+<!--
+	版本：1.0<br/>
+	作者：OKCoin<br/>
+-->
+<script type="text/javascript" src="MD5.js"></script>
+<script type="text/javascript">
+	var okCoinWebSocket = {};
+	okCoinWebSocket.init = function(uri, apiKey, secretKey) {
+		this.wsUri = uri;
+		this.apiKey = apiKey;
+		this.secretKey = secretKey;
+		this.lastHeartBeat = new Date().getTime();
+		this.overtime = 8000;
+		
+		okCoinWebSocket.websocket = new WebSocket(okCoinWebSocket.wsUri);
+		
+		okCoinWebSocket.websocket.onopen = function(evt) {
+			onOpen(evt)
+		};
+		okCoinWebSocket.websocket.onclose = function(evt) {
+			onClose(evt)
+		};
+		okCoinWebSocket.websocket.onmessage = function(evt) {
+			onMessage(evt)
+		};
+		okCoinWebSocket.websocket.onerror = function(evt) {
+			onError(evt)
+		};
+	}
+
+	function checkConnect() {
+		websocket.send("{'event':'ping'}");
+		if ((new Date().getTime() - okCoinWebSocket.lastHeartBeat) > okCoinWebSocket.overtime) {
+			onsole.log("socket 连接断开，正在尝试重新建立连接");
+			//testWebSocket();
+		}
+	}
+
+	function onOpen(evt) {
+		print("CONNECTED-11");
+
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotcny_btc_kline_1min'}");
+		//现货交易、合约交易测试
+		
+		//********                            测试数据                                                                 *******/
+		//////////////////现货行情//////////////////////////////////////////////////
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_ticker'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_ticker'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_depth_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_depth_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_depth_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_depth_60'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_trades'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_trades'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_btcusd_kline_3min'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_1min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_3min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_5min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_15min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_30min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_1hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_2hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_4hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_6hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_12hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_3day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_week'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_1min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_3min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_5min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_15min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_30min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_1hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_2hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_4hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_6hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_12hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_3day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_week'}");
+		//////////////////现货行情//////////////////////////////////////////////////
+		
+		//////////////合约行情//////////////////////////////////////////////////////
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_this_week'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_next_week'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_quarter'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_ticker_this_week'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_ticker_next_week'}");
+
+
+		doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_this_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_this_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_next_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_next_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_60'}");
+
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_this_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_this_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_next_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_next_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_quarter_20'}");
+
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_index'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_index'}");
+		//////////////合约行情//////////////////////////////////////////////////////
+	}
+	
+	function onClose(evt) {
+		print("DISCONNECTED");
+	}
+
+	function onMessage(e) {
+		console.log(new Date().getTime() + ": " + e.data)
+		var array = JSON.parse(e.data);
+
+		for (var i = 0; i < array.length; i++) {
+			for (var j = 0;j < array[i].length; j++) {
+				var isTrade = false;
+				var isCancelOrder = false;
+				
+				if (array[i][j] == 'ok_spotusd_trade' || array[i][j] == 'ok_spotcny_trade') {
+					isTrade = true;
+				} else if (array[i][j] == 'ok_spotusd_cancel_order'
+						|| array[i][j] == 'ok_spotcny_cancel_order') {
+					isCancelOrder = true;
+				}
+				
+				var order_id = array[i][j].order_id;
+				if (typeof (order_id) != 'undefined') {
+					if (isTrade) {
+						//下单成功 业务代码
+						console.log("orderId is  " + order_id);
+					} else if (isCancelOrder) {
+						//取消订单成功 业务代码
+						console.log("order  " + order_id + " is now cancled");
+					}
+				}
+			}
+		}
+
+		if (array.event == 'pong') {
+			okCoinWebSocket.lastHeartBeat = new Date().getTime();
+		} else {
+			createTable(array);
+		}
+	}
+
+	function onError(evt) {
+		print('<span style="color: red;">ERROR:</span> ' + evt.data);
+	}
+
+	function doSend(message) {
+		print("SENT: " + message);
+		okCoinWebSocket.websocket.send(message);
+	}
+
+	function print(message) {
+		var status = document.getElementById("status");
+		status.style.wordWrap = "break-word";
+		status.innerHTML += message + "<br/>";
+	}
+	
+	function createTable(array) {
+		var str = '<table id="tdata" border="1">\r\n<tr id="tr0">\r\n';
+		for ( var index in array[0]) {
+			str += '<th>' + index + '</th>\r\n';
+		}
+		str += '</tr>\r\n';
+
+		for ( var i = 0; i < array.length; i++) {
+			str += '<tr id="tr' + (i+1) + '">\r\n';
+			for ( var j in array[i]) {
+				str += '<td>' + JSON.stringify(array[i][j]) + '</td>\r\n';
+				//if(typeof array[i][j] == 'string' && array[i][j].indexOf("ok_") >= 0) {
+					//console.log(array[i][j]);
+				//}
+			}
+			str += '</tr>\r\n';
+		}
+		
+		str += '</table>\r\n';
+		document.getElementById("output").innerHTML = str;
+	}
+
+	//window.onload = okCoinWebSocket.init("wss://real.okex.com:10440/websocket/okexapi", "123", "321");
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	var okCoinWebSocketCh = {};
+	okCoinWebSocketCh.initCh = function(uri, apiKey, secretKey) {
+		this.wsUri = uri;
+		this.apiKey = apiKey;
+		this.secretKey = secretKey;
+		this.lastHeartBeat = new Date().getTime();
+		this.overtime = 8000;
+		
+		okCoinWebSocketCh.websocket = new WebSocket(okCoinWebSocketCh.wsUri);
+		
+		okCoinWebSocketCh.websocket.onopen = function(evt) {
+			onOpenCh(evt)
+		};
+		okCoinWebSocketCh.websocket.onclose = function(evt) {
+			onCloseCh(evt)
+		};
+		okCoinWebSocketCh.websocket.onmessage = function(evt) {
+			onMessageCh(evt)
+		};
+		okCoinWebSocketCh.websocket.onerror = function(evt) {
+			onErrorCh(evt)
+		};
+	}
+
+	function checkConnectCh() {
+		websocket.send("{'event':'ping'}");
+		if ((new Date().getTime() - okCoinWebSocketCh.lastHeartBeat) > okCoinWebSocketCh.overtime) {
+			onsole.log("socket 连接断开，正在尝试重新建立连接");
+			//testWebSocket();
+		}
+	}
+
+	function onOpenCh(evt) {
+		printCh("CONNECTED-CH 123");
+
+		doSendCh("{'event':'addChannel','channel':'ok_sub_spotcny_btc_kline_1min'}");
+		//现货交易、合约交易测试
+		
+		//********                            测试数据                                                                 *******/
+		//////////////////现货行情//////////////////////////////////////////////////
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_ticker'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_ticker'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_depth_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_depth_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_depth_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_depth_60'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_trades'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_trades'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_btcusd_kline_3min'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_1min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_3min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_5min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_15min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_30min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_1hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_2hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_4hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_6hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_12hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_3day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_btc_kline_week'}");
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_1min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_3min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_5min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_15min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_30min'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_1hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_2hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_4hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_6hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_12hour'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_3day'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_spotusd_ltc_kline_week'}");
+		//////////////////现货行情//////////////////////////////////////////////////
+		
+		//////////////合约行情//////////////////////////////////////////////////////
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_this_week'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_next_week'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_quarter'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_ticker_this_week'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_ticker_next_week'}");
+
+
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_this_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_this_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_next_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_next_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_60'}");
+
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_this_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_this_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_next_week_20'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_next_week_60'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_depth_quarter_20'}");
+
+		
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_index'}");
+		//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_ltc_index'}");
+		//////////////合约行情//////////////////////////////////////////////////////
+	}
+	
+	function onCloseCh(evt) {
+		printCh("ch  cccc");
+	}
+
+	function onMessageCh(e) {
+		console.log(new Date().getTime() + ": " + e.data)
+		var array = JSON.parse(e.data);
+
+		for (var i = 0; i < array.length; i++) {
+			for (var j = 0;j < array[i].length; j++) {
+				var isTrade = false;
+				var isCancelOrder = false;
+				
+				if (array[i][j] == 'ok_spotusd_trade' || array[i][j] == 'ok_spotcny_trade') {
+					isTrade = true;
+				} else if (array[i][j] == 'ok_spotusd_cancel_order'
+						|| array[i][j] == 'ok_spotcny_cancel_order') {
+					isCancelOrder = true;
+				}
+				
+				var order_id = array[i][j].order_id;
+				if (typeof (order_id) != 'undefined') {
+					if (isTrade) {
+						//下单成功 业务代码
+						console.log("orderId is  " + order_id);
+					} else if (isCancelOrder) {
+						//取消订单成功 业务代码
+						console.log("order  " + order_id + " is now cancled");
+					}
+				}
+			}
+		}
+
+		if (array.event == 'pong') {
+			okCoinWebSocketCh.lastHeartBeat = new Date().getTime();
+		} else {
+			createTableCh(array);
+		}
+	}
+
+	function onErrorCh(evt) {
+		printCh('<span style="color: red;">ERROR:</span> ' + evt.data);
+	}
+
+	function doSendCh(message) {
+		printCh("SENT: " + message);
+		okCoinWebSocketCh.websocket.send(message);
+	}
+
+	function printCh(message) {
+		var status = document.getElementById("statusCh");
+		status.style.wordWrap = "break-word";
+		status.innerHTML += message + "<br/>";
+	}
+	
+	function createTableCh(array) {
+		var str = '<table id="tdata" border="1">\r\n<tr id="tr0">\r\n';
+		for ( var index in array[0]) {
+			str += '<th>' + index + '</th>\r\n';
+		}
+		str += '</tr>\r\n';
+
+		for ( var i = 0; i < array.length; i++) {
+			str += '<tr id="tr' + (i+1) + '">\r\n';
+			for ( var j in array[i]) {
+				str += '<td>' + JSON.stringify(array[i][j]) + '</td>\r\n';
+				//if(typeof array[i][j] == 'string' && array[i][j].indexOf("ok_") >= 0) {
+					//console.log(array[i][j]);
+				//}
+			}
+			str += '</tr>\r\n';
+		}
+		
+		str += '</table>\r\n';
+		document.getElementById("outputCh").innerHTML = str;
+	}
+
+	function onStart(){
+		//okCoinWebSocket.init("wss://real.okex.com:10440/websocket/okexapi", "123", "321");
+		//okCoinWebSocketCh.initCh("wss://real.okcoin.cn:10440/websocket/okcoinapi", "123", "321");
+		
+	}
+	window.onload = onStart();
+</script>
+<body>
+<h2 id="th2">WebSocket Test</h2>
+<div id="status"></div>
+<div id="output"></div>
+
+<div id="statusCh"></div>
+<div id="outputCh"></div>
+</body>
+</html>

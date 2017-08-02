@@ -1,5 +1,8 @@
 package com.thinkgem.jeesite.modules.platform.web;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +18,7 @@ import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceSer
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.InfoInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
+import com.thinkgem.jeesite.modules.platform.socket.bitmex.WebsocketClientEndpoint;
 
 /**
  * inter测试Controller
@@ -169,5 +173,44 @@ public class InterTestController extends BaseController {
 		return "mex okkkkk!";
 	}
 	
+	@RequestMapping("websk")
+    public String websk(String name){
+		System.out.println("websk ====" + name);
+		
+		//String url = "wss://real.okcoin.cn:10440/websocket/okcoinapi";
+		String url = "wss://www.bitmex.com/realtime";
+		
+		//String msg = "{'event':'addChannel','channel':'ok_btccny_ticker'}";
+		//String msg = "{\"op\":\"help\"}";
+		String msg = "{\"op\":\"subscribe\",\"args\":[\"orderBookL2:XBTUSD\"]}";
+		try {
+			// open websocket
+			final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(
+					new URI(url));
+
+			// add listener
+			clientEndPoint
+					.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+						public void handleMessage(String message) {
+							System.out.println("return =" + message);
+						}
+					});
+
+			// send message to websocket
+			clientEndPoint.sendMessage(msg);
+
+			// wait 5 seconds for messages from websocket
+			Thread.sleep(5000);
+
+		} catch (InterruptedException ex) {
+			System.err.println("InterruptedException exception: "
+					+ ex.getMessage());
+		} catch (URISyntaxException ex) {
+			System.err.println("URISyntaxException exception: "
+					+ ex.getMessage());
+		}
+
+		return "success";
+	}
 			
 }
