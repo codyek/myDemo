@@ -13,15 +13,16 @@ public class MoniterTask extends TimerTask {
 	private int checkTime = 5000;
 	private WebSocketBase client = null;
 
+	public MoniterTask(WebSocketBase client) {
+		log.debug("TimerTask is starting.... ");
+		this.client = client;
+	}
+	
 	public void updateTime() {
 		log.debug("startTime is update");
 		startTime = System.currentTimeMillis();
 	}
 
-	public MoniterTask(WebSocketBase client) {
-		log.debug("TimerTask is starting.... ");
-		this.client = client;
-	}
 	
 	@Override
 	public void run() {

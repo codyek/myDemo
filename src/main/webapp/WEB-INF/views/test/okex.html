@@ -3,262 +3,15 @@
 	<meta charset="utf-8" />
 	<title>WebSocket中心</title>
 	<meta name="decorator" content="default"/>
+	<script src="okex.js" type="text/javascript"></script>
+	<link href="page.css" rel="stylesheet" />
 	<style type="text/css">
-	div, form, img, ul, ol, li, dl, dt, dd, option, td, th, video {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		list-style: none outside none;
-	}
-	.floatLeft{
-		float:left;
-	}
 	
-	.floatRight{
-		float:right;
-	}
-	.widthAll{
-		width:100%;
-	}
-	#main{
-		width:1180px;
-		padding-top:2px;
-		padding-bottom:6px;
-		margin:0 auto;
-	}
-	#entrust_okex{
-		width:25%;
-		border:1px solid #ddd;
-	}
-	#trade{
-		width:49%;
-		margin-left:0px;
-		
-	}
-	#entrust_mex{
-		width:25%;
-		margin-left:0px;
-		border:1px solid #ddd;
-	}
-	#sell{
-		color:rgb(255,0,0);
-	}
-	#buy{
-		color:rgb(0,255,0);
-	}
-	.titlePart{
-		background: #f1f1f1;
-		border-top: 1px solid #e6e6e6;
-		height: 22px;
-		line-height: 22px;
-	}
-	li{
-		border-bottom: 1px solid #e6e6e6;
-		cursor: pointer;
-	}
-	li span {
-		display: inline-block;
-		font-size: 12px;
-		width: 30%;
-		padding-left: 6px;
-		font-weight: normal;
-		float: left;
-	}
-	
-	li.listCont {
-		position: relative;
-		line-height:22px
-	}
-	.clear {
-		zoom: 1;
-		clear: both;
-	}
-	
-	#okex_price{
-		margin-left:6px;
-		display: inline-block;
-		border-top: 1px solid #e6e6e6;
-	}
-	#mex_price{
-		margin-left:6px;
-		display: inline-block;
-		border-top: 1px solid #e6e6e6;
-	}
-	
-	/*datalist*/
-	.datalist{
-		width:1000px;
-		height:70px;
-		margin:0 auto;
-	}
-	
-	.d_left{
-	width:49%;
-	height:360px;
-	float:left;
-	
-	}
-	.d_right{
-	width:49%;
-	height:360px;
-	float:right;
-	border:1px solid #ddd;
-	}
-	.l_left{
-	width:59%;
-	height:100%;
-	float:left;
-	border:1px solid #ddd;
-	}
-	.l_right{
-	width:39%;
-	height:100%;
-	float:right;
-	border:1px solid #ddd;
-	}
 	</style>
 	<script type="text/javascript">
 		
-		
-	
-			var okCoinWebSocket = {};
-			okCoinWebSocket.init = function(uri) {
-				this.wsUri = uri;
-				this.lastHeartBeat = new Date().getTime();
-				this.overtime = 8000;
-				
-				okCoinWebSocket.websocket = new WebSocket(okCoinWebSocket.wsUri);
-				
-				okCoinWebSocket.websocket.onopen = function(evt) {
-					onOpen(evt)
-				};
-				okCoinWebSocket.websocket.onclose = function(evt) {
-					onClose(evt)
-				};
-				okCoinWebSocket.websocket.onmessage = function(evt) {
-					onMessage(evt)
-				};
-				okCoinWebSocket.websocket.onerror = function(evt) {
-					onError(evt)
-				};
-				
-				//setInterval(checkConnect,5000);
-			}
-			
-			function onOpen(evt) {
-				print("CONNECTED--aa");
-
-				doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_this_week_20'}");
-				//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_this_week_60'}");
-				//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_next_week_20'}");
-				//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_next_week_60'}");
-				//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_20'}");
-				//doSend("{'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_60'}");
-			
-			}
-			
-			function onClose(evt) {
-				print("DISCONNECTED");
-			}
-			
-			function onMessage(e) {
-				//console.log(new Date().getTime() + ": " + e.data)
-				var array = JSON.parse(e.data);
-				var obj = array[0];
-				//asks(array):卖单
-				var asksArr = obj.data.asks;
-				var asks_len = asksArr.length;
-				for(var i = asks_len-1; i > 0; i--){
-					var ask = asksArr[i];
-					if(12==i){
-						var price = document.getElementById("okex_sell_price1");
-						var number = document.getElementById("okex_sell_number1");
-						price.innerHTML = ask[0];
-						number.innerHTML = ask[3];
-					}
-					if(11==i){
-						var price = document.getElementById("okex_sell_price2");
-						var number = document.getElementById("okex_sell_number2");
-						price.innerHTML = ask[0];
-						number.innerHTML = ask[3];
-					}
-					if(10==i){
-						var price = document.getElementById("okex_sell_price3");
-						var number = document.getElementById("okex_sell_number3");
-						price.innerHTML = ask[0];
-						number.innerHTML = ask[3];
-					}
-					if(9==i){
-						var price = document.getElementById("okex_sell_price4");
-						var number = document.getElementById("okex_sell_number4");
-						price.innerHTML = ask[0];
-						number.innerHTML = ask[3];
-					}
-					if(8==i){
-						var price = document.getElementById("okex_sell_price5");
-						var number = document.getElementById("okex_sell_number5");
-						price.innerHTML = ask[0];
-						number.innerHTML = ask[3];
-					}
-				}
-				
-				
-				//bids(array):买单
-				var bidsArr = obj.data.bids;
-				var bids_len = bidsArr.length;
-				for(var i = bids_len-1; i > 0; i--){
-					var bid = bidsArr[i];
-					if(12==i){
-						var price = document.getElementById("okex_buy_price1");
-						var number = document.getElementById("okex_buy_number1");
-						price.innerHTML = bid[0];
-						number.innerHTML = bid[3];
-					}
-					if(11==i){
-						var price = document.getElementById("okex_buy_price2");
-						var number = document.getElementById("okex_buy_number2");
-						price.innerHTML = bid[0];
-						number.innerHTML = bid[3];
-					}
-					if(10==i){
-						var price = document.getElementById("okex_buy_price3");
-						var number = document.getElementById("okex_buy_number3");
-						price.innerHTML = bid[0];
-						number.innerHTML = bid[3];
-					}
-					if(9==i){
-						var price = document.getElementById("okex_buy_price4");
-						var number = document.getElementById("okex_buy_number4");
-						price.innerHTML = bid[0];
-						number.innerHTML = bid[3];
-					}
-					if(8==i){
-						var price = document.getElementById("okex_buy_price5");
-						var number = document.getElementById("okex_buy_number5");
-						price.innerHTML = bid[0];
-						number.innerHTML = bid[3];
-					}
-				}
-				
-
-			}
-			
-			function onError(evt) {
-				print('<span style="color: red;">ERROR:</span> ' + evt.data);
-			}
-			function doSend(message) {
-				print("SENT: " + message);
-				okCoinWebSocket.websocket.send(message);
-			}
-			
-			function print(message) {
-				var status = document.getElementById("order_okex");
-				status.style.wordWrap = "break-word";
-				status.innerHTML = message + "<br/>";
-			}
-	
-					
 		window.onload = okCoinWebSocket.init("wss://real.okex.com:10440/websocket/okexapi");
+					
 	</script>
 </head>
 <body>
@@ -268,6 +21,7 @@
 			<div class="widthAll">
 				<span>　OKEX委托信息</span>
 			</div>
+			合约指数：<span id="okexIndex"></span>  连接状态：<span id="okexStatus">待连接</span>
 			<ul class="widthAll">
 				<li class="titlePart">
 					<span class="order"> 　</span>
@@ -276,21 +30,21 @@
 				</li>
 			</ul>
 			<ul id="sell">
-				<li id="depthli00" class="listCont clear"><span id="sell_order5" class="order">卖5</span><span id="okex_sell_price5" class="price">2,309.66</span><span id="okex_sell_number5" class="number">0.2164</span></li>
-				<li id="depthli00" class="listCont clear"><span id="sell_order4" class="order">卖4</span><span id="okex_sell_price4" class="price">2,309.66</span><span id="okex_sell_number4" class="number">0.2164</span></li>
-				<li id="depthli00" class="listCont clear"><span id="sell_order3" class="order">卖3</span><span id="okex_sell_price3" class="price">2,309.66</span><span id="okex_sell_number3" class="number">0.2164</span></li>
-				<li id="depthli00" class="listCont clear"><span id="sell_order2" class="order">卖2</span><span id="okex_sell_price2" class="price"></span><span id="okex_sell_number2" class="number"></span></li>
-				<li id="depthli00" class="listCont clear"><span id="sell_order1" class="order">卖1</span><span id="okex_sell_price1" class="price">2,309.66</span><span id="okex_sell_number1" class="number">0.2164</span></li>
+				<li id="depthli00" class="listCont clear"><span id="sell_order5" class="order">卖5</span><span id="okex_sell_price5" class="price">--</span><span id="okex_sell_number5" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="sell_order4" class="order">卖4</span><span id="okex_sell_price4" class="price">--</span><span id="okex_sell_number4" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="sell_order3" class="order">卖3</span><span id="okex_sell_price3" class="price">--</span><span id="okex_sell_number3" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="sell_order2" class="order">卖2</span><span id="okex_sell_price2" class="price">--</span><span id="okex_sell_number2" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="sell_order1" class="order">卖1</span><span id="okex_sell_price1" class="price">--</span><span id="okex_sell_number1" class="number">--</span></li>
 			</ul>
 			<div id="okex_price" class="widthAll">
-				<span> 当前价格</span>
+				<span> 当前价格 <span id="okexPrice"></span></span>
 			</div>
 			<ul id="buy" class="widthAll">
-				<li id="depthli00" class="listCont clear"><span id="buy_order1" class="order">买1</span><span id="okex_buy_price1" class="price">2,309.66</span><span id="okex_buy_number1" class="number">0.2164</span></li>
-				<li id="depthli00" class="listCont clear"><span id="buy_order2" class="order">买2</span><span id="okex_buy_price2" class="price">2,309.66</span><span id="okex_buy_number2" class="number">0.2164</span></li>
-				<li id="depthli00" class="listCont clear"><span id="buy_order3" class="order">买3</span><span id="okex_buy_price3" class="price"></span><span id="okex_buy_number3" class="number"></span></li>
-				<li id="depthli00" class="listCont clear"><span id="buy_order4" class="order">买4</span><span id="okex_buy_price4" class="price">2,309.66</span><span id="okex_buy_number4" class="number">0.2164</span></li>
-				<li id="depthli00" class="listCont clear"><span id="buy_order5" class="order">买5</span><span id="okex_buy_price5" class="price">2,309.66</span><span id="okex_buy_number5" class="number">0.2164</span></li>
+				<li id="depthli00" class="listCont clear"><span id="buy_order1" class="order">买1</span><span id="okex_buy_price1" class="price">--</span><span id="okex_buy_number1" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="buy_order2" class="order">买2</span><span id="okex_buy_price2" class="price">--</span><span id="okex_buy_number2" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="buy_order3" class="order">买3</span><span id="okex_buy_price3" class="price">--</span><span id="okex_buy_number3" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="buy_order4" class="order">买4</span><span id="okex_buy_price4" class="price">--</span><span id="okex_buy_number4" class="number">--</span></li>
+				<li id="depthli00" class="listCont clear"><span id="buy_order5" class="order">买5</span><span id="okex_buy_price5" class="price">--</span><span id="okex_buy_number5" class="number">--</span></li>
 			</ul>
 		</div>
 		<div id="trade" class="floatLeft">

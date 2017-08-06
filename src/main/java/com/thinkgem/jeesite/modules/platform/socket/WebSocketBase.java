@@ -51,11 +51,11 @@ public abstract class WebSocketBase {
 
 	public void start() {
 		if (url == null) {
-			log.info("WebSocketClient start error  url can not be null");
+			log.error("WebSocketClient start error  url can not be null");
 			return;
 		}
 		if (service == null) {
-			log.info("WebSocketClient start error  WebSocketService can not be null");
+			log.error("WebSocketClient start error  WebSocketService can not be null");
 			return;
 		}
 		moniter = new MoniterTask(this);
