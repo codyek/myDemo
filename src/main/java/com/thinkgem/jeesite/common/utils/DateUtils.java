@@ -1,9 +1,9 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.common.utils;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -20,6 +20,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		"yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
 		"yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
+	private static String sssFormat = "yyyyMMddhhmmssSSS";
 	/**
 	 * 得到当前日期字符串 格式（yyyy-MM-dd）
 	 */
@@ -54,6 +55,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		return formatDate(date, "yyyy-MM-dd HH:mm:ss");
 	}
 
+	/**
+	 * 得到日期时间字符串，转换格式（yyyyMMddHHmmss）
+	 */
+	public static String formatTimestampTime(Timestamp timestamp) {
+		DateFormat sdf = new SimpleDateFormat(sssFormat);
+		return sdf.format(timestamp);
+	}
+	
 	/**
 	 * 得到当前时间字符串 格式（HH:mm:ss）
 	 */

@@ -61,7 +61,7 @@ public abstract class WebSocketBase {
 		moniter = new MoniterTask(this);
 		this.connect();
 		timerTask = new Timer();
-		timerTask.schedule(moniter, 1000, 5000);
+		timerTask.schedule(moniter, 1000, 9000);
 	}
 
 	public void setStatus(boolean flag) {

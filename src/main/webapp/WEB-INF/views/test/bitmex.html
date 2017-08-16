@@ -146,15 +146,12 @@
 			}
 			
 			function onOpen(evt) {
-				print("CONNECTED--bb");
-				//doSend('{"help"}');
-				var obj = new Object();
-				obj.op = "help";
-				//doSend(obj);
-				doSend('{"op":"help"}');
+				console.log("onOpen--ok!");
 				//doSend('{"op":"subscribe","args":["trade:XBTUSD","instrument:XBTUSD"]}');
 				//doSend('{"op":"subscribe","args":["orderBookL2:XBTUSD"]}');
-			
+				//doSend('{"op":"ping","args":["trade:XBTUSD"]}');
+				doSend('ping');
+				//doSend('{"op":"subscribe","args":["instrument:XBTUSD","orderBook10:XBTUSD"]}');
 			}
 			
 			function onClose(evt) {
@@ -162,19 +159,50 @@
 			}
 			
 			function onMessage(e) {
-				console.log("11: " + e);
-				console.log("22: " + e.data);
-				var array = JSON.parse(e.data);
-				//var obj = array[0];
+				//console.log("onMessage: " + e.data);
 				print(e.data);
+				if('pong' == e.data){
+					return;
+				}
+				var json = JSON.parse(e.data);
+				var table = json.table;
+				if("instrument" == table){
+					// 产品的买卖价格,指数及交易量更新
+					var data = json.data[0];
+					showMexPriceAndIndex(data);
+				}
 				
+				if("orderBook10" == table){
+					// 委托列表首10层
+					var data = json.data[0];
+					getMexPriceData(data);
+				}
 
+			}
+			
+			// 显示价格,指数
+			function showMexPriceAndIndex(data){
+				if(undefined != data.lastPrice && "undefined" !=data.lastPrice && null != data.lastPrice){
+					// 当前价格
+					var mexPrice = document.getElementById("mexPrice");
+					mexPrice.innerHTML = data.lastPrice;
+				}
+				if(undefined != data.indicativeSettlePrice && "undefined" !=data.indicativeSettlePrice && null != data.indicativeSettlePrice){
+					// 指数
+					var mexIndex = document.getElementById("mexIndex");
+					mexIndex.innerHTML = data.indicativeSettlePrice;
+				}
+				/* if(undefined != data.fairPrice && "undefined" !=data.fairPrice && null != data.fairPrice){
+					// 合理价格
+					console.log("fairPrice : " + data.fairPrice);
+				} */
 			}
 			
 			function onError(evt) {
 				print('<span style="color: red;">ERROR:</span> ' + evt.data);
 			}
 			function doSend(message) {
+				console.log("doSend: " + message);
 				print("SENT: " + message);
 				okCoinWebSocket.websocket.send(message);
 			}
@@ -182,9 +210,84 @@
 			function print(message) {
 				var status = document.getElementById("order_okex");
 				status.style.wordWrap = "break-word";
-				status.innerHTML = message + "<br/>";
+				status.innerHTML += message + "<br/>";
 			}
 	
+			function getMexPriceData(data) {
+				//asks(array):卖单
+				var asksArr = data.asks;
+				var asks_len = asksArr.length;
+				for (var i = 0; i < asks_len; i++) {
+					var ask = asksArr[i];
+					if (0 == i) {
+						var price = document.getElementById("mex_sell_price1");
+						var number = document.getElementById("mex_sell_number1");
+						price.innerHTML = ask[0];
+						number.innerHTML = ask[1];
+					}
+					if (1 == i) {
+						var price = document.getElementById("mex_sell_price2");
+						var number = document.getElementById("mex_sell_number2");
+						price.innerHTML = ask[0];
+						number.innerHTML = ask[1];
+					}
+					if (2 == i) {
+						var price = document.getElementById("mex_sell_price3");
+						var number = document.getElementById("mex_sell_number3");
+						price.innerHTML = ask[0];
+						number.innerHTML = ask[1];
+					}
+					if (3 == i) {
+						var price = document.getElementById("mex_sell_price4");
+						var number = document.getElementById("mex_sell_number4");
+						price.innerHTML = ask[0];
+						number.innerHTML = ask[1];
+					}
+					if (4 == i) {
+						var price = document.getElementById("mex_sell_price5");
+						var number = document.getElementById("mex_sell_number5");
+						price.innerHTML = ask[0];
+						number.innerHTML = ask[1];
+					}
+				}
+			
+				//bids(array):买单
+				var bidsArr = data.bids;
+				var bids_len = bidsArr.length;
+				for ( var i = 0; i < bids_len; i++) {
+					var bid = bidsArr[i];
+					if (0 == i) {
+						var price = document.getElementById("mex_buy_price1");
+						var number = document.getElementById("mex_buy_number1");
+						price.innerHTML = bid[0];
+						number.innerHTML = bid[1];
+					}
+					if (1 == i) {
+						var price = document.getElementById("mex_buy_price2");
+						var number = document.getElementById("mex_buy_number2");
+						price.innerHTML = bid[0];
+						number.innerHTML = bid[1];
+					}
+					if (2 == i) {
+						var price = document.getElementById("mex_buy_price3");
+						var number = document.getElementById("mex_buy_number3");
+						price.innerHTML = bid[0];
+						number.innerHTML = bid[1];
+					}
+					if (3 == i) {
+						var price = document.getElementById("mex_buy_price4");
+						var number = document.getElementById("mex_buy_number4");
+						price.innerHTML = bid[0];
+						number.innerHTML = bid[1];
+					}
+					if (4 == i) {
+						var price = document.getElementById("mex_buy_price5");
+						var number = document.getElementById("mex_buy_number5");
+						price.innerHTML = bid[0];
+						number.innerHTML = bid[1];
+					}
+				}
+			}
 					
 		window.onload = okCoinWebSocket.init("wss://www.bitmex.com/realtime");
 	</script>
@@ -228,6 +331,7 @@
 			<div class="widthAll">
 				<span>　BITMEX委托信息</span>
 			</div>
+			合约指数：<span id="mexIndex"></span>  连接状态：<span id="mexStatus">待连接</span>
 			<ul class="widthAll">
 				<li class="titlePart">
 					<span class="order"> 　</span>
@@ -243,7 +347,7 @@
 				<li id="depthli00" class="listCont clear"><span id="sell_order1" class="order">卖1</span><span id="mex_sell_price1" class="price">2,309.66</span><span id="mex_sell_number1" class="number">0.2164</span></li>
 			</ul>
 			<div id="mex_price" class="widthAll">
-				<span> 当前价格</span>
+				<span> 当前价格 <span id="mexPrice"></span></span>
 			</div>
 			<ul id="buy" class="widthAll">
 				<li id="depthli00" class="listCont clear"><span id="buy_order1" class="order">买1</span><span id="mex_buy_price1" class="price">2,309.66</span><span id="mex_buy_number1" class="number">0.2164</span></li>

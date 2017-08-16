@@ -3,8 +3,8 @@
 
 	<diskStore path="../temp/jeesite/ehcache" />
 
-	<!-- 默认缓存配置. 自动失效：最后一次访问时间间隔300秒失效，若没有访问过自创建时间600秒失效。-->
-	<defaultCache maxEntriesLocalHeap="1000" eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="600"
+	<!-- 默认缓存配置. 自动失效：最后一次访问时间间隔3600秒失效，若没有访问过自创建时间3600秒失效。-->
+	<defaultCache maxEntriesLocalHeap="1000" eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600"
 		overflowToDisk="true" statistics="true"/>
 	
 	<!-- 系统缓存 -->
@@ -15,6 +15,9 @@
 	
 	<!-- 集团缓存 -->
 	<cache name="corpCache" maxEntriesLocalHeap="1000" eternal="true" overflowToDisk="true" statistics="true"/>
+	
+	<!-- 实时价格缓存 -->
+	<cache name="priceCache" maxEntriesLocalHeap="1000" eternal="true" overflowToDisk="true" statistics="true"/>
 	
 	<!-- 内容管理模块缓存 -->
 	<cache name="cmsCache" maxEntriesLocalHeap="1000" eternal="true" overflowToDisk="true" statistics="true"/>

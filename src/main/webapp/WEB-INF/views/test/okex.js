@@ -31,7 +31,6 @@
 			var text = '<span style="color: red;">断开</span> ' ;
 			showOkexStatus(text);
 			okCoinWebSocket.init("wss://real.okex.com:10440/websocket/okexapi");
-			//initAddChannel();
 		}
 	}
 	
@@ -55,24 +54,24 @@
 	}
 	
 	function onOpen(evt) {
-		print(">>　websocket opened .....");
+		//print(">>　websocket opened .....");
 		var text = '<span style="color: green;">已连接</span> ' ;
 		showOkexStatus(text);
 		initAddChannel();
 	}
 	
 	function onClose(evt) {
-		print(">> websocket close ----");
+		//print(">> websocket close ----");
 		var text = '<span style="color: red;">断开</span> ' ;
 		showOkexStatus(text);	
 	}
 	
 	function onMessage(msg) {
-		console.log(new Date().getTime() + ": " + msg.data);
-		var text = '<span style="color: green;">已连接</span> ' ;
-		showOkexStatus(text);
 		var array = JSON.parse(msg.data);
 		if (array.event == 'pong') {
+			console.log(new Date().getTime() + ": " + msg.data);
+			var text = '<span style="color: green;">已连接</span> ' ;
+			showOkexStatus(text);
 			okCoinWebSocket.lastHeartBeat = new Date().getTime();
 		} else {
 			var channel = array[0].channel;
@@ -92,13 +91,13 @@
 	}
 	
 	function onError(evt) {
-		print('<span style="color: red;">ERROR:</span> ' + evt.data);
+		//print('<span style="color: red;">ERROR:</span> ' + evt.data);
 		var text = '<span style="color: red;">连接异常</span> ' ;
 		showOkexStatus(text);	
 	}
 	
 	function doSend(message) {
-		print("SENT: " + message);
+		//print("SENT: " + message);
 		okCoinWebSocket.websocket.send(message);
 	}
 	

@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
@@ -174,16 +176,20 @@ public class InterTestController extends BaseController {
 	}
 	
 	@RequestMapping("websk")
+	@ResponseBody
     public String websk(String name){
 		System.out.println("websk ====" + name);
 		
 		//String url = "wss://real.okcoin.cn:10440/websocket/okcoinapi";
-		String url = "wss://www.bitmex.com/realtime";
+		//String url = "wss://www.bitmex.com/realtime";
 		
 		//String msg = "{'event':'addChannel','channel':'ok_btccny_ticker'}";
 		//String msg = "{\"op\":\"help\"}";
-		String msg = "{\"op\":\"subscribe\",\"args\":[\"orderBookL2:XBTUSD\"]}";
-		try {
+		//String msg = "{\"op\":\"subscribe\",\"args\":[\"orderBookL2:XBTUSD\"]}";
+		/*String msg = "{\"op\":\"subscribe\",\"args\":[\"instrument:XBTUSD\"," +
+				"\"instrument:XBTU17\"," +
+				"\"instrument:LTCU17\"]}";*/
+		/*try {
 			// open websocket
 			final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(
 					new URI(url));
@@ -200,7 +206,10 @@ public class InterTestController extends BaseController {
 			clientEndPoint.sendMessage(msg);
 
 			// wait 5 seconds for messages from websocket
-			Thread.sleep(5000);
+			while (true) {
+				Thread.sleep(5000);
+				clientEndPoint.sendMessage("ping");
+			}
 
 		} catch (InterruptedException ex) {
 			System.err.println("InterruptedException exception: "
@@ -208,9 +217,21 @@ public class InterTestController extends BaseController {
 		} catch (URISyntaxException ex) {
 			System.err.println("URISyntaxException exception: "
 					+ ex.getMessage());
+		}*/
+		Object obj = new Object();
+		if("btc".equals(name)){
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
+		}else if("ltc".equals(name)){
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_LTCOKEX_PRICE_KEY);
+		}else if("xbt".equals(name)){
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_XBTUSDMEX_PRICE_KEY);
+		}else if("xbtu17".equals(name)){
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_XBTU17MEX_PRICE_KEY);
+		}else if("ltcu17".equals(name)){
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_LTCU17MEX_PRICE_KEY);
+			
 		}
-
-		return "success";
+		return obj.toString();
 	}
 			
 }

@@ -10,8 +10,12 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @ClientEndpoint
 public class WebsocketClientEndpoint {
+	private Logger log = LoggerFactory.getLogger(getClass());
 
 	Session userSession = null;
     private MessageHandler messageHandler;
@@ -19,10 +23,11 @@ public class WebsocketClientEndpoint {
     public WebsocketClientEndpoint(URI endpointURI) {
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            container.setDefaultMaxBinaryMessageBufferSize(204800);
-            container.setDefaultMaxTextMessageBufferSize(204800);  // 200k
+            container.setDefaultMaxBinaryMessageBufferSize(512000);
+            container.setDefaultMaxTextMessageBufferSize(512000);  // 500k
             container.connectToServer(this, endpointURI);
         } catch (Exception e) {
+        	log.error(">> WebsocketClientEndpoint init error ",e);
             throw new RuntimeException(e);
         }
     }
@@ -34,7 +39,7 @@ public class WebsocketClientEndpoint {
      */
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket");
+    	log.info(">> opening Mex websocket");
         this.userSession = userSession;
     }
 
@@ -46,7 +51,7 @@ public class WebsocketClientEndpoint {
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-        System.out.println("closing websocket" +" userSession="+userSession+"  ,reason="+reason);
+    	log.info(">> closing Mex websocket" +" userSession="+userSession+"  ,reason="+reason);
         this.userSession = null;
     }
 
@@ -82,8 +87,6 @@ public class WebsocketClientEndpoint {
 
     /**
      * Message handler.
-     *
-     * @author Jiji_Sasidharan
      */
     public static interface MessageHandler {
 

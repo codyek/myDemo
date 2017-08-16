@@ -34,6 +34,11 @@
 		<cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"/>
     </cache>
     
+    <!-- 实时价格缓存 -->
+	<cache name="priceCache" maxEntriesLocalHeap="1000" eternal="true" overflowToDisk="true" statistics="true">
+		<cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"/>
+    </cache>
+    
 	<!-- 内容管理模块缓存 -->
 	<cache name="cmsCache" maxEntriesLocalHeap="100" eternal="true" overflowToDisk="true" statistics="true">
 		<cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"/>
