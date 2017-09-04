@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.trade.BitMonitorDao">
+    
+	<sql id="bitMonitorColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.open_time AS "openTime",
+		a.close_time AS "closeTime",
+		a.status_flag AS "statusFlag",
+		a.user_id AS "user.id",
+		a.thread_id AS "threadId",
+		a.open_order_qty AS "openOrderQty",
+		a.close_order_qty AS "closeOrderQty",
+		a.new_time AS "newTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u6.name AS "user.name"
+	</sql>
+	
+	<sql id="bitMonitorJoins">
+		LEFT JOIN sys_user u6 ON u6.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="BitMonitor">
+		SELECT 
+			<include refid="bitMonitorColumns"/>
+		FROM bit_monitor a
+		<include refid="bitMonitorJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BitMonitor">
+		SELECT 
+			<include refid="bitMonitorColumns"/>
+		FROM bit_monitor a
+		<include refid="bitMonitorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="openTime != null and openTime != ''">
+				AND a.open_time = #{openTime}
+			</if>
+			<if test="closeTime != null and closeTime != ''">
+				AND a.close_time = #{closeTime}
+			</if>
+			<if test="statusFlag != null and statusFlag != ''">
+				AND a.status_flag = #{statusFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BitMonitor">
+		SELECT 
+			<include refid="bitMonitorColumns"/>
+		FROM bit_monitor a
+		<include refid="bitMonitorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_monitor(
+			id,
+			code,
+			open_time,
+			close_time,
+			status_flag,
+			user_id,
+			thread_id,
+			open_order_qty,
+			close_order_qty,
+			new_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{openTime},
+			#{closeTime},
+			#{statusFlag},
+			#{user.id},
+			#{threadId},
+			#{openOrderQty},
+			#{closeOrderQty},
+			#{newTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_monitor SET 	
+			code = #{code},
+			open_time = #{openTime},
+			close_time = #{closeTime},
+			status_flag = #{statusFlag},
+			user_id = #{user.id},
+			thread_id = #{threadId},
+			open_order_qty = #{openOrderQty},
+			close_order_qty = #{closeOrderQty},
+			new_time = #{newTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_monitor SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

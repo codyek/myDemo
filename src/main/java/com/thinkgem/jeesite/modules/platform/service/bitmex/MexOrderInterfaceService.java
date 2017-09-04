@@ -24,12 +24,12 @@ public class MexOrderInterfaceService extends MexBaseService{
 	
 	/**
 	* 创建新订单
-	* @param symbol XBTUSD：比特币， ltc_usd：莱特币
-    * @param ordType 合约类型。this_week：当周；next_week：下周；quarter：季度
+	* @param symbol XBTUSD：比特币，
+    * @param ordType 订单类型。：市场，限制，停止，停止限制，市场交易
     * @param price 价格
     * @param orderQty 委托数量
-    * @param side 1:开多   2:开空   3:平多   4:平空
-    * @param text 杠杆倍数 value:10\20 默认10
+    * @param side Buy, Sell.
+    * @param text 
 	* @return String
 	* @throws Exception
 	 */

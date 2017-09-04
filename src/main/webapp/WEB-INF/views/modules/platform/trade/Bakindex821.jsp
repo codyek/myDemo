@@ -61,11 +61,16 @@
 				<tr>
 					<th>OKEX与XBTUSD</th>
 					<th id="OKEXAndXBTUSD"></th>
-					<th></th>
+				</tr>
+				<tr>
+					<th>OKEX与XBTU17</th>
+					<th id="OKEXAndXBTU17"></th>
+				</tr>
+				<tr>
+					<th>XBTUSD与XBTU17</th>
+					<th id="XBTUSDAndXBTU17"></th>
 				</tr>
 			</thead>
-			<tfoot id="zailist"></tfoot>
-			<tbody id="kuanlist"></tbody>
 			</table>
 		</div>
 		<div id="entrust_mex" class="floatLeft">
@@ -112,8 +117,6 @@
 	var app = {};
 	option = null;
 	var priceData = null;
-	var showMax = 0;
-	var showMin = 0;
 	
 	$(document).ready(function() {
 		var d = new Date();
@@ -132,8 +135,8 @@
 		//mexWebSocket.init("wss://www.bitmex.com/realtime");
 	});
 	
-	// 间隔时间，10分钟内出现只算一次
-	var intervalTime = 10*60;
+	
+	
 	//统计数据
 	function totalMaxAndMin(){
 		var data = priceData;
@@ -148,9 +151,9 @@
 			var agio = obj.okToUSDAgio;
 			var time = obj.time;
 			// 窄
-			if(0 < agio && agio < 6){
-				if(time -intervalTime > zaiTime){
-					//console.log("intervalTime= "+intervalTime+"  ,time="+time+"  ,zaiTime="+zaiTime);
+			if(0 < agio && agio < 8){
+				// 60秒内出现只算一次
+				if(time -60 > zaiTime){
 					zaiText += "<tr><td>"+agio+"</td><td>"+time+"</td><td>"+intZ+"</td></tr>";
 					zaiTime = time;
 					intZ ++;
@@ -158,16 +161,16 @@
 			}
 			
 			// 宽	
-			if(agio > (showMax - 3)){
-				if(time -intervalTime > kuanTime){
-					//console.log("intervalTime= "+intervalTime+"  ,time="+time+"  ,zaiTime="+zaiTime);
+			if(agio > (max - 5)){
+				if(time -60 > kuanTime){
 					kuanText += "<tr><td>"+agio+"</td><td>"+time+"</td><td>"+intK+"</td></tr>";
-					kuanTime = time;
+					zaiTime = time;
 					intK ++;
 				}
 			}
 		}
 		
+		$("#showText").html(text);
 		$("#zailist").html(zaiText);
 		$("#kuanlist").html(kuanText);
 		
@@ -186,20 +189,29 @@
 		    var PriceTime = [];
 		    var okdata = [];
 		    var usddata = [];
+		    var u17data = [];
 		    var okToUSDAgio = [];
+		    var okToU17Agio = [];
+		    var usdToU17Agio = [];
 		    for (var i = 0; i < rawData.length; i++) {
 		    	var obj = rawData[i];
 		    	PriceTime.push(obj.time);
 		    	okdata.push(obj.okPrice);
 		    	usddata.push(obj.mexUSDPrice);
+		    	u17data.push(obj.mexU17Price);
 		    	okToUSDAgio.push(obj.okToUSDAgio);
+		    	okToU17Agio.push(obj.okToU17Agio);
+		    	usdToU17Agio.push(obj.usdToU17Agio);
 		    }
 
 		    return {
 		    	PriceTime: PriceTime,
 		    	okdata: okdata,
 		    	usddata: usddata,
-		    	okToUSDAgio: okToUSDAgio
+		    	u17data: u17data,
+		    	okToUSDAgio: okToUSDAgio,
+		    	okToU17Agio: okToU17Agio,
+		    	usdToU17Agio: usdToU17Agio
 		    };
 		} 
 		// 数字排序
@@ -223,8 +235,8 @@
 				average = sum/count;
 				average = fomatFloat(average,2);
 			}
-			showMax = max;
-			showMin = min;
+			var showMax = max;
+			var showMin = min;
 			if(max < 0 && max < min){
 				showMax = min;
 				showMin = max;
@@ -251,7 +263,7 @@
 				        }
 				    },
 				    legend: {
-				        data:['OKEX','XBTUSD']
+				        data:['OKEX','XBTUSD','XBTU17']
 				    },
 				    grid: {
 				        left: '10%',
@@ -307,19 +319,30 @@
 				            lineStyle: {
 				                normal: {opacity: 0.5}
 				            }
+				        },
+				        {
+				            name:'XBTU17',
+				            type:'line',
+				            smooth: true,
+				            data:data.u17data,
+				            lineStyle: {
+				                normal: {opacity: 0.5}
+				            }
 				        }
 				    ]	
 				}, true);
 			//统计数据
 			$("#OKEXAndXBTUSD").html(total(data.okToUSDAgio));
+			$("#OKEXAndXBTU17").html(total(data.okToU17Agio));
+			$("#XBTUSDAndXBTU17").html(total(data.usdToU17Agio));
 		}
 			
 		function getAllData(){
 			var sdate = $("#sdate").val();
 		    var edate = $("#edate").val();
 			var obj = new Object();
-			obj.startDt = sdate;
-			//obj.startDt = "2017-08-20 22:20:00";
+			//obj.startDt = sdate;
+			obj.startDt = "2017-08-20 22:20:00";
 			obj.endDt = edate;
 			$("#container").mLoading("show");//显示loading组件
 			var url = "getBtcPriceData";

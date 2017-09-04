@@ -21,7 +21,7 @@ public class BitMexInterConstants {
 	protected static Logger logger = LoggerFactory.getLogger(BitMexInterConstants.class);
 	
 	/** 交易平台  */
-	private final static String PLATFORM_CODE = "bitmex";
+	public final static String PLATFORM_CODE = "bitmex";
 	
 	/** 交易平台域名地址字典  默认 https://www.bitmex.com  */
 	private final static String URL_PREX_TYPE = "bit_url_prex";

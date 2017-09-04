@@ -21,7 +21,7 @@ public class OkexInterConstants {
 	protected static Logger logger = LoggerFactory.getLogger(OkexInterConstants.class);
 	
 	/** 交易平台  */
-	private final static String PLATFORM_CODE = "okex";
+	public final static String PLATFORM_CODE = "okex";
 	
 	/** 交易平台域名地址字典  默认 https://www.okex.com  */
 	private final static String URL_PREX_TYPE = "bit_url_prex";

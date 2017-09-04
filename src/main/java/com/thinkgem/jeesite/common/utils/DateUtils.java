@@ -179,6 +179,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		return (afterTime - beforeTime) / (1000 * 60 * 60 * 24);
 	}
 	
+	/** 
+	 * 获取时间戳作为 code
+	* @return Long
+	 */
+	public static String getSysTimeMillisCode(){
+		return String.valueOf(System.currentTimeMillis());
+	}
+	
 	/**
 	 * @param args
 	 * @throws ParseException

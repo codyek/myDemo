@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.trade.BitTradeDao">
+    
+	<sql id="bitTradeColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.user_id AS "user.id",
+		a.monitor_code AS "monitorCode",
+		a.type_flag AS "typeFlag",
+		a.max_agio AS "maxAgio",
+		a.min_agio AS "minAgio",
+		a.symbol_a AS "symbolA",
+		a.symbol_b AS "symbolB",
+		a.deposit_rate_a AS "depositRateA",
+		a.deposit_rate_b AS "depositRateB",
+		a.open_barn_time AS "openBarnTime",
+		a.close_barn_time AS "closeBarnTime",
+		a.revenue AS "revenue",
+		a.fee AS "fee",
+		a.profit AS "profit",
+		a.if_close AS "ifClose",
+		a.if_burst_barn AS "ifBurstBarn",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name"
+	</sql>
+	
+	<sql id="bitTradeJoins">
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="BitTrade">
+		SELECT 
+			<include refid="bitTradeColumns"/>
+		FROM bit_trade a
+		<include refid="bitTradeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByCode" resultType="BitTrade">
+		SELECT 
+			<include refid="bitTradeColumns"/>
+		FROM bit_trade a
+		<include refid="bitTradeJoins"/>
+		WHERE a.code = #{code}
+	</select>
+	
+	<select id="findList" resultType="BitTrade">
+		SELECT 
+			<include refid="bitTradeColumns"/>
+		FROM bit_trade a
+		<include refid="bitTradeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="monitorCode != null and monitorCode != ''">
+				AND a.monitor_code = #{monitorCode}
+			</if>
+			<if test="openBarnTime != null and openBarnTime != ''">
+				AND a.open_barn_time = #{openBarnTime}
+			</if>
+			<if test="closeBarnTime != null and closeBarnTime != ''">
+				AND a.close_barn_time = #{closeBarnTime}
+			</if>
+			<if test="ifClose != null and ifClose != ''">
+				AND a.if_close = #{ifClose}
+			</if>
+			<if test="ifBurstBarn != null and ifBurstBarn != ''">
+				AND a.if_burst_barn = #{ifBurstBarn}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BitTrade">
+		SELECT 
+			<include refid="bitTradeColumns"/>
+		FROM bit_trade a
+		<include refid="bitTradeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_trade(
+			id,
+			code,
+			user_id,
+			monitor_code,
+			type_flag,
+			max_agio,
+			min_agio,
+			symbol_a,
+			symbol_b,
+			deposit_rate_a,
+			deposit_rate_b,
+			open_barn_time,
+			close_barn_time,
+			revenue,
+			fee,
+			profit,
+			if_close,
+			if_burst_barn,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{user.id},
+			#{monitorCode},
+			#{typeFlag},
+			#{maxAgio},
+			#{minAgio},
+			#{symbolA},
+			#{symbolB},
+			#{depositRateA},
+			#{depositRateB},
+			#{openBarnTime},
+			#{closeBarnTime},
+			#{revenue},
+			#{fee},
+			#{profit},
+			#{ifClose},
+			#{ifBurstBarn},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_trade SET 	
+			code = #{code},
+			user_id = #{user.id},
+			monitor_code = #{monitorCode},
+			type_flag = #{typeFlag},
+			max_agio = #{maxAgio},
+			min_agio = #{minAgio},
+			symbol_a = #{symbolA},
+			symbol_b = #{symbolB},
+			deposit_rate_a = #{depositRateA},
+			deposit_rate_b = #{depositRateB},
+			open_barn_time = #{openBarnTime},
+			close_barn_time = #{closeBarnTime},
+			revenue = #{revenue},
+			fee = #{fee},
+			profit = #{profit},
+			if_close = #{ifClose},
+			if_burst_barn = #{ifBurstBarn},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_trade SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

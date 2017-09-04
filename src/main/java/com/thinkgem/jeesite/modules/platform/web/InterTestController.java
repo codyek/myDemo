@@ -2,18 +2,27 @@ package com.thinkgem.jeesite.modules.platform.web;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.mongodb.model.LtcTradeData;
+import com.thinkgem.jeesite.modules.mongodb.service.LtcTradeDataInterface;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
@@ -232,6 +241,48 @@ public class InterTestController extends BaseController {
 			
 		}
 		return obj.toString();
+	}
+	
+	@Autowired
+	private LtcTradeDataInterface ltcTradeData;
+	
+	@RequestMapping(value = "postPriceLtc")
+	@ResponseBody
+	public JSONArray taskPostLtc(String startDt, String endDt) throws Exception {
+		logger.info(">>>-- postPrice LTC  input="+ startDt + " , " +endDt);
+		if(null != startDt && null != endDt){
+			long start = Long.parseLong(
+					DateUtils.formatDate(
+							DateUtils.parseDate(startDt), "yyyyMMddHHmmss"));
+			long end = Long.parseLong(
+					DateUtils.formatDate(
+							DateUtils.parseDate(endDt), "yyyyMMddHHmmss"));
+			logger.info(">>>-- postPrice LTC  start="+ start + " , end=" +end);
+			Direction direction = Direction.ASC;
+			List<LtcTradeData> list = ltcTradeData.findByTimeBetween(start, end,new Sort(direction,"time"));
+			JSONArray arr = JSONArray.parseArray(JSON.toJSONString(list));
+	        return arr;
+		}else{
+			return null;
+		}
+	}
+	
+	@RequestMapping(value = "postPriceLtcOne")
+	@ResponseBody
+	public JSONArray taskPostLtcOne(String date) throws Exception {
+		logger.info(">>>-- postPrice LTC  input="+ date);
+		if(null != date){
+			long start = Long.parseLong(date);
+			logger.info(">>>-- postPrice LTC  start="+ start);
+			Direction direction = Direction.ASC;
+			//List<LtcTradeData> list = ltcTradeData.findByTimeBetween(start, end,new Sort(direction,"time"));
+			PageRequest pageable = new PageRequest(0,1,new Sort(direction,"time"));
+			List<LtcTradeData> list = ltcTradeData.findByTimePageable(start, pageable);
+			JSONArray arr = JSONArray.parseArray(JSON.toJSONString(list));
+	        return arr;
+		}else{
+			return null;
+		}
 	}
 			
 }

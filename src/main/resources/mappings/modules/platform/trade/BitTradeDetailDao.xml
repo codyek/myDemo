@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.trade.BitTradeDetailDao">
+    
+	<sql id="bitTradeDetailColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.trade_code AS "tradeCode",
+		a.detail_type AS "detailType",
+		a.platform AS "platform",
+		a.symbol AS "symbol",
+		a.lever AS "lever",
+		a.amount AS "amount",
+		a.direction AS "direction",
+		a.position AS "position",
+		a.deposit AS "deposit",
+		a.price AS "price",
+		a.price_amount AS "priceAmount",
+		a.monitor_pice AS "monitorPice",
+		a.burst_pice AS "burstPice",
+		a.status_flag AS "statusFlag",
+		a.if_burst_barn AS "ifBurstBarn",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bitTradeDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="BitTradeDetail">
+		SELECT 
+			<include refid="bitTradeDetailColumns"/>
+		FROM bit_trade_detail a
+		<include refid="bitTradeDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByCode" resultType="BitTradeDetail">
+		SELECT 
+			<include refid="bitTradeDetailColumns"/>
+		FROM bit_trade_detail a
+		<include refid="bitTradeDetailJoins"/>
+		WHERE a.code = #{code}
+	</select>
+	
+	<select id="findList" resultType="BitTradeDetail">
+		SELECT 
+			<include refid="bitTradeDetailColumns"/>
+		FROM bit_trade_detail a
+		<include refid="bitTradeDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="tradeCode != null and tradeCode != ''">
+				AND a.trade_code = #{tradeCode}
+			</if>
+			<if test="statusFlag != null and statusFlag != ''">
+				AND a.status_flag = #{statusFlag}
+			</if>
+			<if test="ifBurstBarn != null and ifBurstBarn != ''">
+				AND a.if_burst_barn = #{ifBurstBarn}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BitTradeDetail">
+		SELECT 
+			<include refid="bitTradeDetailColumns"/>
+		FROM bit_trade_detail a
+		<include refid="bitTradeDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_trade_detail(
+			id,
+			code,
+			trade_code,
+			detail_type,
+			platform,
+			symbol,
+			lever,
+			amount,
+			direction,
+			position,
+			deposit,
+			price,
+			price_amount,
+			monitor_pice,
+			burst_pice,
+			status_flag,
+			if_burst_barn,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{tradeCode},
+			#{detailType},
+			#{platform},
+			#{symbol},
+			#{lever},
+			#{amount},
+			#{direction},
+			#{position},
+			#{deposit},
+			#{price},
+			#{priceAmount},
+			#{monitorPice},
+			#{burstPice},
+			#{statusFlag},
+			#{ifBurstBarn},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_trade_detail SET 	
+			code = #{code},
+			trade_code = #{tradeCode},
+			detail_type = #{detailType},
+			platform = #{platform},
+			symbol = #{symbol},
+			lever = #{lever},
+			amount = #{amount},
+			direction = #{direction},
+			position = #{position},
+			deposit = #{deposit},
+			price = #{price},
+			price_amount = #{priceAmount},
+			monitor_pice = #{monitorPice},
+			burst_pice = #{burstPice},
+			status_flag = #{statusFlag},
+			if_burst_barn = #{ifBurstBarn},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_trade_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
