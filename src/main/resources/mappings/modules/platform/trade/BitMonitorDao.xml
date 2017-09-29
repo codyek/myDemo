@@ -34,6 +34,14 @@
 		WHERE a.id = #{id}
 	</select>
 	
+	<select id="getByCode" resultType="BitMonitor">
+		SELECT 
+			<include refid="bitMonitorColumns"/>
+		FROM bit_monitor a
+		<include refid="bitMonitorJoins"/>
+		WHERE a.code = #{code}
+	</select>
+	
 	<select id="findList" resultType="BitMonitor">
 		SELECT 
 			<include refid="bitMonitorColumns"/>
@@ -49,6 +57,9 @@
 			</if>
 			<if test="closeTime != null and closeTime != ''">
 				AND a.close_time = #{closeTime}
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
 			</if>
 			<if test="statusFlag != null and statusFlag != ''">
 				AND a.status_flag = #{statusFlag}

@@ -55,6 +55,14 @@ public class TradeController extends BaseController {
 	}
 	
 	@RequiresPermissions("platform:trade:view")
+	@RequestMapping(value = {"xbtUsdPage", ""})
+	public String btcAndXbtUsdPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+		TradeTaskReq req = new TradeTaskReq();
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/hedge/xbtusd";
+	}
+	
+	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"testPage", ""})
 	public String testPage(TradeTaskReq req, Model model) {
 		model.addAttribute("TradeTaskReq", req);
@@ -64,7 +72,8 @@ public class TradeController extends BaseController {
 	@RequestMapping(value = "getBtcPriceData")
 	@ResponseBody
 	public JSONArray getPriceData(String startDt, String endDt){
-		String url = "http://115.126.39.71:8088/BtcDataQuery/task/postPrice.do"; 
+		//String url = "http://115.126.39.71:8088/BtcDataQuery/task/postPrice.do"; 
+		String url = "http://localhost:8088/BtcDataQuery/task/postPrice.do"; 
 		Map<String,String> params = new HashMap<String,String>(); 
 		params.put("startDt", startDt);
 		params.put("endDt", endDt);
@@ -73,13 +82,11 @@ public class TradeController extends BaseController {
 	}
 	
 	/**
-	 * 
 	* @Title: startJob
-	* @param @param maxAgio 最大差价（开仓差价）
-	* @param @param minAgio 最小差价（平仓差价）
-	* @param @param lever 杠杆
-	* @param @param margin 保证金
-	* @param @return
+	* @param  maxAgio 最大差价（开仓差价）
+	* @param  minAgio 最小差价（平仓差价）
+	* @param  lever 杠杆
+	* @param   保证金率
 	* @return String
 	* @throws
 	 */
@@ -105,5 +112,45 @@ public class TradeController extends BaseController {
 		
 		return msg;
 	}
+	
+	/**
+	* @Title: updateData
+	* @param  maxAgio 最大差价（开仓差价）
+	* @param  minAgio 最小差价（平仓差价）
+	* @param   保证金率
+	* @return String
+	 */
+	@RequestMapping(value = "updateData")
+	@ResponseBody
+	public String updateData(TradeTaskReq req){
+		// 入参验证
+		if(null == req
+			|| StringUtils.isBlank(req.getSymbolA())
+			|| StringUtils.isBlank(req.getSymbolB())
+			|| StringUtils.isBlank(req.getType())
+			|| null == req.getDepositA()
+			|| null == req.getDepositB()
+			|| null == req.getLeverA()
+			|| null == req.getLeverB()
+			|| null == req.getMaxAgio()
+			|| null == req.getMinAgio()
+			){
+			return "fail input check";
+		}
+		// 调service
+		String msg = totalControlService.updateData(req);
+		return msg;
+	}
 			
+	/**
+	* @Title: stopJob
+	* @return String
+	 */
+	@RequestMapping(value = "stopJob")
+	@ResponseBody
+	public String stopJob(){
+		// 调service
+		String msg = totalControlService.stopJob();
+		return msg;
+	}
 }

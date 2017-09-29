@@ -1,6 +1,5 @@
 package com.thinkgem.jeesite.modules.platform.socket.bitmex;
 
-import java.net.URISyntaxException;
 import java.util.TimerTask;
 
 import org.slf4j.Logger;
@@ -17,28 +16,25 @@ public class MexMoniterTask extends TimerTask {
 	private MexTask client = null;
 
 	public MexMoniterTask(MexTask client) {
-		log.debug("MexMoniterTask TimerTask is starting.... ");
+		log.info("MexMoniterTask TimerTask is starting...");
 		this.client = client;
 	}
 	
 	public void updateTime() {
-		log.debug("startTime is update");
+		log.debug("mex startTime is update");
 		startTime = System.currentTimeMillis();
 	}
 
 	
 	@Override
 	public void run() {
+		log.debug(">>>  mex MexMoniterTask running....... ");
 		if (System.currentTimeMillis() - startTime > checkTime) {
-			log.debug("Moniter reconnect....... ");
-			try {
-				client.connect();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
+			log.info("mex Moniter reconnect...");
+			client.reconnect();
 		}
 		client.sentPing();
-		log.debug("Moniter ping data sent.... ");
+		log.debug("mex Moniter ping data sent...");
 	}
 
 }

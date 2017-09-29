@@ -74,6 +74,14 @@ public class BitMexInterConstants {
 	/**  获取您帐户的保证金状态  */
 	public static String GET_USER_MARGIN_URL;
 	
+	private static String GET_USER_WALLET_CODE = "get_user_wallet";
+	/**  获取您当前的钱包信息  */
+	public static String GET_USER_WALLET_URL;
+	
+	private static String POST_POSITION_LEVERAGE_CODE = "post_position_leverage";
+	/**  选择一个仓位的杠杆  */
+	public static String POST_POSITION_LEVERAGE_URL;
+	
 	private static String _CODE = "aaa";
 	/**  aaaa  */
 	public static String _URL;
@@ -129,6 +137,12 @@ public class BitMexInterConstants {
 				}
 				if(GET_USER_MARGIN_CODE.equals(code)){
 					GET_USER_MARGIN_URL = ifs.getUrl();
+				}
+				if(GET_USER_WALLET_CODE.equals(code)){
+					GET_USER_WALLET_URL = ifs.getUrl();
+				}
+				if(POST_POSITION_LEVERAGE_CODE.equals(code)){
+					POST_POSITION_LEVERAGE_URL = ifs.getUrl();
 				}
 			
 			}

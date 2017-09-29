@@ -14,12 +14,12 @@ public class MoniterTask extends TimerTask {
 	private WebSocketBase client = null;
 
 	public MoniterTask(WebSocketBase client) {
-		log.debug("TimerTask is starting.... ");
+		log.info("ok TimerTask is starting.... ");
 		this.client = client;
 	}
 	
 	public void updateTime() {
-		log.debug("startTime is update");
+		log.debug("ok startTime is update");
 		startTime = System.currentTimeMillis();
 	}
 
@@ -28,11 +28,11 @@ public class MoniterTask extends TimerTask {
 	public void run() {
 		if (System.currentTimeMillis() - startTime > checkTime) {
 			client.setStatus(false);
-			log.debug("Moniter reconnect....... ");
+			log.info(">>okMoniter reconnect....... ");
 			client.reConnect();
 		}
 		client.sentPing();
-		log.debug("Moniter ping data sent.... ");
+		log.debug("okMoniter ping data sent.... ");
 	}
 
 }

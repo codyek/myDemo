@@ -101,7 +101,7 @@ public abstract class MexBaseService {
 			// 完整路径
 			String allUrl = BitMexInterConstants.BITMEX_PREX_URL + url;
 			
-			logger.debug(">> allUrl="+allUrl+", method="+method.name()+", param="+param);
+			logger.info(">> allUrl="+allUrl+", method="+method.name()+", param="+param);
 			HttpEntity<String> response = rest.exchange(allUrl, method, entity, String.class);
 			result = response.getBody();
 		} catch (HttpClientErrorException e) {
@@ -123,7 +123,7 @@ public abstract class MexBaseService {
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
-		logger.debug(">> post response result = "+result);
+		logger.info(">> post response result = "+result);
 		return result;
 	}
 	

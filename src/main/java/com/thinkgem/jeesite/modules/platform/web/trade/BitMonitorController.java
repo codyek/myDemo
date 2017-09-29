@@ -1,7 +1,6 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.modules.platform.web.trade;
+
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,14 +12,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitMonitor;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 /**
  * 监控管理Controller
@@ -80,4 +83,23 @@ public class BitMonitorController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/platform/trade/bitMonitor/?repage";
 	}
 
+	/**
+	* @return String
+	 */
+	@RequestMapping(value = "getStatus")
+	@ResponseBody
+	public String getStatus(){
+		String msg = "success";
+		BitMonitor bitMonitor = new BitMonitor();
+		User user = UserUtils.getUser();
+		bitMonitor.setUser(user);
+		bitMonitor.setStatusFlag(Constants.STATUS_RUN);
+		// 调service
+		List<BitMonitor> list = bitMonitorService.findList(bitMonitor);
+		logger.info("list size = "+list.size());
+		if(null != list && !list.isEmpty()){
+			msg = "running";
+		}
+		return msg;
+	}
 }

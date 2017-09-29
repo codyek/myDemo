@@ -23,6 +23,10 @@
 				}
 			});
 		});
+	
+		
+	
+	 
 	</script>
 </head>
 <body>
@@ -54,6 +58,8 @@
 			<label class="control-label">币种A：</label>
 			<div class="controls">
 				<form:input path="symbolA" htmlEscape="false" maxlength="20" class="input-xlarge required"  value="btc_usd" />
+				<!--<form:input path="symbolA" htmlEscape="false" maxlength="20" class="input-xlarge required"  value="ltc_usd" />
+				-->
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
@@ -61,6 +67,8 @@
 			<label class="control-label">币种B：</label>
 			<div class="controls">
 				<form:input path="symbolB" htmlEscape="false" maxlength="20" class="input-xlarge required"  value="XBTUSD" />
+				<!--<form:input path="symbolB" htmlEscape="false" maxlength="20" class="input-xlarge required"  value="LTCU17" />
+				-->
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>

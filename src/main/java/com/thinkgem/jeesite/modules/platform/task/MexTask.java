@@ -1,7 +1,6 @@
 package com.thinkgem.jeesite.modules.platform.task;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Timer;
 
 import org.slf4j.Logger;
@@ -34,16 +33,27 @@ public class MexTask {
 		
 		try {
 			mexMoniterTask = new MexMoniterTask(this);
-			connect();
 			timerTask = new Timer();
-			timerTask.schedule(mexMoniterTask, 1000, 9000);
+			timerTask.schedule(mexMoniterTask, 1000, 20000);
+			connect();
 			// add listener
+			listenerHandler(cep);
+						
+		} catch (Exception e) {
+			log.error(">> mexMoniterTask　exception : ",e);
+		}
+	}
+	
+	public void listenerHandler(WebsocketClientEndpoint cep){
+		if(null != cep){
 			cep.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
 				public void handleMessage(String message) {
+					//log.info(">>> lll --- message=");
 					if(StringUtils.isNotBlank(message)){
+						// 响应  更新监控时间
+						mexMoniterTask.updateTime();
+						EhCacheUtils.put(Constants.PRICE_CACHE,Constants.SYMBOL_MEX_TIME, System.currentTimeMillis());
 						if(message.contains("pong")){
-							// pong 响应  更新监控时间
-							mexMoniterTask.updateTime();
 						}else{
 							JSONObject json = JSONObject.parseObject(message);
 							if(null != json && !json.isEmpty() && json.containsKey("data")){
@@ -51,29 +61,23 @@ public class MexTask {
 								JSONObject data = jArr.getJSONObject(0);
 								String symbol = data.getString("symbol");
 								if(data.containsKey("lastPrice")){
-									
 									double price = data.getDoubleValue("lastPrice");
-									
-									if("XBTUSD".equals(symbol)){
-										// 写入缓存
-										EhCacheUtils.put(Constants.PRICE_CACHE,Constants.CACHE_XBTUSDMEX_PRICE_KEY, data);
-									}else if("XBTU17".equals(symbol)){
-										// 写入缓存
-										EhCacheUtils.put(Constants.PRICE_CACHE,Constants.CACHE_XBTU17MEX_PRICE_KEY, data);
-									}else if("LTCU17".equals(symbol)){
-										log.debug(" LTCU17 price = " + price);
-										// 写入缓存
-										EhCacheUtils.put(Constants.PRICE_CACHE,Constants.CACHE_LTCU17MEX_PRICE_KEY, data);
+									String key = "";
+									if(Constants.SYMBOL_XBTUSD.equals(symbol)){
+										key = Constants.CACHE_XBTUSDMEX_PRICE_KEY;
+									}else if(Constants.SYMBOL_XBTU17.equals(symbol)){
+										key = Constants.CACHE_XBTU17MEX_PRICE_KEY;
+									}else if(Constants.SYMBOL_LTCU17.equals(symbol)){
+										key = Constants.CACHE_LTCU17MEX_PRICE_KEY;
 									}
+									// 实时价格写入缓存
+									EhCacheUtils.put(Constants.PRICE_CACHE,key, price);
 								}
 							}
 						}
 					}
 				}
 			});
-						
-		} catch (Exception e) {
-			log.error(">>　exception : ",e);
 		}
 	}
 	
@@ -85,8 +89,10 @@ public class MexTask {
 	* @throws
 	 */
 	public void sentPing() {
-		String dataMsg = "ping";
-		cep.sendMessage(dataMsg);
+		if(null != cep){
+			String dataMsg = "ping";
+			cep.sendMessage(dataMsg);
+		}
 	}
 	
 	/**
@@ -96,14 +102,28 @@ public class MexTask {
 	* @return void
 	* @throws
 	 */
-	public void connect() throws URISyntaxException{
+	public void connect() throws Exception{
 		// 订阅 XBTUSD,XBTU17，LTCU17 实时价格
 		String msg = "{\"op\":\"subscribe\",\"args\":[\"instrument:XBTUSD\"," +
 				"\"instrument:XBTU17\"," +
 				"\"instrument:LTCU17\"]}";
 		// open websocket
-		cep = new WebsocketClientEndpoint(new URI(URL));
-		
-		cep.sendMessage(msg);
+		if(null == cep){
+			cep = new WebsocketClientEndpoint(new URI(URL));
+		}
+		if(null != cep){
+			cep.sendMessage(msg);
+		}
+	}
+	
+	public void reconnect(){
+		cep = null;
+		try {
+			connect();
+			listenerHandler(cep);
+		} catch (Exception e) {
+			log.error(">> reconnect error=",e);
+			e.printStackTrace();
+		}
 	}
 }

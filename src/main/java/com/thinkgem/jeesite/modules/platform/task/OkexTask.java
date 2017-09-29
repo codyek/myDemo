@@ -15,10 +15,7 @@ public class OkexTask {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	/**
-	 * 
 	* @Title: okexWebsocketTask 获取比特币,ltc实时价格
-	* @param @return
-	* @return String
 	* @throws
 	 */
 	@Async
@@ -29,12 +26,11 @@ public class OkexTask {
 		// WebSocket客户端
 		WebSoketClient client = new WebSoketClient(WebSocketServiceImpl.SOCKET_URL, service);
 		// 启动客户端
+		client.setUrl(WebSocketServiceImpl.SOCKET_URL);
 		client.start();
 		// 订阅实时价格和指数 渠道
-		String channel = "[{'event':'addChannel','channel':'"+WebSocketServiceImpl.BTC_QUARTER+"'},"
-				        + "{'event':'addChannel','channel':'"+WebSocketServiceImpl.LTC_QUARTER+"'}]";
-		// 添加订阅
-		client.addChannel(channel);
+		client.addChannel(WebSocketServiceImpl.BTC_QUARTER);
+		client.addChannel(WebSocketServiceImpl.LTC_QUARTER);
 	}
 	
 	public static void main(String[] args) {

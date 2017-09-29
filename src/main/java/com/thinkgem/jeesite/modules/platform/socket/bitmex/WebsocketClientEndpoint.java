@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class WebsocketClientEndpoint {
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	Session userSession = null;
+	public Session userSession = null;
     private MessageHandler messageHandler;
 
     public WebsocketClientEndpoint(URI endpointURI) {
@@ -51,7 +51,8 @@ public class WebsocketClientEndpoint {
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-    	log.info(">> closing Mex websocket" +" userSession="+userSession+"  ,reason="+reason);
+    	//log.error(">> closing Mex websocket" +" userSession="+userSession+"  ,reason="+reason);
+    	log.error(">> closing Mex websocket" +" reason="+reason);
         this.userSession = null;
     }
 
@@ -82,7 +83,11 @@ public class WebsocketClientEndpoint {
      * @param message
      */
     public void sendMessage(String message) {
-        this.userSession.getAsyncRemote().sendText(message);
+    	if(null != this.userSession){
+    		if(null != this.userSession.getAsyncRemote()){
+    			this.userSession.getAsyncRemote().sendText(message);
+        	}
+    	}
     }
 
     /**

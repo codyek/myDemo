@@ -21,6 +21,19 @@ import com.thinkgem.jeesite.modules.platform.service.MexBaseService;
 @Transactional(readOnly = true)
 public class MexOrderInterfaceService extends MexBaseService{
 	
+	/**
+	* 设置杠杆数
+	* @param symbol XBTUSD：比特币，
+    * @param leverage 价格
+	* @throws Exception
+	 */
+	public String post_leverage(String symbol, Double leverage) throws Exception {
+		String url = BitMexInterConstants.POST_POSITION_LEVERAGE_URL;
+		JSONObject param = new JSONObject();
+		param.put("symbol", symbol);
+		param.put("leverage", leverage);
+		return exchange(url, HttpMethod.POST, true, param);
+	}
 	
 	/**
 	* 创建新订单
@@ -109,7 +122,7 @@ public class MexOrderInterfaceService extends MexBaseService{
 	/**
 	 * 以垂直格式获取当前订单
 	 * @param symbol
-	 *            XBTUSD：比特币， ltc_usd：莱特币
+	 *            XBTUSD：比特币， XBTU17, LTCU17：莱特币
 	 * @param depth
 	 *            订单的深度, 0:全面深度。
 	 * @return String

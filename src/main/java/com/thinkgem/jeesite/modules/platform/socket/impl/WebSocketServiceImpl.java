@@ -34,6 +34,8 @@ public class WebSocketServiceImpl implements WebSocketService{
 	@Override
 	public void onReceive(String msg){
 		if(StringUtils.isNotBlank(msg)){
+			//log.info(">>  ok  rrrr - - -");
+			EhCacheUtils.put(Constants.PRICE_CACHE,Constants.SYMBOL_OKEX_TIME, System.currentTimeMillis());
 			if(msg.contains("\"event\":\"pong\"")){
 				// pong 响应 不处理
 			}else{
@@ -54,8 +56,9 @@ public class WebSocketServiceImpl implements WebSocketService{
 					if(json.containsKey("data")){
 						JSONObject data = json.getJSONObject("data");
 						if(data.containsKey("last")){
-							// 写入缓存
-							EhCacheUtils.put(Constants.PRICE_CACHE,cacheKey, data);
+							double price = data.getDoubleValue("last");
+							// 实时价格写入缓存
+							EhCacheUtils.put(Constants.PRICE_CACHE,cacheKey, price);
 						}
 						
 					}

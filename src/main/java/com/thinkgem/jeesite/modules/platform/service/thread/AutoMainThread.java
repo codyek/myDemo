@@ -64,7 +64,7 @@ public class AutoMainThread extends Thread{
 					// 获取差价
 					BigDecimal agioOld = getAgio(symbolA, symbolB);
 					BigDecimal agio =  agioOld.abs();
-					log.info(">> montiro agio ="+df.format(agio)+" ,agioOld = "+df.format(agioOld) );
+					log.info(">>1 montiro agio ="+df.format(agio)+" ,agioOld = "+df.format(agioOld) );
 					// 比较差价与最大值、最小值
 					if(agio.compareTo(max) > 0){
 						// 差价 > 最大值   操作：宽开 或 宽平

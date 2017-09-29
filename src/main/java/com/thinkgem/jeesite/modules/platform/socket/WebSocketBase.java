@@ -51,11 +51,11 @@ public abstract class WebSocketBase {
 
 	public void start() {
 		if (url == null) {
-			log.error("WebSocketClient start error  url can not be null");
+			log.error(">>WebSocketClient start error  url can not be null");
 			return;
 		}
 		if (service == null) {
-			log.error("WebSocketClient start error  WebSocketService can not be null");
+			log.error(">>WebSocketClient start error  WebSocketService can not be null");
 			return;
 		}
 		moniter = new MoniterTask(this);
@@ -72,7 +72,9 @@ public abstract class WebSocketBase {
 		if (channel == null) {
 			return;
 		}
-		this.sendMessage(channel);
+		String dataMsg = "{'event':'addChannel','channel':'" + channel
+				+ "','binary':'true'}";
+		this.sendMessage(dataMsg);
 		subscribChannel.add(channel);
 	}
 
@@ -80,7 +82,9 @@ public abstract class WebSocketBase {
 		if (channel == null) {
 			return;
 		}
-		this.sendMessage(channel);
+		String dataMsg = "{'event':'removeChannel','channel':'" + channel
+				+ "'}";
+		this.sendMessage(dataMsg);
 		subscribChannel.remove(channel);
 	}
 
@@ -126,7 +130,7 @@ public abstract class WebSocketBase {
 			handler.handshakeFuture().sync();
 			this.setStatus(true);
 		} catch (Exception e) {
-			log.info("WebSocketClient start error ", e);
+			log.error(">> WebSocketClient start error! url = "+url, e);
 			group.shutdownGracefully();
 			this.setStatus(false);
 		}
@@ -135,7 +139,7 @@ public abstract class WebSocketBase {
 
 	private void sendMessage(String message) {
 		if (!isAlive) {
-			log.info("WebSocket is not Alive addChannel error");
+			log.error(">> WebSocket is not Alive addChannel error! message="+ message);
 		}
 		channel.writeAndFlush(new TextWebSocketFrame(message));
 	}

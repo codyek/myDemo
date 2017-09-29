@@ -35,6 +35,18 @@ public class MexAccountInterfaceService extends MexBaseService{
 		return exchange(url, HttpMethod.GET, true, param);
 	}
 	
+	/**
+	* 获取您当前的钱包信息
+	* @param currency 货币：XBt， XBT
+	* @return String
+	* @throws Exception
+	 */
+	public String get_user_wallet(String currency) throws Exception {
+		String url = BitMexInterConstants.GET_USER_WALLET_URL;
+		JSONObject param = new JSONObject();
+		param.put("currency", currency);
+		return exchange(url, HttpMethod.GET, true, param);
+	}
 	
 	/**
 	 * 修改公开订单的数量或价格

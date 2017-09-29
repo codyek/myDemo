@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.modules.platform.service.trade;
 
 import java.util.List;
@@ -22,6 +19,10 @@ import com.thinkgem.jeesite.modules.platform.dao.trade.BitMonitorDao;
 @Transactional(readOnly = true)
 public class BitMonitorService extends CrudService<BitMonitorDao, BitMonitor> {
 
+	public BitMonitor getByCode(String code) {
+		return dao.getByCode(code);
+	}
+	
 	public BitMonitor get(String id) {
 		return super.get(id);
 	}

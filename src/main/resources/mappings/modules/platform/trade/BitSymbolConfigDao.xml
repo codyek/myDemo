@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.trade.BitSymbolConfigDao">
+    
+	<sql id="bitSymbolConfigColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.symbol AS "symbol",
+		a.platform AS "platform",
+		a.fee_rate AS "feeRate",
+		a.par_value AS "parValue",
+		a.unit AS "unit",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bitSymbolConfigJoins">
+	</sql>
+    
+	<select id="get" resultType="BitSymbolConfig">
+		SELECT 
+			<include refid="bitSymbolConfigColumns"/>
+		FROM bit_symbol_config a
+		<include refid="bitSymbolConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BitSymbolConfig">
+		SELECT 
+			<include refid="bitSymbolConfigColumns"/>
+		FROM bit_symbol_config a
+		<include refid="bitSymbolConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="symbol != null and symbol != ''">
+				AND a.symbol = #{symbol}
+			</if>
+			<if test="platform != null and platform != ''">
+				AND a.platform = #{platform}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BitSymbolConfig">
+		SELECT 
+			<include refid="bitSymbolConfigColumns"/>
+		FROM bit_symbol_config a
+		<include refid="bitSymbolConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_symbol_config(
+			id,
+			code,
+			symbol,
+			platform,
+			fee_rate,
+			par_value,
+			unit,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{symbol},
+			#{platform},
+			#{feeRate},
+			#{parValue},
+			#{unit},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_symbol_config SET 	
+			code = #{code},
+			symbol = #{symbol},
+			platform = #{platform},
+			fee_rate = #{feeRate},
+			par_value = #{parValue},
+			unit = #{unit},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_symbol_config SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

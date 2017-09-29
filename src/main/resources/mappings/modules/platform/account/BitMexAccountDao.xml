@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.platform.dao.account.BitMexAccountDao">
+    
+	<sql id="bitMexAccountColumns">
+		a.id AS "id",
+		a.use_id AS "useId",
+		a.symbol AS "symbol",
+		a.account_balance AS "accountBalance",
+		a.available AS "available",
+		a.balance AS "balance",
+		a.bond AS "bond",
+		a.contract_id AS "contractId",
+		a.contract_type AS "contractType",
+		a.freeze AS "freeze",
+		a.profit AS "profit",
+		a.unprofit AS "unprofit",
+		a.rights AS "rights",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bitMexAccountJoins">
+	</sql>
+    
+	<select id="get" resultType="BitMexAccount">
+		SELECT 
+			<include refid="bitMexAccountColumns"/>
+		FROM bit_mexaccount a
+		<include refid="bitMexAccountJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BitMexAccount">
+		SELECT 
+			<include refid="bitMexAccountColumns"/>
+		FROM bit_mexaccount a
+		<include refid="bitMexAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="useId != null and useId != ''">
+				AND a.use_id = #{useId}
+			</if>
+			<if test="symbol != null and symbol != ''">
+				AND a.symbol = #{symbol}
+			</if>
+			<if test="accountBalance != null and accountBalance != ''">
+				AND a.account_balance = #{accountBalance}
+			</if>
+			<if test="available != null and available != ''">
+				AND a.available = #{available}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BitMexAccount">
+		SELECT 
+			<include refid="bitMexAccountColumns"/>
+		FROM bit_mexaccount a
+		<include refid="bitMexAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bit_mexaccount(
+			id,
+			use_id,
+			symbol,
+			account_balance,
+			available,
+			balance,
+			bond,
+			contract_id,
+			contract_type,
+			freeze,
+			profit,
+			unprofit,
+			rights,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{useId},
+			#{symbol},
+			#{accountBalance},
+			#{available},
+			#{balance},
+			#{bond},
+			#{contractId},
+			#{contractType},
+			#{freeze},
+			#{profit},
+			#{unprofit},
+			#{rights},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bit_mexaccount SET 	
+			use_id = #{useId},
+			symbol = #{symbol},
+			account_balance = #{accountBalance},
+			available = #{available},
+			balance = #{balance},
+			bond = #{bond},
+			contract_id = #{contractId},
+			contract_type = #{contractType},
+			freeze = #{freeze},
+			profit = #{profit},
+			unprofit = #{unprofit},
+			rights = #{rights},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bit_mexaccount SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

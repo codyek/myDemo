@@ -8,6 +8,18 @@ public class TradeTaskReq {
 	private String symbolA;
 	/**  B币种  */
 	private String symbolB;
+	/**  A币种平台  */
+	private String platformA;
+	/**  B币种平台  */
+	private String platformB;
+	/**  A币种费率  */
+	private BigDecimal feeRateA;
+	/**  B币种费率  */
+	private BigDecimal feeRateB;
+	/**  A合约单张面值  */
+	private Integer parValueA;
+	/**  B合约单张面值  */
+	private Integer parValueB;
 	/**  A杠杆  */
 	private Integer leverA;
 	/**  B杠杆  */
@@ -16,9 +28,9 @@ public class TradeTaskReq {
 	private Integer amountA;
 	/**  B数量  */
 	private Integer amountB;
-	/**  A保证金  */
+	/**  A保证金率  */
 	private BigDecimal depositA;
-	/**  B保证金  */
+	/**  B保证金率  */
 	private BigDecimal depositB;
 	/**  最大差价  */
 	private BigDecimal maxAgio;
@@ -32,9 +44,16 @@ public class TradeTaskReq {
 	private BigDecimal burstPiceA;
 	/**  B爆仓价格  */
 	private BigDecimal burstPiceB;
+	/**  A换算成价格对应的数量  */
+	private BigDecimal priceAmountA;
+	/**  B换算成价格对应的数量  */
+	private BigDecimal priceAmountB;
 	
 	/**   监控操作方式 - 宽开窄平、窄开宽平or两者  */
 	private String type;
+	
+	/**   停止监控  */
+	private String stopJob;
 	
 	/**   监控主程序code  */
 	private String monitorCode;
@@ -135,5 +154,58 @@ public class TradeTaskReq {
 	public void setBurstPiceB(BigDecimal burstPiceB) {
 		this.burstPiceB = burstPiceB;
 	}
-	
+	public String getPlatformA() {
+		return platformA;
+	}
+	public void setPlatformA(String platformA) {
+		this.platformA = platformA;
+	}
+	public String getPlatformB() {
+		return platformB;
+	}
+	public void setPlatformB(String platformB) {
+		this.platformB = platformB;
+	}
+	public BigDecimal getFeeRateA() {
+		return feeRateA;
+	}
+	public void setFeeRateA(BigDecimal feeRateA) {
+		this.feeRateA = feeRateA;
+	}
+	public BigDecimal getFeeRateB() {
+		return feeRateB;
+	}
+	public void setFeeRateB(BigDecimal feeRateB) {
+		this.feeRateB = feeRateB;
+	}
+	public Integer getParValueA() {
+		return parValueA;
+	}
+	public void setParValueA(Integer parValueA) {
+		this.parValueA = parValueA;
+	}
+	public Integer getParValueB() {
+		return parValueB;
+	}
+	public void setParValueB(Integer parValueB) {
+		this.parValueB = parValueB;
+	}
+	public BigDecimal getPriceAmountA() {
+		return priceAmountA;
+	}
+	public void setPriceAmountA(BigDecimal priceAmountA) {
+		this.priceAmountA = priceAmountA;
+	}
+	public BigDecimal getPriceAmountB() {
+		return priceAmountB;
+	}
+	public void setPriceAmountB(BigDecimal priceAmountB) {
+		this.priceAmountB = priceAmountB;
+	}
+	public String getStopJob() {
+		return stopJob;
+	}
+	public void setStopJob(String stopJob) {
+		this.stopJob = stopJob;
+	}
 }

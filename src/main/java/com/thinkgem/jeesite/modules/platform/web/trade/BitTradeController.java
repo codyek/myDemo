@@ -1,7 +1,6 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.modules.platform.web.trade;
+
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,14 +12,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.platform.constants.Constants;
+import com.thinkgem.jeesite.modules.platform.entity.trade.BitMonitor;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTrade;
+import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 /**
  * 交易主表Controller
@@ -33,6 +38,9 @@ public class BitTradeController extends BaseController {
 
 	@Autowired
 	private BitTradeService bitTradeService;
+	
+	@Autowired
+	private BitMonitorService bitMonitorService;
 	
 	@ModelAttribute
 	public BitTrade get(@RequestParam(required=false) String id) {
@@ -80,4 +88,29 @@ public class BitTradeController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/platform/trade/bitTrade/?repage";
 	}
 
+	/**
+	 * 获取当前监控交易数据
+	 * @return List<BitTrade>
+	 */
+	@RequestMapping(value = "getTradeList")
+	@ResponseBody
+	public List<BitTrade> getTradeList(){
+		List<BitTrade> list = null;
+		BitMonitor bitMonitor = new BitMonitor();
+		User user = UserUtils.getUser();
+		bitMonitor.setUser(user);
+		bitMonitor.setStatusFlag(Constants.STATUS_RUN);
+		// 调service
+		List<BitMonitor> monitors = bitMonitorService.findList(bitMonitor);
+		logger.info("monitors size = "+monitors.size());
+		if(null != monitors && !monitors.isEmpty()){
+			String monitorCode = monitors.get(0).getCode();
+			BitTrade bitTrade = new BitTrade();
+			bitTrade.setMonitorCode(monitorCode);
+			list = bitTradeService.findList(bitTrade);
+			logger.info("BitTrades size = "+list.size());
+		}
+		return list;
+	}
+	
 }

@@ -52,16 +52,17 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        log.debug("WebSocket Client disconnected!");
+        log.info(">> WebSocket Client disconnected!");
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    	moniter.updateTime();
+    	//log.info("channelRead0-------");
         Channel ch = ctx.channel();
-        moniter.updateTime();
         if (!handshaker.isHandshakeComplete()) {
             handshaker.finishHandshake(ch, (FullHttpResponse) msg);
-            log.debug("WebSocket Client connected!");
+            log.info(">>WebSocket Client connected!");
             handshakeFuture.setSuccess();
             return;
         }
@@ -81,9 +82,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         	BinaryWebSocketFrame binaryFrame=(BinaryWebSocketFrame)frame;
         	service.onReceive(decodeByteBuff(binaryFrame.content()));
         }else if (frame instanceof PongWebSocketFrame) {
-            log.debug("WebSocket Client received pong");
+            log.info("WebSocket Client received pong");
         } else if (frame instanceof CloseWebSocketFrame) {
-            log.debug("WebSocket Client received closing");
+            log.info("WebSocket Client received closing");
             ch.close();
         }
     }
