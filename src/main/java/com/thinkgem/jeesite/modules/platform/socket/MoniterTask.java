@@ -10,7 +10,7 @@ public class MoniterTask extends TimerTask {
 	protected Logger log = LoggerFactory.getLogger(getClass());
 	
 	private long startTime = System.currentTimeMillis();
-	private int checkTime = 15000;
+	private int checkTime = 35000; // 35秒判断重连
 	private WebSocketBase client = null;
 
 	public MoniterTask(WebSocketBase client) {

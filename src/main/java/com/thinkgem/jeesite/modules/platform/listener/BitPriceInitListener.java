@@ -51,13 +51,13 @@ public class BitPriceInitListener implements ApplicationListener{
 		// ok time
 		Long okTime = (Long)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.SYMBOL_OKEX_TIME);
 		if(null == okTime || okTime < curTime){
-			log.error(">> ok price no run! rerunning! ");
-			//okexTask.okexWebsocketTask();
+			log.error(">> ok price no run! rerunning。");
+			okexTask.okexWebsocketTask();
 		}
 		// Mex time
 		Long mexTime = (Long)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.SYMBOL_MEX_TIME);
 		if(null == mexTime || mexTime < curTime){
-			log.error(">> mex price no run! rerunning!");
+			log.error(">> mex price no run! rerunning。");
 			mexTask.mexWebsocketTask();
 		}
 	}

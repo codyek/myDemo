@@ -61,7 +61,8 @@ public abstract class WebSocketBase {
 		moniter = new MoniterTask(this);
 		this.connect();
 		timerTask = new Timer();
-		timerTask.schedule(moniter, 1000, 9000);
+		// OKEX API 每30秒发送一次心跳数据：{'event':'ping'}
+		timerTask.schedule(moniter, 1000, 29000);
 	}
 
 	public void setStatus(boolean flag) {

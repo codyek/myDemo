@@ -34,7 +34,7 @@ public class MexTask {
 		try {
 			mexMoniterTask = new MexMoniterTask(this);
 			timerTask = new Timer();
-			timerTask.schedule(mexMoniterTask, 1000, 20000);
+			timerTask.schedule(mexMoniterTask, 1000, 4800); // bitmex API 设置一个 5 秒钟的ping定时器 
 			connect();
 			// add listener
 			listenerHandler(cep);

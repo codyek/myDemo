@@ -222,7 +222,7 @@
 				</div>
 			</div>
 		    <div id="footer" class="row-fluid">
-	            Copyright &copy; 2012-${fns:getConfig('copyrightYear')} ${fns:getConfig('productName')} - Version   ${fns:getConfig('version')}
+	            Copyright &copy; 2017-${fns:getConfig('copyrightYear')} ${fns:getConfig('productName')} - Version   ${fns:getConfig('version')}
 			</div>
 		</div>
 	</div>
