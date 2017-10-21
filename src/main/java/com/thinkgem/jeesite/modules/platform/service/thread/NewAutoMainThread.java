@@ -607,10 +607,10 @@ public class NewAutoMainThread implements Runnable{
 			cacheKey = Constants.CACHE_LTCOKEX_PRICE_KEY;
 		}else if(Constants.SYMBOL_XBTUSD.equals(symbol)){
 			cacheKey = Constants.CACHE_XBTUSDMEX_PRICE_KEY;
-		}else if(Constants.SYMBOL_XBTU17.equals(symbol)){
-			cacheKey = Constants.CACHE_XBTU17MEX_PRICE_KEY;
-		}else if(Constants.SYMBOL_LTCU17.equals(symbol)){
-			cacheKey = Constants.CACHE_LTCU17MEX_PRICE_KEY;
+		}else if(Constants.SYMBOL_XBTQAE.equals(symbol)){
+			cacheKey = Constants.CACHE_XBTQAEMEX_PRICE_KEY;
+		}else if(Constants.SYMBOL_LTCQAE.equals(symbol)){
+			cacheKey = Constants.CACHE_LTCQAEMEX_PRICE_KEY;
 		}
 		Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,cacheKey);
 		return new BigDecimal(curPrice);

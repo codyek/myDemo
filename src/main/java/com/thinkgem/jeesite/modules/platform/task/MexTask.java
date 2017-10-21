@@ -29,6 +29,11 @@ public class MexTask {
 	
 	@Async
 	public void mexWebsocketTask(){
+		try {
+			Thread.sleep(2000);  // 休眠2秒
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		log.info(">>>>>>>>>>>>>>>>   mexWebsocketTask start! <<<<<<<<<<<<<<<<  ");
 		
 		try {
@@ -65,10 +70,10 @@ public class MexTask {
 									String key = "";
 									if(Constants.SYMBOL_XBTUSD.equals(symbol)){
 										key = Constants.CACHE_XBTUSDMEX_PRICE_KEY;
-									}else if(Constants.SYMBOL_XBTU17.equals(symbol)){
-										key = Constants.CACHE_XBTU17MEX_PRICE_KEY;
-									}else if(Constants.SYMBOL_LTCU17.equals(symbol)){
-										key = Constants.CACHE_LTCU17MEX_PRICE_KEY;
+									}else if(Constants.SYMBOL_XBTQAE.equals(symbol)){
+										key = Constants.CACHE_XBTQAEMEX_PRICE_KEY;
+									}else if(Constants.SYMBOL_LTCQAE.equals(symbol)){
+										key = Constants.CACHE_LTCQAEMEX_PRICE_KEY;
 									}
 									// 实时价格写入缓存
 									EhCacheUtils.put(Constants.PRICE_CACHE,key, price);

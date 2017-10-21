@@ -235,9 +235,9 @@ public class InterTestController extends BaseController {
 		}else if("xbt".equals(name)){
 			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_XBTUSDMEX_PRICE_KEY);
 		}else if("xbtu17".equals(name)){
-			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_XBTU17MEX_PRICE_KEY);
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_XBTQAEMEX_PRICE_KEY);
 		}else if("ltcu17".equals(name)){
-			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_LTCU17MEX_PRICE_KEY);
+			obj = EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_LTCQAEMEX_PRICE_KEY);
 			
 		}
 		return obj.toString();

@@ -15,8 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.SpringContextHolder;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.mongodb.model.BtcTradeData;
+import com.thinkgem.jeesite.modules.mongodb.model.BtcToXbtTradeData;
 import com.thinkgem.jeesite.modules.mongodb.service.BtcTradeDataInterface;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstants;
@@ -24,8 +23,6 @@ import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTrade;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
 import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
-import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -397,7 +394,7 @@ public class AutoMainThread extends Thread{
 	
 	private BtcTradeDataInterface btcTradeData;
 	private Long queryTime = 0L;
-	private BtcTradeData btcDate;
+	private BtcToXbtTradeData btcDate;
 	/**
 	 *  获取币种 A与B 实时差价 或 一币种实时价格
 	* @return BigDecimal
@@ -414,9 +411,9 @@ public class AutoMainThread extends Thread{
 		
 		Direction direction = Direction.ASC;
 		PageRequest pageable = new PageRequest(0,1,new Sort(direction,"time"));
-		List<BtcTradeData> list = btcTradeData.findByTimePageable(queryTime, pageable);
+		List<BtcToXbtTradeData> list = btcTradeData.findByTimePageable(queryTime, pageable);
 		JSONArray arr = JSONArray.parseArray(JSON.toJSONString(list));
-		btcDate = arr.getObject(0, BtcTradeData.class);
+		btcDate = arr.getObject(0, BtcToXbtTradeData.class);
 		
 		queryTime = btcDate.getTime();
 		  

@@ -7,7 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import com.thinkgem.jeesite.modules.mongodb.model.BtcTradeData;
+import com.thinkgem.jeesite.modules.mongodb.model.BtcToXbtTradeData;
+
 
 
 /**
@@ -16,15 +17,15 @@ import com.thinkgem.jeesite.modules.mongodb.model.BtcTradeData;
  * @author hzf
  *
  */
-public interface BtcTradeDataInterface extends MongoRepository<BtcTradeData, Long>{
+public interface BtcTradeDataInterface extends MongoRepository<BtcToXbtTradeData, Long>{
 
 	@Query(value="{'time':?0}")
-	BtcTradeData findByTime(String name);
+	BtcToXbtTradeData findByTime(String name);
 	
 	@Query(value="{'time' : {'$gt' : ?0}}")
-	List<BtcTradeData> findByTimePageable(long time,Pageable pageable);
+	List<BtcToXbtTradeData> findByTimePageable(long time,Pageable pageable);
 	
 	@Query(value="{'time' : {'$gt' : ?0, '$lt' : ?1}}")
-	List<BtcTradeData> findByTimeBetween(long from, long to, Sort sort);
+	List<BtcToXbtTradeData> findByTimeBetween(long from, long to, Sort sort);
 }
 

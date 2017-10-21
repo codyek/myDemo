@@ -37,17 +37,15 @@ public class BitPriceInitListener implements ApplicationListener{
 			
 			mexTask.mexWebsocketTask();
 			
-			
-			
 		}
 	}
 	
 	// 定时Task 检查价格是否实施更新
-	@Scheduled(cron = "0 0/10 * * * ? ") // 10分钟
+	@Scheduled(cron = "0 0/2 * * * ? ") // 2分钟
 	public void currencyPriceTask(){
 		log.info(">>>>> currencyPriceTask    <<< ");
 		
-		Long curTime = System.currentTimeMillis() - 10*60*1000; // 10分钟前
+		Long curTime = System.currentTimeMillis() - 2*60*1000; // 2分钟前
 		// ok time
 		Long okTime = (Long)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.SYMBOL_OKEX_TIME);
 		if(null == okTime || okTime < curTime){

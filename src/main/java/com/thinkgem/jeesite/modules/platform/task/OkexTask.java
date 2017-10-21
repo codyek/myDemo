@@ -20,6 +20,11 @@ public class OkexTask {
 	 */
 	@Async
 	public void okexWebsocketTask(){
+		try {
+			Thread.sleep(2000);  // 休眠2秒
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		log.info(">>>>>>>>>>   okexWebsocketTask start!!  <<<<<<<<<<<<<<<<<<<<<");
 		// 订阅消息处理类,用于处理WebSocket服务返回的消息
 		WebSocketService service = new WebSocketServiceImpl();
