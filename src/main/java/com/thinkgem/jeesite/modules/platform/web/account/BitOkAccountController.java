@@ -95,15 +95,17 @@ public class BitOkAccountController extends BaseController {
 	@Autowired
 	private MexAccountInterfaceService mexAccountInterfaceService;
 	
-	@RequestMapping(value = "saveOne", method=RequestMethod.POST)
+	@RequestMapping(value = "saveOne", method=RequestMethod.GET)
 	@ResponseBody
 	public String saveOne(BitOkAccount bitOkAccount,String symbol, Model model, RedirectAttributes redirectAttributes) {
 		User user = UserUtils.getUser();
 		String json = "okk";
 		try {
-			//json = accountInterfaceService.future_userinfo_4fix();
-			/*logger.info(">>　json＝"+json);
-			UserinfoFix uf = JSONObject.parseObject(json,UserinfoFix.class);
+			json = accountInterfaceService.future_userinfo();
+			logger.info(">>　future_userinfo json＝"+json);
+			json = accountInterfaceService.future_userinfo_4fix();
+			logger.info(">>　future_userinfo_4fix json＝"+json);
+			/*UserinfoFix uf = JSONObject.parseObject(json,UserinfoFix.class);
 			if(null != uf){
 				boolean f = uf.getResult();
 				logger.info(">>　f＝"+f);

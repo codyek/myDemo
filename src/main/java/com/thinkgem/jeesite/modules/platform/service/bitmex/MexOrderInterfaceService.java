@@ -38,7 +38,7 @@ public class MexOrderInterfaceService extends MexBaseService{
 	/**
 	* 创建新订单
 	* @param symbol XBTUSD：比特币，
-    * @param ordType 订单类型。：市场，限制，停止，停止限制，市场交易
+    * @param ordType 订单类型。：市场(Market)，限制(Limit)，停止(Stop)，停止限制(StopLimit)，市场交易
     * @param price 价格
     * @param orderQty 委托数量
     * @param side Buy, Sell.

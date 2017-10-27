@@ -53,14 +53,14 @@ public abstract class OkexBaseService {
 		String sign = BitMD5Util.buildOkexsignV1(params, secretkey);
 		
 		params.put("sign", sign);
-		logger.debug(">> post url = " + url);
-		logger.debug(">> post params = " + params);
+		logger.info(">> post url = " + url);
+		logger.info(">> post params = " + params);
 		String result = HttpUtils.httpsPost(url, new LinkedList<NameValuePair>(), params);
 		if(StringUtils.isEmpty(result)){
 			logger.error(">> post result is null !!!, url="+url);
 			return null;
 		}
-		logger.debug(">> post result = " + result);
+		logger.info(">> post result = " + result);
 		JSONObject json = JSONObject.parseObject(result);
 		Object rlt = json.get("result");
 		if(null != rlt){

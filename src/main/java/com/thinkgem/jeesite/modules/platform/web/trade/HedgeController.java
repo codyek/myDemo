@@ -24,7 +24,7 @@ import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.InfoInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.thread.TotalControlService;
+import com.thinkgem.jeesite.modules.platform.service.thread.HedgeTotalControlService;
 
 /**
  * 交易中心 Controller
@@ -32,8 +32,8 @@ import com.thinkgem.jeesite.modules.platform.service.thread.TotalControlService;
  * @version 2017-07-08
  */
 @Controller
-@RequestMapping(value = "${adminPath}/trade")
-public class TradeController extends BaseController {
+@RequestMapping(value = "${adminPath}/hedge")
+public class HedgeController extends BaseController {
 
 	@Autowired
 	private InfoInterfaceService interService;
@@ -45,7 +45,7 @@ public class TradeController extends BaseController {
 	private OrderInterfaceService orderService;
 	
 	@Autowired
-	private TotalControlService totalControlService;
+	private HedgeTotalControlService hedgeTotalControlService;
 	
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"index", ""})
@@ -77,18 +77,6 @@ public class TradeController extends BaseController {
 		return "modules/platform/trade/TestTradeForm";
 	}
 	
-	@RequestMapping(value = "getBtcPriceData")
-	@ResponseBody
-	public JSONArray getPriceData(String startDt, String endDt){
-		//String url = "http://115.126.39.71:8088/BtcDataQuery/task/postPrice.do"; 
-		String url = "http://localhost:8088/BtcDataQuery/task/postPrice.do"; 
-		Map<String,String> params = new HashMap<String,String>(); 
-		params.put("startDt", startDt);
-		params.put("endDt", endDt);
-		String data = HttpUtils.httpsGet(url, params);
-		return JSONArray.parseArray(data);
-	}
-	
 	/**
 	* @Title: startJob
 	* @param  maxAgio 最大差价（开仓差价）
@@ -116,7 +104,7 @@ public class TradeController extends BaseController {
 			return "fail input check";
 		}
 		// 调service
-		String msg = totalControlService.control(req);
+		String msg = hedgeTotalControlService.control(req);
 		
 		return msg;
 	}
@@ -146,7 +134,7 @@ public class TradeController extends BaseController {
 			return "fail input check";
 		}
 		// 调service
-		String msg = totalControlService.updateData(req);
+		String msg = hedgeTotalControlService.updateData(req);
 		return msg;
 	}
 			
@@ -158,7 +146,7 @@ public class TradeController extends BaseController {
 	@ResponseBody
 	public String stopJob(){
 		// 调service
-		String msg = totalControlService.stopJob();
+		String msg = hedgeTotalControlService.stopJob();
 		return msg;
 	}
 }

@@ -18,6 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSONObject;
+import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.MexHMACSHA256;
 import com.thinkgem.jeesite.common.utils.RestClient;
 import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstants;
@@ -109,13 +110,13 @@ public abstract class MexBaseService {
 			logger.error(">> post response status = "+status);
 			if(CODE_400.equals(status)){
 				// Parameter Error 参数错误
-				
+				throw new ServiceException("Parameter Error 参数错误!");
 			} else if(CODE_401.equals(status)){
 				// Unauthorized 授权失败
-				
+				throw new ServiceException("Unauthorized 授权失败!");
 			} else if(CODE_404.equals(status)){
 				// Not Found 
-				
+				throw new Exception(e);
 			}else{
 				
 			}
