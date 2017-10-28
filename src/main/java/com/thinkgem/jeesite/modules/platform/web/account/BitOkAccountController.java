@@ -21,7 +21,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitOkAccount;
 import com.thinkgem.jeesite.modules.platform.entity.account.UserinfoFix;
 import com.thinkgem.jeesite.modules.platform.entity.account.UserinfoFix.Info;
@@ -101,8 +103,8 @@ public class BitOkAccountController extends BaseController {
 		User user = UserUtils.getUser();
 		String json = "okk";
 		try {
-			json = accountInterfaceService.future_userinfo();
-			logger.info(">>　future_userinfo json＝"+json);
+			//json = accountInterfaceService.future_userinfo();
+			//logger.info(">>　future_userinfo json＝"+json);
 			json = accountInterfaceService.future_userinfo_4fix();
 			logger.info(">>　future_userinfo_4fix json＝"+json);
 			/*UserinfoFix uf = JSONObject.parseObject(json,UserinfoFix.class);
@@ -122,11 +124,18 @@ public class BitOkAccountController extends BaseController {
 				bitOkAccount.setBalance(in.getLtc().getBalance());
 				bitOkAccountService.save(bitOkAccount);
 			}*/
-			
+			json = mexAccountInterfaceService.get_user();
+			logger.info(">>  get_user = "+json);
 			json = mexAccountInterfaceService.get_user_margin(symbol);
 			logger.info(">>  get_user_margin = "+json);
 			json = mexAccountInterfaceService.get_user_wallet(symbol);
 			logger.info(">>  get_user_wallet = "+json);
+			json = mexAccountInterfaceService.get_user_execution(symbol);
+			logger.info(">>  get_user_execution = "+json);
+			json = mexAccountInterfaceService.get_user_walletHistory(symbol);
+			logger.info(">>  get_user_walletHistory = "+json);
+			json = mexAccountInterfaceService.get_user_walletSummary(symbol);
+			logger.info(">>  get_user_walletSummary = "+json);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,9 +153,14 @@ public class BitOkAccountController extends BaseController {
 		List<BitOkAccount> ret = bitOkAccountService.findList(bitOkAccount);
 		if(null != ret && !ret.isEmpty()){
 			bitOkAccount = ret.get(0);
+			// BTC 转 USD， btc_usd 实时价格从缓存取
+			Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
+			BigDecimal usdPrice = bitOkAccount.getAccountBalance().multiply(new BigDecimal(curPrice));
+			bitOkAccount.setBond(usdPrice.setScale(4,BigDecimal.ROUND_HALF_UP));
 		}else{
 			bitOkAccount.setBalance(new BigDecimal(0));
 			bitOkAccount.setAccountBalance(new BigDecimal(0));
+			bitOkAccount.setBond(new BigDecimal(0));
 		}
 		return bitOkAccount;
 	}

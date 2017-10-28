@@ -145,8 +145,8 @@
 			var sdate = $("#sdate").val();
 		    var edate = $("#edate").val();
 			var obj = new Object();
-			//obj.startDt = sdate;
-			obj.startDt = "2017-10-12 21:20:00";
+			obj.startDt = sdate;
+			//obj.startDt = "2017-10-12 21:20:00";
 			obj.endDt = edate;
 			$("#container").mLoading("show");//显示loading组件
 			var url = "getBtcXbtusdPriceData";
@@ -462,7 +462,7 @@
 		    var edate = $("#edate").val();
 			var obj = new Object();
 			obj.startDt = sdate;
-			obj.startDt = "2017-10-12 21:20:00";
+			//obj.startDt = "2017-10-12 21:20:00";
 			obj.endDt = edate;
 			obj.symbol = symbol;
 			var url = "getDepthData";

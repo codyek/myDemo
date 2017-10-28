@@ -57,6 +57,7 @@ public class Constants {
 	public static final String DETAIL_TYPE_KP = "4"; 
 	
 	// 交易方向：1:开多 BuyUp , 2:开空BuyDown,  3:平多 SellUp,  4:平空SellDown
+	// mex  只有 buy 1,4 sell 2,3
 	/** 交易方向- 开多  */
 	public static final String DIRECTION_BUY_UP = "1"; 
 	/** 交易方向 - 开空  */

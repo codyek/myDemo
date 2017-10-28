@@ -72,6 +72,7 @@
 				</td>
 				<shiro:hasPermission name="platform:apiauthor:aPIAuthorize:edit"><td>
     				<a href="${ctx}/platform/apiauthor/aPIAuthorize/form?id=${author.id}">修改</a>
+    				<a href="${ctx}/platform/apiauthor/aPIAuthorize/getInfo?id=${author.id}">获取账户余额</a>
 					<a href="${ctx}/platform/apiauthor/aPIAuthorize/delete?id=${author.id}" onclick="return confirmx('确认要删除该API授权吗？', this.href)">删除</a>
 				</td></shiro:hasPermission>
 			</tr>

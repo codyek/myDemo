@@ -27,6 +27,14 @@ import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
+/**
+ *  V 1.0
+* @ClassName: AutoMainThread 
+* @Description: TODO
+* @author EK huangone 
+* @date 2017-10-28 下午5:36:30 
+*
+ */
 public class AutoMainThread extends Thread{
 
 	private Logger log = LoggerFactory.getLogger(getClass());

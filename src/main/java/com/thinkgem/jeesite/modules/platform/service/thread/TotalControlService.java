@@ -23,7 +23,7 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 /**
- * 自动对冲总控制线程
+ * 自动对冲总控制线程 V 1.0
 * @ClassName: TotalControlService 
 * @author EK huangone 
 * @date 2017-8-21 下午11:15:59 

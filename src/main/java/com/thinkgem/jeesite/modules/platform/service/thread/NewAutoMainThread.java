@@ -40,6 +40,14 @@ import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
+/**
+ *  V 2.0
+* @ClassName: NewAutoMainThread 
+* @Description: TODO
+* @author EK huangone 
+* @date 2017-10-28 下午5:36:17 
+*
+ */
 public class NewAutoMainThread implements Runnable{
 
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -58,7 +66,6 @@ public class NewAutoMainThread implements Runnable{
 	
 	//private Timer timerTask = null;
 	
-	//private SubTask subTask = null;
 	private long checkTime = 20000; // 每二十秒检查一次
 
 	public NewAutoMainThread(TradeTaskReq req, User user, String cacheKey) {
@@ -71,9 +78,6 @@ public class NewAutoMainThread implements Runnable{
 	public void run() {
 		try {
 			log.info(">> start runing ....");
-			//subTask = new SubTask(this);
-			//timerTask = new Timer();
-			//timerTask.schedule(subTask, 1000, 10000); // 每十秒运行一次，延时1秒
 			long startTime = System.currentTimeMillis();
 			while (true) {
 				try {

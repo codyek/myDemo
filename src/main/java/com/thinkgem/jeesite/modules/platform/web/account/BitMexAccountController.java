@@ -20,7 +20,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitMexAccount;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitOkAccount;
 import com.thinkgem.jeesite.modules.platform.service.account.BitMexAccountService;
@@ -96,9 +98,14 @@ public class BitMexAccountController extends BaseController {
 		List<BitMexAccount> ret = bitMexAccountService.findList(bitMexAccount);
 		if(null != ret && !ret.isEmpty()){
 			bitMexAccount = ret.get(0);
+			// XBT 转 USD， XBTUSD 实时价格从缓存取
+			Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_XBTUSDMEX_PRICE_KEY);
+			BigDecimal usdPrice = bitMexAccount.getAccountBalance().multiply(new BigDecimal(curPrice));
+			bitMexAccount.setBond(usdPrice.setScale(4,BigDecimal.ROUND_HALF_UP));
 		}else{
 			bitMexAccount.setBalance(new BigDecimal(0));
 			bitMexAccount.setAccountBalance(new BigDecimal(0));
+			bitMexAccount.setBond(new BigDecimal(0));
 		}
 		return bitMexAccount;
 	}

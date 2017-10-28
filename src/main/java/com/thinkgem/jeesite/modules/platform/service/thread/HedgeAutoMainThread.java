@@ -8,10 +8,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.common.utils.SpringContextHolder;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstants;
 import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
@@ -23,7 +25,9 @@ import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
 import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
 import com.thinkgem.jeesite.modules.platform.service.account.BitMexAccountService;
 import com.thinkgem.jeesite.modules.platform.service.account.BitOkAccountService;
+import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
@@ -181,6 +185,7 @@ public class HedgeAutoMainThread implements Runnable{
 	* @param isBurstB
 	 */
 	private void doBurst(Boolean isBurstA, Boolean isBurstB) throws Exception{
+		log.info(">>> doBurst isBurstA="+isBurstA +", isBurstB="+isBurstB);
 		// 窄平
 		BitTrade entity = getTradeEty(null,false); // 交易主表信息
 		
@@ -252,7 +257,8 @@ public class HedgeAutoMainThread implements Runnable{
 	 * type 监听类型
 	 */
 	private void openTrade(Boolean isWide,String type) throws Exception{
-		//log.info(">> openTrade 11 isWide ="+isWide);
+		log.info(">> openTrade isWide ="+isWide+" , type="+type);
+		
 		BitTrade entity = getTradeEty(type,true); // 交易主表信息
 		this.setTradeCode();
 		entity.setCode(tradeCode);
@@ -346,7 +352,7 @@ public class HedgeAutoMainThread implements Runnable{
 					}else{
 						detailEtyB.setDirection(Constants.DIRECTION_SELL_DOWN);
 					}
-					doTradeDetailOrder(detailEtyB,false,true);
+					doTradeDetailOrder(detailEtyB,false,false);
 				}
 			}
 		}
@@ -366,7 +372,7 @@ public class HedgeAutoMainThread implements Runnable{
 	 * type 监听类型
 	 */
 	private void closeTrade(Boolean isWide,String type) throws Exception{
-		//log.info(">> CCcloseTrade 11 isWide ="+isWide);
+		log.info(">> CCcloseTrade  isWide ="+isWide +" ,type="+type);
 		BitTrade entity = getTradeEty(type,false); // 交易主表信息
 		String detailType = "";
 		if(isWide){
@@ -455,6 +461,7 @@ public class HedgeAutoMainThread implements Runnable{
 	* @return 是否成功
 	 */
 	private Boolean doTradeDetailOrder(BitTradeDetail detailEty, boolean isOpen, boolean isA) throws Exception{
+		log.info(">>> doTradeDetailOrder isOpen="+isOpen +", isA="+isA);
 		Boolean flage = false;
 		String symbol = detailEty.getSymbol();
 		String platform = detailEty.getPlatform();
@@ -484,23 +491,23 @@ public class HedgeAutoMainThread implements Runnable{
 		if(deposit.compareTo(depositOther) > 0){
 			deposit = depositOther;
 		}
-		
-		// 使用保证金率 = 保证金率%*0.01
-		//BigDecimal temp = deposit.multiply(new BigDecimal(0.01));
-		//balance = balance.multiply(temp);
+		// TODO 先计算okex BTC与 mex XBTUSD  取10USD的倍数 保证金= n*10;
+		deposit = new BigDecimal((deposit.intValue()/10)*10);
 		// 使用杠杆后可用额（头寸） = 使用保证金 * 杠杆 
 		BigDecimal allQuota = deposit.multiply(new BigDecimal(lever));
 		// 委托数量
 		Integer amount = 0;
-		Integer parValue = 0;
+		Integer parValue = 0;  // 合约单张面值
 		if(isA){
 			parValue = req.getParValueA();
 		}else{
 			parValue = req.getParValueB();
 		}
-		// 根据保证金、杠杆、 计算委托数量  如： okex btc 1张= 100USD
+		// 根据保证金、杠杆、 计算委托数量  如： okex btc 1张= 100USD， mex 1张=1USD
 		amount = allQuota.intValue() / parValue;
 		
+		detailEty.setAmount(amount);
+		detailEty.setPosition(allQuota);
 		detailEty.setDeposit(deposit);
 		detailEty.setPlatform(platform);
 		detailEty.setCode(DateUtils.getSysTimeMillisCode());
@@ -509,30 +516,34 @@ public class HedgeAutoMainThread implements Runnable{
 		// 头寸 = 交易价格 * 委托数量
 		BigDecimal price = getCachePrice(symbol); // 实时价格
 		detailEty.setPrice(price);
-		detailEty.setAmount(amount);
-		detailEty.setPosition(allQuota);
-		// 价格对应的数量 = 头寸/价格 
+		// 价格对应的BTC数量 = 头寸/价格 
 		BigDecimal pAmount = allQuota.divide(price, 10, BigDecimal.ROUND_HALF_DOWN);
 		if(isOpen){
 			if(isA){
+				req.setAmountA(amount);
 				req.setPriceAmountA(pAmount);
 			}else{
+				req.setAmountB(amount);
 				req.setPriceAmountB(pAmount);
 			}
 			detailEty.setPriceAmount(pAmount); 
 		}else {
 			if(isA){
+				detailEty.setAmount(req.getAmountA());
 				detailEty.setPriceAmount(req.getPriceAmountA()); 
 			}else{
+				detailEty.setAmount(req.getAmountB());
 				detailEty.setPriceAmount(req.getPriceAmountB()); 
 			}
 		}
 		if(BitMexInterConstants.PLATFORM_CODE.equals(platform)){
 			// MEX
 			flage = postMex(detailEty,false);
+			log.info(">>>>>>>>　　　Post Mex flage ="+flage);
 		}else if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
 			// OKEX
 			flage = postOkex(detailEty,false);
+			log.info(">>>>>>>>　　　Post Okex flage ="+flage);
 		}
 		return flage;
 	}
@@ -546,27 +557,34 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private Boolean postMex(BitTradeDetail detailEty,boolean isAgain) throws Exception{
 		Boolean flage = false;
-		// TODO 
 		MexOrderInterfaceService service = SpringContextHolder.getBean(MexOrderInterfaceService.class);
 		long startTime = System.currentTimeMillis();
+		log.info(">> mex post Amount =  "+detailEty.getAmount());
 		try {
 			// 设置杠杆倍数
 			service.post_leverage(detailEty.getSymbol(),10D);
 			String direction = detailEty.getDirection();
 			String side = "";
-			if(Constants.DIRECTION_BUY_UP.equals(direction) || Constants.DIRECTION_BUY_DOWN.equals(direction)){
-				side = "Buy";
-			}else if(Constants.DIRECTION_SELL_UP.equals(direction) || Constants.DIRECTION_SELL_DOWN.equals(direction)){
-				side = "Sell";
+			if(Constants.DIRECTION_BUY_UP.equals(direction) || Constants.DIRECTION_SELL_DOWN.equals(direction)){
+				side = "Buy"; // 1开多,4平空
+			}else if(Constants.DIRECTION_BUY_DOWN.equals(direction) || Constants.DIRECTION_SELL_UP.equals(direction)){
+				side = "Sell"; // 2开空，3平多
 			}
 			// doPost
-			service.post_order(detailEty.getSymbol(),"Market",0D,detailEty.getAmount().doubleValue(), side, detailEty.getTradeCode());
-			flage = true;
+			String json = service.post_order(detailEty.getSymbol(),"Market",0D,detailEty.getAmount().doubleValue(), side, detailEty.getTradeCode());
+			if(StringUtils.isNotBlank(json)){
+				JSONObject jobJ = JSONObject.parseObject(json);
+				if(jobJ.containsKey("orderID")){
+					String orderId = jobJ.getString("orderID");
+					log.info(">> Bitmex Post success oId = "+orderId);
+					flage = true;
+				}
+			}
 		} catch (ServiceException e) {
 			// 参数失败
 			flage = false;
 			log.error(">> postMex Biz_error :",e.getMessage());
-			return flage;
+			return true;
 		} catch (Exception e) {
 			// 网络异常，重试一次
 			if(!isAgain){
@@ -574,7 +592,7 @@ public class HedgeAutoMainThread implements Runnable{
 			}else{
 				flage = false;
 				log.error(">> postMex error :",e);
-				return flage;
+				return true;
 			}
 		}
 		long endTime = System.currentTimeMillis();
@@ -583,7 +601,7 @@ public class HedgeAutoMainThread implements Runnable{
 		BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
 		bean.save(detailEty);
 		
-		return flage;
+		return true;
 	}
 	
 	/**
@@ -595,15 +613,23 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private Boolean postOkex(BitTradeDetail detailEty,boolean isAgain) throws Exception{
 		Boolean flage = false;
-		// TODO 
 		OrderInterfaceService service = SpringContextHolder.getBean(OrderInterfaceService.class);
 		long startTime = System.currentTimeMillis();
+		log.info(">> mex Okex Amount =  "+detailEty.getAmount());
 		try {
 			String direction = detailEty.getDirection();
+			Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
 			// doPost
-			service.future_trade(detailEty.getSymbol(), "quarter", "0",
+			String json = service.future_trade(detailEty.getSymbol(), "quarter", curPrice.toString(),
 					detailEty.getAmount().toString(), direction, "1", "10");
-			flage = true;
+			if(StringUtils.isNotBlank(json)){
+				JSONObject jobJ = JSONObject.parseObject(json);
+				if(jobJ.containsKey("result") && jobJ.containsKey("order_id") && jobJ.getBooleanValue("result")){
+					Integer orderId = jobJ.getInteger("order_id");
+					log.info(">> okex Post success oId = "+orderId);
+					flage = true;
+				}
+			}
 		} catch (Exception e) {
 			// 重试一次
 			if(!isAgain){
@@ -638,7 +664,7 @@ public class HedgeAutoMainThread implements Runnable{
 		BitTradeDetail detailEty = new BitTradeDetail();
 		detailEty.setTradeCode(tradeCode);
 		List<BitTradeDetail> list = bean.findList(detailEty);
-		boolean upIsA = false; // A币种是否为做多
+		//boolean upIsA = false; // A币种是否为做多
 		if(null != list && !list.isEmpty()){
 			// 以币种计算  [0]开， [1]平
 			BitTradeDetail[] symbolUp = new BitTradeDetail[2];
@@ -648,9 +674,9 @@ public class HedgeAutoMainThread implements Runnable{
 				String direction = dal.getDirection();
 				
 				if(Constants.DIRECTION_BUY_UP.equals(direction)){
-					if(req.getSymbolA().equals(dal.getSymbol())){
+					/*if(req.getSymbolA().equals(dal.getSymbol())){
 						upIsA = true;
-					}
+					}*/
 					// 开多
 					symbolUp[0] = dal;
 				}else if(Constants.DIRECTION_SELL_UP.equals(direction)){
@@ -686,23 +712,23 @@ public class HedgeAutoMainThread implements Runnable{
 			/** 保存账户保证金  */
 			BigDecimal feeRateA = req.getFeeRateA();
 			BigDecimal feeRateB = req.getFeeRateB();
-			BigDecimal feeRateUp = ZERO;
+			/*BigDecimal feeRateUp = ZERO;
 			BigDecimal feeRateDown = ZERO;
 			if(upIsA){
 				feeRateUp = feeRateA.multiply(new BigDecimal(0.01));
 				feeRateDown = feeRateB.multiply(new BigDecimal(0.01));
 				BigDecimal feeUp = feeRateUp.multiply(totalPin_up);
 				BigDecimal feeDown = feeRateDown.multiply(totalPin_down);
-				updateAccount(req.getSymbolA(),req.getPlatformA(),revenue_up.subtract(feeUp));
-				updateAccount(req.getSymbolB(),req.getPlatformB(),revenue_down.subtract(feeDown));
+				//updateAccount(req.getSymbolA(),req.getPlatformA(),revenue_up.subtract(feeUp));
+				//updateAccount(req.getSymbolB(),req.getPlatformB(),revenue_down.subtract(feeDown));
 			}else{
 				feeRateUp = feeRateB.multiply(new BigDecimal(0.01));
 				feeRateDown = feeRateA.multiply(new BigDecimal(0.01));
 				BigDecimal feeUp = feeRateUp.multiply(totalPin_up);
 				BigDecimal feeDown = feeRateDown.multiply(totalPin_down);
-				updateAccount(req.getSymbolA(),req.getPlatformA(),revenue_down.subtract(feeDown));
-				updateAccount(req.getSymbolB(),req.getPlatformB(),revenue_up.subtract(feeUp));
-			}
+				//updateAccount(req.getSymbolA(),req.getPlatformA(),revenue_down.subtract(feeDown));
+				//updateAccount(req.getSymbolB(),req.getPlatformB(),revenue_up.subtract(feeUp));
+			}*/
 			
 			// 费用 
 			//  预计费用
@@ -745,6 +771,7 @@ public class HedgeAutoMainThread implements Runnable{
 	private BigDecimal getAccountBalance(String symbol,String platform) throws Exception{
 		BigDecimal balance = this.ZERO;
 		User user = UserUtils.getUser();
+		BigDecimal price = getCachePrice(symbol);
 		if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
 			// okex 账户
 			BitOkAccountService OkBean = SpringContextHolder.getBean(BitOkAccountService.class);
@@ -754,6 +781,7 @@ public class HedgeAutoMainThread implements Runnable{
 			List<BitOkAccount> ret = OkBean.findList(bitOkAccount);
 			BitOkAccount okAccount = ret.get(0);
 			balance = okAccount.getAccountBalance();
+			
 		}else{
 			// bitmex 账户
 			BitMexAccountService MexBean = SpringContextHolder.getBean(BitMexAccountService.class);
@@ -764,11 +792,21 @@ public class HedgeAutoMainThread implements Runnable{
 			BitMexAccount mexAccount = ret.get(0);
 			balance = mexAccount.getAccountBalance();
 		}
+		// BTC 转 USD
+		balance = balance.multiply(price);
 		return balance;
 	}
 	
-	private void updateAccount(String symbol,String platform, BigDecimal balance) throws Exception{
-		User user = UserUtils.getUser();
+	private void updateAccount() {
+		try {
+			MexAccountInterfaceService mexAccountSer = SpringContextHolder.getBean(MexAccountInterfaceService.class);
+			AccountInterfaceService okAccountSer = SpringContextHolder.getBean(AccountInterfaceService.class);
+			mexAccountSer.getAccountbalance();
+			okAccountSer.getAccountbalance();
+		} catch (Exception e) {
+			log.error(">> 获取账户余额信息  error:",e);
+		}
+		/*User user = UserUtils.getUser();
 		if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
 			// okex 账户
 			BitOkAccountService OkBean = SpringContextHolder.getBean(BitOkAccountService.class);
@@ -789,7 +827,7 @@ public class HedgeAutoMainThread implements Runnable{
 			BitMexAccount mexAccount = ret.get(0);
 			mexAccount.setAccountBalance(mexAccount.getAccountBalance().add(balance));
 			MexBean.save(mexAccount);
-		}
+		}*/
 	}
 	
 	/**
@@ -880,5 +918,7 @@ public class HedgeAutoMainThread implements Runnable{
 		}else{
 			log.error(">> cacheReq is null !");
 		}
+		// 查询账户余额信息
+		updateAccount();
 	}
 }

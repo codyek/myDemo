@@ -70,6 +70,10 @@ public class BitMexInterConstants {
 	/**  以垂直格式获取当前订单  */
 	public static String GET_ORDERBOOK_L2_URL;
 	
+	private static String GET_USER_CODE = "get_user";
+	/**  获取您帐户信息  */
+	public static String GET_USER_URL;
+	
 	private static String GET_USER_MARGIN_CODE = "get_user_margin";
 	/**  获取您帐户的保证金状态  */
 	public static String GET_USER_MARGIN_URL;
@@ -77,6 +81,18 @@ public class BitMexInterConstants {
 	private static String GET_USER_WALLET_CODE = "get_user_wallet";
 	/**  获取您当前的钱包信息  */
 	public static String GET_USER_WALLET_URL;
+	
+	private static String GET_USER_WALLETHISTORY_CODE = "get_user_walletHistory";
+	/**  获取钱包交易历史数据  */
+	public static String GET_USER_WALLETHISTORY_URL;
+	
+	private static String GET_USER_WALLETSUMMARY_CODE = "get_user_walletSummary";
+	/**  获取所有钱包交易数据  */
+	public static String GET_USER_WALLETSUMMARY_URL;
+	
+	private static String GET_USER_EXECUTION_CODE = "get_user_execution";
+	/**  获取您当前的余额数据  */
+	public static String GET_USER_EXECUTION_URL;
 	
 	private static String POST_POSITION_LEVERAGE_CODE = "post_position_leverage";
 	/**  选择一个仓位的杠杆  */
@@ -135,11 +151,23 @@ public class BitMexInterConstants {
 				if(GET_ORDERBOOK_L2_CODE.equals(code)){
 					GET_ORDERBOOK_L2_URL = ifs.getUrl();
 				}
+				if(GET_USER_CODE.equals(code)){
+					GET_USER_URL = ifs.getUrl();
+				}
 				if(GET_USER_MARGIN_CODE.equals(code)){
 					GET_USER_MARGIN_URL = ifs.getUrl();
 				}
 				if(GET_USER_WALLET_CODE.equals(code)){
 					GET_USER_WALLET_URL = ifs.getUrl();
+				}
+				if(GET_USER_WALLETHISTORY_CODE.equals(code)){
+					GET_USER_WALLETHISTORY_URL = ifs.getUrl();
+				}
+				if(GET_USER_WALLETSUMMARY_CODE.equals(code)){
+					GET_USER_WALLETSUMMARY_URL = ifs.getUrl();
+				}
+				if(GET_USER_EXECUTION_CODE.equals(code)){
+					GET_USER_EXECUTION_URL = ifs.getUrl();
 				}
 				if(POST_POSITION_LEVERAGE_CODE.equals(code)){
 					POST_POSITION_LEVERAGE_URL = ifs.getUrl();

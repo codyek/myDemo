@@ -26,8 +26,10 @@
 					<div>
 						<table id="contentTable" class="table table-striped table-bordered table-condensed">
 							<tr>
-								<td width="70px">可用保证金</td>
-								<td id="available_ok">--</td>
+								<td width="70px">可用保证金(USD)</td>
+								<td id="balance_ok">--</td>
+								<td width="60px">可用保证金(BTC)</td>
+								<td id="available_ok" >--</td>
 							</tr>
 						</table>
 					</div>
@@ -42,8 +44,10 @@
 					<div>
 						<table id="contentTable" class="table table-striped table-bordered table-condensed">
 							<tr>
-								<td width="70px">可用保证金</td>
-								<td id="available_mex">--</td>
+								<td width="70px">可用保证金(USD)</td>
+								<td id="balance_mex">--</td>
+								<td width="60px">账户余额(XBT)</td>
+								<td id="available_mex" >--</td>
 							</tr>
 						</table>
 					</div>
@@ -218,7 +222,7 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	//$("#balance_ok").html(data.balance);
+		    	$("#balance_ok").html(data.bond);
 		    	$("#available_ok").html(data.accountBalance);
 		    	 changeOk(50);
 		    },
@@ -239,7 +243,7 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	//$("#balance_mex").html(data.balance);
+		    	$("#balance_mex").html(data.bond);
 		    	$("#available_mex").html(data.accountBalance);
 		    	changeMex(50);
 		    },
@@ -250,14 +254,14 @@
 	}
 	
 	function changeOk(deposit){
-		var value = $("#available_ok").html();
+		var value = $("#balance_ok").html();
 		var lever = $("#leverA").val();
 		var pst = lever * value;
 		pst = pst * (deposit/100);
 		$("#pstA").html(decimal(pst,2));
 	}
 	function changeMex(deposit){
-		var value = $("#available_mex").html();
+		var value = $("#balance_mex").html();
 		var lever = $("#leverB").val();
 		var pst = lever * value;
 		pst = pst * (deposit/100);

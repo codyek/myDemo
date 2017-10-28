@@ -74,6 +74,7 @@ public class MexOrderInterfaceService extends MexBaseService{
 		JSONObject param = new JSONObject();
 		param.put("symbol", symbol);
 		param.put("count", count);
+		param.put("reverse", true);
 		return exchange(url, HttpMethod.GET, true, param);
 	}
 	

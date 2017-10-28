@@ -44,11 +44,10 @@
 					<div>
 						<table id="contentTable" class="table table-striped table-bordered table-condensed">
 							<tr>
-								<%--<td width="60px">账户余额</td>
-								<td id="balance_ok" >--</td>
-								--%>
-								<td width="70px">可用保证金</td>
-								<td id="available_ok">--</td>
+								<td width="70px">可用保证金(USD)</td>
+								<td id="balance_ok">--</td>
+								<td width="60px">可用保证金(BTC)</td>
+								<td id="available_ok" >--</td>
 							</tr>
 						</table>
 					</div>
@@ -58,12 +57,11 @@
 					<p>&nbsp;&nbsp; 当前价格：<span id="mexPrice"></span><span class="floatRight">合约指数：<span id="mexIndex"></span>&nbsp;&nbsp;</span></p>
 					<div>
 						<table id="contentTable" class="table table-striped table-bordered table-condensed">
-							<tr><%--
-								<td width="60px">账户余额</td>
-								<td id="balance_mex" >--</td>
-								--%>
-								<td width="70px">可用保证金</td>
-								<td id="available_mex">--</td>
+							<tr>
+								<td width="70px">可用保证金(USD)</td>
+								<td id="balance_mex">--</td>
+								<td width="60px">账户余额(XBT)</td>
+								<td id="available_mex" >--</td>
 							</tr>
 						</table>
 					</div>
@@ -261,7 +259,7 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	//$("#balance_ok").html(data.balance);
+		    	$("#balance_ok").html(data.bond);
 		    	$("#available_ok").html(data.accountBalance);
 		    	 changeOk(50);
 		    },
@@ -282,7 +280,7 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	//$("#balance_mex").html(data.balance);
+		    	$("#balance_mex").html(data.bond);
 		    	$("#available_mex").html(data.accountBalance);
 		    	changeMex(50);
 		    },
@@ -293,14 +291,14 @@
 	}
 	
 	function changeOk(deposit){
-		var value = $("#available_ok").html();
+		var value = $("#balance_ok").html();
 		var lever = $("#leverA").val();
 		var pst = lever * value;
 		pst = pst * (deposit/100);
 		$("#pstA").html(decimal(pst,2));
 	}
 	function changeMex(deposit){
-		var value = $("#available_mex").html();
+		var value = $("#balance_mex").html();
 		var lever = $("#leverB").val();
 		var pst = lever * value;
 		pst = pst * (deposit/100);
@@ -690,10 +688,10 @@
 		    var edate = $("#edate").val();
 			var obj = new Object();
 			obj.startDt = sdate;
-			//obj.startDt = "2017-08-20 22:20:00";
+			obj.startDt = "2017-10-12 21:20:00";
 			obj.endDt = edate;
 			$("#container").mLoading("show");//显示loading组件
-			var url = "getBtcPriceData";
+			var url = "${ctx}/analysis/getBtcXbtusdPriceData";
 			$.ajax({
 		        url: url,  
 			    data:obj,  

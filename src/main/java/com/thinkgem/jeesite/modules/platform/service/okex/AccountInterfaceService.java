@@ -1,13 +1,22 @@
 package com.thinkgem.jeesite.modules.platform.service.okex;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONObject;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
+import com.thinkgem.jeesite.modules.platform.entity.account.BitOkAccount;
 import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
+import com.thinkgem.jeesite.modules.platform.service.account.BitOkAccountService;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 
 /**
@@ -20,7 +29,47 @@ import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
 @Service
 @Transactional(readOnly = true)
 public class AccountInterfaceService extends OkexBaseService{
-
+	
+	@Autowired
+	private BitOkAccountService bitOkAccountService;
+	
+	@Transactional
+	public BigDecimal getAccountbalance() throws Exception{
+		BigDecimal balance = null;
+		String json = future_userinfo_4fix();
+		//logger.info(">>　okex future_userinfo_4fix json＝"+json);
+		if(StringUtils.isNotBlank(json)){
+			JSONObject jobJ = JSONObject.parseObject(json);
+			if(jobJ.containsKey("result") && jobJ.containsKey("info") && jobJ.getBooleanValue("result")){
+				JSONObject infoObject = jobJ.getJSONObject("info");
+				if(infoObject.containsKey("btc")){
+					JSONObject btcObj = infoObject.getJSONObject("btc");
+					balance = btcObj.getBigDecimal("balance");
+					balance = balance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					// 保存到数据库 
+					saveOkexAccount(balance);
+				}
+			}
+		}
+		return balance;
+	}
+	
+	// 保存Okex账户btc_usd余额
+	private void saveOkexAccount(BigDecimal balance){
+		BitOkAccount bitOkAccount = new BitOkAccount();
+		User user = UserUtils.getUser();
+		bitOkAccount.setUseId(user.getId());
+		bitOkAccount.setSymbol("btc_usd");
+		List<BitOkAccount> list = bitOkAccountService.findList(bitOkAccount);
+		if(null != list && !list.isEmpty()){
+			bitOkAccount = list.get(0);
+		}
+		bitOkAccount.setBalance(balance);
+		bitOkAccount.setAccountBalance(balance);
+		bitOkAccountService.save(bitOkAccount);
+		logger.info(">>>　save okex Account ok!");
+	}
+	
 	/**
 	* 获取OKEX合约账户信息（全仓）
 	* @return String

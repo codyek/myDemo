@@ -24,6 +24,7 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.mongodb.model.LtcTradeData;
 import com.thinkgem.jeesite.modules.mongodb.service.LtcTradeDataInterface;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
+import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
@@ -48,6 +49,12 @@ public class InterTestController extends BaseController {
 	
 	@Autowired
 	private OrderInterfaceService orderService;
+	
+	@Autowired
+	private MexOrderInterfaceService mexOrderService;
+	
+	@Autowired
+	private MexAccountInterfaceService mexAccountService;
 	
 	@RequestMapping(value = {"gets", ""})
 	@ResponseBody
@@ -145,12 +152,6 @@ public class InterTestController extends BaseController {
 	}
 	
 	// --------------------------------------------------------------------
-	
-	@Autowired
-	private MexOrderInterfaceService mexOrderService;
-	
-	@Autowired
-	private MexAccountInterfaceService mexAccountService;
 	
 
 	@RequestMapping(value = {"mex", ""})
@@ -284,5 +285,75 @@ public class InterTestController extends BaseController {
 			return null;
 		}
 	}
-			
+	
+	@RequestMapping(value = {"testGetOrder", ""})
+	public String testGetOrderPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+		//model.addAttribute("page", page);
+		return "modules/platform/trade/TestGetOrder";
+	}
+	
+	@RequestMapping(value = {"testInterForm", ""})
+	public String testInterFormPage(TradeTaskReq req,HttpServletRequest request, HttpServletResponse response, Model model) {
+		//model.addAttribute("page", page);
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/trade/TestInterForm";
+	}
+	
+	@RequestMapping("saveOrders")
+	@ResponseBody
+    public String saveOrders(TradeTaskReq req){
+		String msg = "";
+		try {
+			String symbol = req.getSymbolA();
+			String dir = req.getOpenDirA();
+			if("btc_usd".equals(symbol)){
+				Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
+				// okex
+				msg = orderService.future_trade(symbol, "quarter", curPrice.toString(), req.getAmountA().toString(), dir, "1", "10");
+			}else if("XBTUSD".equals(symbol)){
+				// mex
+				// 设置杠杆倍数
+				mexOrderService.post_leverage(symbol,10D);
+				String side = "";
+				if(Constants.DIRECTION_BUY_UP.equals(dir) || Constants.DIRECTION_SELL_DOWN.equals(dir)){
+					side = "Buy";  // 1开多,4平空
+				}else if(Constants.DIRECTION_BUY_DOWN.equals(dir) || Constants.DIRECTION_SELL_UP.equals(dir)){
+					side = "Sell"; // 2开空，3平多
+				}
+				msg = mexOrderService.post_order(symbol, "Market",0D, req.getAmountA().doubleValue(), side, req.getType());
+			}
+		} catch (Exception e) {
+			msg = e.getMessage();
+			logger.error(">> getOkexOrders error:",e);
+		}
+		
+		return msg;
+	}
+	
+	
+	@RequestMapping("getOkexOrders")
+	@ResponseBody
+    public String getOkexOrders(String symbol,String status){
+		String msg = "";
+		try {
+			msg = orderService.future_order_info(symbol, "quarter", "-1", status, "0", "20");
+		} catch (Exception e) {
+			logger.error(">> getOkexOrders error:",e);
+		}
+		
+		return msg;
+	}
+		
+	@RequestMapping("getMexOrders")
+	@ResponseBody
+    public String getMexOrders(String symbol){
+		String msg = "";
+		try {
+			msg = mexOrderService.get_order(symbol, 20D);
+		} catch (Exception e) {
+			logger.error(">> getMexOrders error:",e);
+		}
+		
+		return msg;
+	}
 }
