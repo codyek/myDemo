@@ -93,9 +93,13 @@
 		var okexPrice = document.getElementById("okexPrice");
 		var mexPrice = document.getElementById("mexPrice");
 		var showAgio = document.getElementById("showAgio");
-		
+		var balance_ok = document.getElementById("balance_ok");
+		var available_ok = document.getElementById("available_ok");
 		showAgio.innerHTML = decimal(price - mexPrice.innerHTML,2);
 		okexPrice.innerHTML = price;
+		var btcValue = available_ok.innerHTML;
+		var showUsd = price*btcValue
+		balance_ok.innerHTML = decimal(showUsd, 2);
 	}
 	
 	// ok当前指数

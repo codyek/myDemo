@@ -91,7 +91,12 @@
 	// ok当前价格
 	function showOkexPrice(price){
 		var okexPrice = document.getElementById("okexPrice");
+		var balance_ok = document.getElementById("balance_ok");
+		var available_ok = document.getElementById("available_ok");
 		okexPrice.innerHTML = price;
+		var btcValue = available_ok.innerHTML;
+		var showUsd = price*btcValue
+		balance_ok.innerHTML = decimal(showUsd, 2);
 	}
 	
 	// ok当前指数

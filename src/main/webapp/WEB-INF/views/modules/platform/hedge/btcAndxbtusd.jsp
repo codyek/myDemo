@@ -4,11 +4,12 @@
 	<meta charset="utf-8" />
 	<title>BTC与XBTUSD</title>
 	<meta name="decorator" content="default"/>
-	<link href="${ctxStatic}/hedge/pageNew.css" rel="stylesheet" />
+	<link href="${ctxStatic}/hedge/page_XbtUsd.css" rel="stylesheet" />
+	<link href="${ctxStatic}/tab/tab.css" rel="stylesheet" />
 	<script src="${ctxStatic}/jquery/jquery-1.9.1.min.js" type="text/javascript" ></script>
 	<script src="${ctxStatic}/echarts/jquery.mloading.js" type="text/javascript" ></script>
 	<script src="${ctxStatic}/My97DatePicker/WdatePicker.js" type="text/javascript" ></script>
-	<script src="${ctxStatic}/hedge/okexNew.js" type="text/javascript"></script>
+	<script src="${ctxStatic}/hedge/okex_XbtUsd.js" type="text/javascript"></script>
 	<script src="${ctxStatic}/hedge/mex.js" type="text/javascript"></script>
 	<script src="${ctxStatic}/hedge/common.js" type="text/javascript"></script>
 	<style type="text/css">
@@ -84,30 +85,57 @@
 					<input id="btnUpdate" class="btn" type="button" value="修 改" onclick="updateData()"/>&nbsp;
 					<input id="btnCancel" class="btn" type="button" value="停 止" onclick="stopJob()"/>
 				</div>
-				<div >
-					<table id="contentTable" class="table table-striped table-bordered table-condensed">
-						<th>
-							<td colspan="4">监控数据</td>
-							<td >最新监听时间</td>
-							<td >--</td>
-							<td ><input class="btn" type="button" value="刷新" onclick="getTradeList()"/></td>
-						</th>
-						<tr>
-							<td >开始时间</td>
-							<td >结束时间</td>
-							<td >最大差价</td>
-							<td >最小差价</td>
-							<td >是否爆仓</td>
-							<td >收入</td>
-							<td >费用</td>
-							<td >净收益</td>
-						</tr>
-						<tfoot id="showTradeTr"></tfoot>
-					</table>
-				</div>
 			</form:form>
+		</div>
+			
+			<!--  选项卡   -->
+			<div class="titTabs">
+				<ul class="titTab">
+					<li class="active">监控主数据</li>
+					<li>当前对冲单</li>
+				</ul>
+				<div class="titInfo">
+					<div class="on">
+						 <table id="contentTable" class="table table-striped table-bordered table-condensed">
+							<tr>
+								<td width="120px">最新监听时间</td>
+								<td width="120px">--</td>
+								<td colspan="5"> </td>
+								<td ><input class="btn" type="button" value="刷新" onclick="getTradeList()"/></td>
+							</tr>
+							<tr>
+								<td >开始时间</td>
+								<td >结束时间</td>
+								<td >最大差价</td>
+								<td >最小差价</td>
+								<td >是否爆仓</td>
+								<td >收入</td>
+								<td >费用</td>
+								<td >净收益</td>
+							</tr>
+							<tfoot id="showTradeTr"></tfoot>
+						</table>
+					</div>
+					<div>
+						<table id="" class="table table-striped table-bordered table-condensed">
+							<tr>
+								<td >交易时间</td>
+								<td >币种</td>
+								<td >杠杆</td>
+								<td >数量</td>
+								<td >头寸</td>
+								<td >交易方向</td>
+								<td >成交价格</td>
+								<td >爆仓价格</td>
+								<td >当前收益率</td>
+								<td >操作</td>
+							</tr>
+							<tfoot id="showDetailTr"></tfoot>
+						</table>
+					</div>
+				</div>
 			</div>
-	</div>
+		</div>
 </div>
 
 	<script type="text/javascript">
@@ -115,6 +143,11 @@
 	var symbolB = "XBTUSD";
 	
 	$(document).ready(function() {
+		// 选项卡
+		$(".titTab li").click(function(){
+	          $(".titTab li").eq($(this).index()).addClass("active").siblings().removeClass("active");
+	          $(".titInfo div").hide().eq($(this).index()).show();
+        });
 		
 	    // 初始化websocket 显示实时价格和指数
 	    //  okex 
@@ -127,6 +160,7 @@
 	    getOkAccount();
 	    getMexAccount();
 	    getTradeList();
+	    getTradeDetailList();
 	});
 	
 	// 遮罩效果
@@ -210,6 +244,58 @@
 			$("#showTradeTr").html(showText);
 		}
 	}
+	
+	// 获取当前对冲明细单
+	function getTradeDetailList(){
+		var obj = new Object();
+		var url ="${ctx}/platform/trade/bitTrade/getTradeDetailList";
+		$.ajax({
+	        url: url,  
+		    data:obj,  
+		    type: 'POST',
+		    cache: false,
+		    success: function (data) {  
+		    	showTradeDetailData(data);
+		    },
+		    error:function(xhr,errorText,errorType){
+		    	top.$.jBox.tip('请求监控状态网络异常！','error');
+		    }
+		});
+	}
+	
+	function showTradeDetailData(data){
+		if(null != data){
+			var showText = "";
+			for (var i = 0; i < data.length; i++) {
+		    	var obj = data[i];
+		    	var closeTime = "";
+		    	var revenue = "";
+		    	var fee = "";
+		    	var profit = "";
+		    	if(null != obj.closeBarnTime && typeof(obj.closeBarnTime) != "undefined"){
+		    		closeTime = obj.closeBarnTime;
+		    	}
+		    	if(null != obj.revenue && typeof(obj.revenue) != "undefined"){
+		    		revenue = obj.revenue;
+		    	}
+		    	if(null != obj.fee && typeof(obj.fee) != "undefined"){
+		    		fee = obj.fee;
+		    	}
+		    	if(null != obj.profit && typeof(obj.profit) != "undefined"){
+		    		profit = obj.profit;
+		    	}
+		    	showText += "<tr><td>"+obj.openBarnTime+"</td><td>"+closeTime
+							    	+"</td><td>"+obj.maxAgio+"</td>"
+							    	+"</td><td>"+obj.minAgio+"</td>"
+							    	+"</td><td>"+obj.ifBurstBarn+"</td>"
+							    	+"</td><td>"+revenue+"</td>"
+							    	+"</td><td>"+fee+"</td>"
+		    					 	+"</td><td>"+profit+"</td></tr>";
+			}
+			$("#showDetailTr").html(showText);
+		}
+	}
+	
 	
 	function getOkAccount(){
 		var obj = new Object();
@@ -326,6 +412,8 @@
 		$("#tradeInfo").mLoading("show");//显示loading组件
 		var url = "${ctx}/hedge/stopJob" ;
 		var obj = new Object();
+		obj.symbolA=symbolA;
+		obj.symbolB=symbolB;
 		$.ajax({
 	        url: url,  
 		    data:obj,  

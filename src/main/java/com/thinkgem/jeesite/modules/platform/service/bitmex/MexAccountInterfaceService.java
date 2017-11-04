@@ -38,8 +38,8 @@ public class MexAccountInterfaceService extends MexBaseService{
 		//logger.info(">>  bitmex get_user_margin = "+json);
 		if(StringUtils.isNotBlank(json)){
 			JSONObject jobJ = JSONObject.parseObject(json);
-			if(jobJ.containsKey("walletBalance")){
-				balance = jobJ.getBigDecimal("walletBalance");
+			if(jobJ.containsKey("marginBalance")){
+				balance = jobJ.getBigDecimal("marginBalance");
 				// mex XBt 转 XBT 1XBt = 0.00000001XBT
 				balance = balance.multiply(new BigDecimal(0.00000001));
 				balance = balance.setScale(6,BigDecimal.ROUND_HALF_UP);

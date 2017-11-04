@@ -313,7 +313,9 @@ public class InterTestController extends BaseController {
 			}else if("XBTUSD".equals(symbol)){
 				// mex
 				// 设置杠杆倍数
+				//msg = mexOrderService.post_leverage(symbol,10D);
 				mexOrderService.post_leverage(symbol,10D);
+				//logger.info(">>>　　post_leverage＝　"+msg);
 				String side = "";
 				if(Constants.DIRECTION_BUY_UP.equals(dir) || Constants.DIRECTION_SELL_DOWN.equals(dir)){
 					side = "Buy";  // 1开多,4平空

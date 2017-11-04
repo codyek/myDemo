@@ -22,7 +22,9 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitMonitor;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTrade;
+import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
+import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
@@ -41,6 +43,9 @@ public class BitTradeController extends BaseController {
 	
 	@Autowired
 	private BitMonitorService bitMonitorService;
+	
+	@Autowired
+	private BitTradeDetailService bitTradeDetailService;
 	
 	@ModelAttribute
 	public BitTrade get(@RequestParam(required=false) String id) {
@@ -113,4 +118,36 @@ public class BitTradeController extends BaseController {
 		return list;
 	}
 	
+	/**
+	 * 获取当前监控交易数据
+	 * @return List<BitTrade>
+	 */
+	@RequestMapping(value = "getTradeDetailList")
+	@ResponseBody
+	public List<BitTradeDetail> getTradeDetailList(){
+		List<BitTradeDetail> list = null;
+		BitMonitor bitMonitor = new BitMonitor();
+		User user = UserUtils.getUser();
+		bitMonitor.setUser(user);
+		bitMonitor.setStatusFlag(Constants.STATUS_RUN);
+		// 调service
+		List<BitMonitor> monitors = bitMonitorService.findList(bitMonitor);
+		logger.info("Detail monitors size = "+monitors.size());
+		if(null != monitors && !monitors.isEmpty()){
+			String monitorCode = monitors.get(0).getCode();
+			BitTrade bitTrade = new BitTrade();
+			bitTrade.setMonitorCode(monitorCode);
+			bitTrade.setIfClose("0");
+			List<BitTrade> mainlist = bitTradeService.findList(bitTrade);
+			if(null != mainlist && !mainlist.isEmpty()){
+				logger.info("Detail BitTrades size = "+mainlist.size());
+				BitTrade trade = mainlist.get(0);
+				String tCode = trade.getCode();
+				BitTradeDetail bitTradeDetail = new BitTradeDetail();
+				bitTradeDetail.setTradeCode(tCode);
+				list = bitTradeDetailService.findList(bitTradeDetail);
+			}
+		}
+		return list;
+	}
 }

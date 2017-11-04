@@ -53,7 +53,9 @@ public class MexOrderInterfaceService extends MexBaseService{
 		JSONObject param = new JSONObject();
 		param.put("symbol", symbol);
 		param.put("ordType", ordType);
-		param.put("price", price);
+		if(!"Market".equals(ordType)){ // 市场价 无price入参
+			param.put("price", price);
+		}
 		param.put("orderQty", orderQty);
 		param.put("side", side);
 		param.put("text", text);

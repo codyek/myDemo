@@ -89,6 +89,8 @@ public abstract class MexBaseService {
 					param.clear();
 					sign = getSign(method.name(),url,nonce,"",secretkey);
 				}else{
+					String pUrl = convertJson2GetParamsUrlEncode(param);
+					url += "?"+pUrl;
 					sign = getSign(method.name(),url,nonce,param.toString(),secretkey);
 				}
 				

@@ -75,9 +75,9 @@ public class HedgeAutoMainThread implements Runnable{
 					BigDecimal min = req.getMinAgio();
 					// 关闭自动任务：关闭命令+可开仓状态
 					if ("stop".equals(req.getStopJob())) {
-						if(Constants.CAN_OPEN.equals(status)){
+						//if(Constants.CAN_OPEN.equals(status)){
 							break;
-						}
+						//}
 					}
 					// 获取差价
 					BigDecimal agioOld = getAgio(req.getSymbolA(), req.getSymbolB());
@@ -577,14 +577,18 @@ public class HedgeAutoMainThread implements Runnable{
 				if(jobJ.containsKey("orderID")){
 					String orderId = jobJ.getString("orderID");
 					log.info(">> Bitmex Post success oId = "+orderId);
+					detailEty.setRemarks(orderId);
 					flage = true;
 				}
 			}
+			
+			// TODO 
+			//flage = true;
 		} catch (ServiceException e) {
 			// 参数失败
 			flage = false;
 			log.error(">> postMex Biz_error :",e.getMessage());
-			return true;
+			return flage;
 		} catch (Exception e) {
 			// 网络异常，重试一次
 			if(!isAgain){
@@ -592,7 +596,7 @@ public class HedgeAutoMainThread implements Runnable{
 			}else{
 				flage = false;
 				log.error(">> postMex error :",e);
-				return true;
+				return flage;
 			}
 		}
 		long endTime = System.currentTimeMillis();
@@ -601,7 +605,7 @@ public class HedgeAutoMainThread implements Runnable{
 		BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
 		bean.save(detailEty);
 		
-		return true;
+		return flage;
 	}
 	
 	/**
@@ -627,9 +631,12 @@ public class HedgeAutoMainThread implements Runnable{
 				if(jobJ.containsKey("result") && jobJ.containsKey("order_id") && jobJ.getBooleanValue("result")){
 					Integer orderId = jobJ.getInteger("order_id");
 					log.info(">> okex Post success oId = "+orderId);
+					detailEty.setRemarks(orderId.toString());
 					flage = true;
 				}
 			}
+			// TODO
+			//  flage = true;
 		} catch (Exception e) {
 			// 重试一次
 			if(!isAgain){
@@ -897,6 +904,7 @@ public class HedgeAutoMainThread implements Runnable{
 		
 	}
 	
+	private long startTimeAccount = System.currentTimeMillis();
 	/** 每十秒打印一次日志，更新 TradeTaskReq
 	 * @throws
 	 */
@@ -908,7 +916,7 @@ public class HedgeAutoMainThread implements Runnable{
 		BigDecimal priceB = getCachePrice(req.getSymbolB());
 		log.info(">> AutoTask AGIO ="+df.format(agio)+" ,agioOld = "+df.format(agioOld)
 				+",priceA="+df.format(priceA)+",priceB="+df.format(priceB));
-		TradeTaskReq cacheReq = TotalControlService.getMonitorCache(cacheKey);
+		TradeTaskReq cacheReq = HedgeTotalControlService.getMonitorCache(cacheKey);
 		if(null != cacheReq){
 			req.setDepositA(cacheReq.getDepositA());
 			req.setDepositB(cacheReq.getDepositB());
@@ -919,6 +927,10 @@ public class HedgeAutoMainThread implements Runnable{
 			log.error(">> cacheReq is null !");
 		}
 		// 查询账户余额信息
-		updateAccount();
+		long currTimeAccount = System.currentTimeMillis();
+		if(currTimeAccount - startTimeAccount > 300000){// 300秒查一次
+			updateAccount();
+			startTimeAccount = currTimeAccount;
+		}
 	}
 }

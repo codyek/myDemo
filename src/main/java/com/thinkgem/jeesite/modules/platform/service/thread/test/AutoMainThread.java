@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.platform.service.thread;
+package com.thinkgem.jeesite.modules.platform.service.thread.test;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -15,22 +15,27 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.SpringContextHolder;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.mongodb.model.LtcTradeData;
-import com.thinkgem.jeesite.modules.mongodb.service.LtcTradeDataInterface;
+import com.thinkgem.jeesite.modules.mongodb.model.BtcToXbtTradeData;
+import com.thinkgem.jeesite.modules.mongodb.service.BtcTradeDataInterface;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstants;
 import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTrade;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
 import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
-import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
-public class LtcAutoMainThread extends Thread{
+/**
+ *  V 1.0
+* @ClassName: AutoMainThread 
+* @Description: TODO
+* @author EK huangone 
+* @date 2017-10-28 下午5:36:30 
+*
+ */
+public class AutoMainThread extends Thread{
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -45,7 +50,7 @@ public class LtcAutoMainThread extends Thread{
 	
 	private TradeTaskReq req;
 
-	public LtcAutoMainThread(TradeTaskReq req, User user, String cacheKey) {
+	public AutoMainThread(TradeTaskReq req, User user, String cacheKey) {
 		this.req = req;
 		this.user = user;
 		this.cacheKey = cacheKey;
@@ -64,7 +69,7 @@ public class LtcAutoMainThread extends Thread{
 					// 获取差价
 					BigDecimal agioOld = getAgio(symbolA, symbolB);
 					BigDecimal agio =  agioOld.abs();
-					log.info(">> montiro agio ="+df.format(agio)+" ,agioOld = "+df.format(agioOld) );
+					log.info(">>1 montiro agio ="+df.format(agio)+" ,agioOld = "+df.format(agioOld) );
 					// 比较差价与最大值、最小值
 					if(agio.compareTo(max) > 0){
 						// 差价 > 最大值   操作：宽开 或 宽平
@@ -295,37 +300,37 @@ public class LtcAutoMainThread extends Thread{
 		String openDirA = req.getOpenDirA();
 		BigDecimal burstA = req.getBurstPiceA();
 		BigDecimal burstB = req.getBurstPiceB();
-		BigDecimal okPrice = new BigDecimal(ltcDate.getOkLTCPrice());
-		BigDecimal mexPrice = new BigDecimal(ltcDate.getMexLTCPrice());
+		BigDecimal okPrice = new BigDecimal(btcDate.getOkPrice());
+		BigDecimal mexPrice = new BigDecimal(btcDate.getMexUSDPrice());
 		if(Constants.DIRECTION_BUY_UP.equals(openDirA)){
 			// A 开多， 爆仓：实时价格 <= 爆仓价
-			if("ltc_usd".equals(symbolA)){
+			if("btc_usd".equals(symbolA)){
 				isBurstA = okPrice.compareTo(burstA) <=0;
 			}else{
 				isBurstA = mexPrice.compareTo(burstA) <=0;
 			}
 			// B 开空， 爆仓：实时价格 >= 爆仓价
-			if("ltc_usd".equals(symbolB)){
+			if("btc_usd".equals(symbolB)){
 				isBurstB = okPrice.compareTo(burstB) >=0;
 			}else{
 				isBurstB = mexPrice.compareTo(burstB) >=0;
 			}
 		}else{
 			// A 开空
-			if("ltc_usd".equals(symbolA)){
+			if("btc_usd".equals(symbolA)){
 				isBurstA = okPrice.compareTo(burstA) >=0;
 			}else{
 				isBurstA = mexPrice.compareTo(burstA) >=0;
 			}
 			// B 开多
-			if("ltc_usd".equals(symbolB)){
+			if("btc_usd".equals(symbolB)){
 				isBurstB = okPrice.compareTo(burstB) <=0;
 			}else{
 				isBurstB = mexPrice.compareTo(burstB) <=0;
 			}
 		}
 		if(isBurstA || isBurstB){
-			log.info(">>>>>>   爆仓！！！！！ time = "+ltcDate.getTime());
+			log.info(">>>>>>   爆仓！！！！！ time = "+btcDate.getTime());
 			/** 爆仓处理  **/
 			doBurst(isBurstA, isBurstB);
 		}
@@ -395,9 +400,9 @@ public class LtcAutoMainThread extends Thread{
 		return getAgio(symbol, null);
 	}
 	
-	private LtcTradeDataInterface ltcTradeData;
+	private BtcTradeDataInterface btcTradeData;
 	private Long queryTime = 0L;
-	private LtcTradeData ltcDate;
+	private BtcToXbtTradeData btcDate;
 	/**
 	 *  获取币种 A与B 实时差价 或 一币种实时价格
 	* @return BigDecimal
@@ -405,8 +410,8 @@ public class LtcAutoMainThread extends Thread{
 	private BigDecimal getAgio(String symbolA, String symbolB){
 		BigDecimal agio = Constants.BIGDECIMAL_ZERO;
 		// TODO 重要
-		if(null == ltcTradeData){
-			ltcTradeData = SpringContextHolder.getBean(LtcTradeDataInterface.class);
+		if(null == btcTradeData){
+			btcTradeData = SpringContextHolder.getBean(BtcTradeDataInterface.class);
 		}
 		if(null == queryTime || queryTime == 0L){
 			queryTime = 20170720121212L;
@@ -414,20 +419,20 @@ public class LtcAutoMainThread extends Thread{
 		
 		Direction direction = Direction.ASC;
 		PageRequest pageable = new PageRequest(0,1,new Sort(direction,"time"));
-		List<LtcTradeData> list = ltcTradeData.findByTimePageable(queryTime, pageable);
+		List<BtcToXbtTradeData> list = btcTradeData.findByTimePageable(queryTime, pageable);
 		JSONArray arr = JSONArray.parseArray(JSON.toJSONString(list));
-		ltcDate = arr.getObject(0, LtcTradeData.class);
+		btcDate = arr.getObject(0, BtcToXbtTradeData.class);
 		
-		queryTime = ltcDate.getTime();
+		queryTime = btcDate.getTime();
 		  
 		if(null == symbolB){
-			if("ltc_usd".equals(symbolA)){
-				agio = new BigDecimal(ltcDate.getOkLTCPrice());
+			if("btc_usd".equals(symbolA)){
+				agio = new BigDecimal(btcDate.getOkPrice());
 			}else {
-				agio = new BigDecimal(ltcDate.getMexLTCPrice());
+				agio = new BigDecimal(btcDate.getMexUSDPrice());
 			}
 		}else{
-			agio = new BigDecimal(ltcDate.getOkToMexAgio());
+			agio = new BigDecimal(btcDate.getOkToUSDAgio());
 		}
 		return agio;
 	}
@@ -439,10 +444,10 @@ public class LtcAutoMainThread extends Thread{
 	 */
 	private BigDecimal getMonitorPice(String symbol){
 		BigDecimal price = new BigDecimal(0);
-		if("ltc_usd".equals(symbol)){
-			price = new BigDecimal(ltcDate.getOkLTCPrice());
+		if("btc_usd".equals(symbol)){
+			price = new BigDecimal(btcDate.getOkPrice());
 		}else {
-			price = new BigDecimal(ltcDate.getMexLTCPrice());
+			price = new BigDecimal(btcDate.getMexUSDPrice());
 		}
 		return price;
 	}
@@ -517,7 +522,7 @@ public class LtcAutoMainThread extends Thread{
 		// 委托数量
 		Integer amount = 0;
 		
-		if("ltc_usd".equals(symbol)){
+		if("btc_usd".equals(symbol)){
 			platform = OkexInterConstants.PLATFORM_CODE;
 			// 根据保证金、杠杆、 计算委托数量   okex btc 1张= 100USD
 			amount = allQuota.intValue() / 100;
@@ -539,14 +544,14 @@ public class LtcAutoMainThread extends Thread{
 		// 价格对应的数量 = 头寸/价格 
 		BigDecimal pAmount = allQuota.divide(price, 6, BigDecimal.ROUND_HALF_DOWN);
 		if(isOpen){
-			if("ltc_usd".equals(symbol)){
+			if("btc_usd".equals(symbol)){
 				PriceAmountOkex = pAmount;
 			}else{
 				PriceAmountMex = pAmount;
 			}
 			detailEty.setPriceAmount(pAmount); 
 		}else {
-			if("ltc_usd".equals(symbol)){
+			if("btc_usd".equals(symbol)){
 				detailEty.setPriceAmount(PriceAmountOkex); 
 			}else{
 				detailEty.setPriceAmount(PriceAmountMex); 

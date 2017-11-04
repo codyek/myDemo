@@ -13,6 +13,7 @@ import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.task.MexTask;
 import com.thinkgem.jeesite.modules.platform.task.OkexTask;
+import com.thinkgem.jeesite.modules.platform.task.RestartMonitor;
 
 @Component
 public class BitPriceInitListener implements ApplicationListener{
@@ -27,6 +28,10 @@ public class BitPriceInitListener implements ApplicationListener{
     @Qualifier("mexTask") 
     private MexTask mexTask;
 	
+	@Autowired
+	@Qualifier("restartMonitor") 
+	private RestartMonitor restartMonitor;
+	
 	private static boolean isStart = false;
 
 	@Override
@@ -37,6 +42,8 @@ public class BitPriceInitListener implements ApplicationListener{
 			
 			mexTask.mexWebsocketTask();
 			
+			//检查是否有未关闭的监控，重新启动原未关闭的监控
+			//restartMonitor.doRestartMonitor();
 		}
 	}
 	

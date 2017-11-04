@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.platform.service.thread;
+package com.thinkgem.jeesite.modules.platform.service.thread.test;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -17,6 +17,7 @@ import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitMonitor;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitSymbolConfig;
 import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
+import com.thinkgem.jeesite.modules.platform.service.thread.ThreadManager;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitSymbolConfigService;
 import com.thinkgem.jeesite.modules.sys.entity.User;

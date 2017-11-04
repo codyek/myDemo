@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.platform.service.thread;
+package com.thinkgem.jeesite.modules.platform.service.thread.test;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;

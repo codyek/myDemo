@@ -144,9 +144,9 @@ public class HedgeController extends BaseController {
 	 */
 	@RequestMapping(value = "stopJob")
 	@ResponseBody
-	public String stopJob(){
+	public String stopJob(String symbolA, String symbolB){
 		// 调service
-		String msg = hedgeTotalControlService.stopJob();
+		String msg = hedgeTotalControlService.stopJob(symbolA,symbolB);
 		return msg;
 	}
 }

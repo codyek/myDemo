@@ -363,6 +363,8 @@
 		$("#tradeInfo").mLoading("show");//显示loading组件
 		var url = "${ctx}/trade/stopJob" ;
 		var obj = new Object();
+		obj.symbolA=symbolA;
+		obj.symbolB=symbolB;
 		$.ajax({
 	        url: url,  
 		    data:obj,  
@@ -688,7 +690,7 @@
 		    var edate = $("#edate").val();
 			var obj = new Object();
 			obj.startDt = sdate;
-			obj.startDt = "2017-10-12 21:20:00";
+			//obj.startDt = "2017-10-12 21:20:00";
 			obj.endDt = edate;
 			$("#container").mLoading("show");//显示loading组件
 			var url = "${ctx}/analysis/getBtcXbtusdPriceData";

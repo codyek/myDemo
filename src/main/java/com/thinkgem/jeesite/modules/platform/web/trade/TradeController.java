@@ -24,7 +24,7 @@ import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.InfoInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.thread.TotalControlService;
+import com.thinkgem.jeesite.modules.platform.service.thread.test.TotalControlService;
 
 /**
  * 交易中心 Controller

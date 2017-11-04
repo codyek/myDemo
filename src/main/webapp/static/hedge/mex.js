@@ -84,7 +84,12 @@
 				&& null != data.lastPrice) {
 			// 当前价格
 			var mexPrice = document.getElementById("mexPrice");
+			var balance_mex = document.getElementById("balance_mex");
+			var available_mex = document.getElementById("available_mex");
 			mexPrice.innerHTML = data.lastPrice;
+			var btcValue = available_mex.innerHTML;
+			var showUsd = data.lastPrice*btcValue
+			balance_mex.innerHTML = decimal(showUsd, 2);
 		}
 		if (undefined != data.indicativeSettlePrice
 				&& "undefined" != data.indicativeSettlePrice

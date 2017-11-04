@@ -83,7 +83,7 @@ function fomatFloat(src,pos){
     return Math.round(src*Math.pow(10, pos))/Math.pow(10, pos);     
 } 
 
-// btc交易价格数据转换
+// btc-XBTUSD交易价格数据转换
 function splitBtcData(rawData) {
     var PriceTime = [];
     var okdata = [];
@@ -95,6 +95,27 @@ function splitBtcData(rawData) {
     	okdata.push(obj.okPrice);
     	usddata.push(obj.mexUSDPrice);
     	okToUSDAgio.push(obj.okToUSDAgio);
+    }
+    return {
+    	PriceTime: PriceTime,
+    	okdata: okdata,
+    	usddata: usddata,
+    	okToUSDAgio: okToUSDAgio
+    };
+} 
+
+//btc-XBTQAE交易价格数据转换
+function splitBtcQaeData(rawData) {
+    var PriceTime = [];
+    var okdata = [];
+    var usddata = [];
+    var okToUSDAgio = [];
+    for (var i = 0; i < rawData.length; i++) {
+    	var obj = rawData[i];
+    	PriceTime.push(obj.time);
+    	okdata.push(obj.okPrice);
+    	usddata.push(obj.mexQaePrice);
+    	okToUSDAgio.push(obj.okToQaeAgio);
     }
     return {
     	PriceTime: PriceTime,
