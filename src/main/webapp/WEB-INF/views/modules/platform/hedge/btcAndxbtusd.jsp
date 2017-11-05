@@ -235,11 +235,11 @@
 		    	}
 		    	showText += "<tr><td>"+obj.openBarnTime+"</td><td>"+closeTime
 							    	+"</td><td>"+obj.maxAgio+"</td>"
-							    	+"</td><td>"+obj.minAgio+"</td>"
-							    	+"</td><td>"+obj.ifBurstBarn+"</td>"
-							    	+"</td><td>"+revenue+"</td>"
-							    	+"</td><td>"+fee+"</td>"
-		    					 	+"</td><td>"+profit+"</td></tr>";
+							    	+"<td>"+obj.minAgio+"</td>"
+							    	+"<td>"+obj.ifBurstBarn+"</td>"
+							    	+"<td>"+revenue+"</td>"
+							    	+"<td>"+fee+"</td>"
+		    					 	+"<td>"+profit+"</td></tr>";
 			}
 			$("#showTradeTr").html(showText);
 		}
@@ -268,29 +268,15 @@
 			var showText = "";
 			for (var i = 0; i < data.length; i++) {
 		    	var obj = data[i];
-		    	var closeTime = "";
-		    	var revenue = "";
-		    	var fee = "";
-		    	var profit = "";
-		    	if(null != obj.closeBarnTime && typeof(obj.closeBarnTime) != "undefined"){
-		    		closeTime = obj.closeBarnTime;
-		    	}
-		    	if(null != obj.revenue && typeof(obj.revenue) != "undefined"){
-		    		revenue = obj.revenue;
-		    	}
-		    	if(null != obj.fee && typeof(obj.fee) != "undefined"){
-		    		fee = obj.fee;
-		    	}
-		    	if(null != obj.profit && typeof(obj.profit) != "undefined"){
-		    		profit = obj.profit;
-		    	}
-		    	showText += "<tr><td>"+obj.openBarnTime+"</td><td>"+closeTime
-							    	+"</td><td>"+obj.maxAgio+"</td>"
-							    	+"</td><td>"+obj.minAgio+"</td>"
-							    	+"</td><td>"+obj.ifBurstBarn+"</td>"
-							    	+"</td><td>"+revenue+"</td>"
-							    	+"</td><td>"+fee+"</td>"
-		    					 	+"</td><td>"+profit+"</td></tr>";
+		    	showText += "<tr><td>"+obj.createDate+"</td><td>"+obj.symbol
+							    	+"</td><td>"+obj.lever+"</td>"
+							    	+"<td>"+obj.amount+"</td>"
+							    	+"<td>"+obj.position+"</td>"
+							    	+"<td>"+obj.direction+"</td>"
+							    	+"<td>"+obj.price+"</td>"
+		    					 	+"<td>"+obj.burstPice+"</td>"
+		    					 	+"<td>"+0+"</td>"
+		    					 	+"<td></td></tr>";
 			}
 			$("#showDetailTr").html(showText);
 		}

@@ -6,13 +6,13 @@
 	<meta name="decorator" content="default"/>
 	<script src="${ctxStatic}/jquery/jquery-1.9.1.min.js" type="text/javascript" ></script>
 	<script type="text/javascript">
-	function getOkexOrders(){
-		var url = "getOkexOrders" ;
-		var sy = $("#okSymbol").val();
-		var status = $("#status").val();
+	function getOkexAccount(){
+		var url = "getOkexAccount" ;
+		//var sy = $("#okSymbol").val();
+		//var status = $("#status").val();
 		var obj = new Object();
-		obj.symbol = sy;
-		obj.status = status;
+		//obj.symbol = sy;
+		//obj.status = status;
 		$.ajax({
 	        url: url,  
 		    data:obj,  
@@ -28,11 +28,11 @@
 		});
 	}
 	
-	function getMexOrders(){
-		var url = "getMexOrders" ;
-		var sy = $("#mexSymbol").val();
+	function getMexAccount(){
+		var url = "getMexAccount" ;
+		//var sy = $("#mexSymbol").val();
 		var obj = new Object();
-		obj.symbol = sy;
+		//obj.symbol = sy;
 		$.ajax({
 	        url: url,  
 		    data:obj,  
@@ -51,15 +51,8 @@
 	</script>
 </head>
 <body>
-	<p>okex:
-	<input id="okSymbol"  type="text"  value="btc_usd" />
-	<input id="status"   type="text" value="1" />   1或2
-	</p>
-	<p>Mex:
-	<input id="mexSymbol"  type="text" value="XBT" />
-	</p>
-	<input class="btn" type="button" value="获取Okex订单Json"  onclick="getOkexOrders()"/>
-	<input class="btn" type="button" value="获取Mex订单"  onclick="getMexOrders()"/>
+	<input class="btn" type="button" value="获取Okex账户信息"  onclick="getOkexAccount()"/>
+	<input class="btn" type="button" value="获取Mex账户信息"  onclick="getMexAccount()"/>
 	<div id="show_json"></div>
 </body>
 </html>

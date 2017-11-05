@@ -1,0 +1,55 @@
+ /*交易主表、交易明细表、历史监控*/
+    .titTabs {
+        width: auto;
+        margin: 0 auto;
+        margin-top: 5px;
+        margin-left:10px;
+        margin-right:10px;
+    }
+
+    .titTabs .titTab {
+        height: 37px;
+        font-size: 14px;
+        border-bottom: 1px #e1e1e1 solid
+    }
+
+    .titTabs .titTab li {
+        float: left;
+        height: 36px;
+        width: 120px;
+        line-height: 36px;
+        padding: 0 15px;
+        margin-right: 5px;
+        background: #f0f0f0;
+        border-top: 1px #e1e1e1 solid;
+        border-left: 1px #e1e1e1 solid;
+        border-right: 1px #e1e1e1 solid;
+    }
+
+    .titTabs .titTab li:hover {
+        height: 37px;
+        background: #f0f0f0;
+        cursor: pointer
+    }
+
+    .titTabs .active {
+        height: 37px !important;
+        background: #45aeea !important;
+        color: #fff
+    }
+
+    .titTabs .titInfo {
+        background: #fff;
+        border-bottom: 1px #e1e1e1 solid;
+        border-left: 1px #e1e1e1 solid;
+        border-right: 1px #e1e1e1 solid;
+    }
+
+    .titTabs .titInfo div {
+        display: none
+    }
+
+    .titTabs .titInfo .on {
+        display: block
+    }
+

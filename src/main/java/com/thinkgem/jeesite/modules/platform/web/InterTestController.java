@@ -358,4 +358,33 @@ public class InterTestController extends BaseController {
 		
 		return msg;
 	}
+	
+	@RequestMapping(value = {"testGetAccount", ""})
+	public String testGetAccount(HttpServletRequest request, HttpServletResponse response, Model model) {
+		return "modules/platform/trade/TestGetAccount";
+	}
+	
+	@RequestMapping("getMexAccount")
+	@ResponseBody
+    public String getMexAccount(){
+		String msg = "";
+		try {
+			msg = mexAccountService.get_user_margin("XBt");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return msg;
+	}
+	
+	@RequestMapping("getOkexAccount")
+	@ResponseBody
+    public String getOkexAccount(){
+		String msg = "";
+		try {
+			msg = accountService.future_userinfo_4fix();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return msg;
+	}
 }

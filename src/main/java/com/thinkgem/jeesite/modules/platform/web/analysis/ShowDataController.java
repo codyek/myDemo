@@ -20,7 +20,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.mongodb.model.BtcToQaeTradeData;
 import com.thinkgem.jeesite.modules.mongodb.model.BtcToXbtTradeData;
+import com.thinkgem.jeesite.modules.mongodb.service.BtcQaeTradeDataInterface;
 import com.thinkgem.jeesite.modules.mongodb.service.BtcTradeDataInterface;
 import com.thinkgem.jeesite.modules.mongodb.service.MexLtcDepthDataInterface;
 import com.thinkgem.jeesite.modules.mongodb.service.MexXbtQaeDepthDataInterface;
@@ -37,6 +39,8 @@ public class ShowDataController extends BaseController {
 
 	@Autowired
 	private BtcTradeDataInterface btcTradeData;
+	@Autowired
+	private BtcQaeTradeDataInterface xbtQaeTradeData;
 	
 	@Autowired
 	private OkexBtcDepthDataInterface OkexBtcDepth;
@@ -111,4 +115,35 @@ public class ShowDataController extends BaseController {
 			return null;
 		}
 	}
+	
+	@RequiresPermissions("platform:trade:view")
+	@RequestMapping(value = {"xbtQaeDataPage", ""})
+	public String xbtQaeDataPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+		TradeTaskReq req = new TradeTaskReq();
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/hedge/analysis/xbtqae";
+	}
+	
+	@RequiresPermissions("platform:trade:view")
+	@RequestMapping(value = "getBtcXbtqaePriceData")
+	@ResponseBody
+	public JSONArray getBtcXbtqaePriceData(String startDt, String endDt){
+		log.info(">>>-- postPrice Qae  input="+ startDt + " , " +endDt);
+		if(null != startDt && null != endDt){
+			long start = Long.parseLong(
+					DateUtils.formatDate(
+							DateUtils.parseDate(startDt), "yyyyMMddHHmmss"));
+			long end = Long.parseLong(
+					DateUtils.formatDate(
+							DateUtils.parseDate(endDt), "yyyyMMddHHmmss"));
+			log.info(">>>-- postPrice Qae  start="+ start + " , end=" +end);
+			Direction direction = Direction.ASC;
+			List<BtcToQaeTradeData> list = xbtQaeTradeData.findByTimeBetween(start, end,new Sort(direction,"time"));
+			JSONArray arr = JSONArray.parseArray(JSON.toJSONString(list));
+			return arr;
+		}else{
+			return null;
+		}
+	}
+	
 }

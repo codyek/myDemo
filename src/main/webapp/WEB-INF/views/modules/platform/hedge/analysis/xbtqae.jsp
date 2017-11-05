@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <head>
 	<meta charset="utf-8" />
-	<title>BTC与XBT掉期分析</title>
+	<title>BTC与XBT季度分析</title>
 	<meta name="decorator" content="default"/>
 	<link href="${ctxStatic}/hedge/analysis/page.css" rel="stylesheet" />
 	<link href="${ctxStatic}/echarts/jquery.mloading.css" rel="stylesheet" type="text/css" />
@@ -54,7 +54,7 @@
 	var myChartDepthOne = echarts.init(domDepthOne);
 	var myChartDepthTwo = echarts.init(domDepthTwo);
 	var symbolA = "btc_usd";
-	var symbolB = "XBTUSD";
+	var symbolB = "XBTZ17";
 	var app = {};
 	option = null;
 	var priceData = null;
@@ -88,7 +88,7 @@
 	
 	// BitMex 定义订阅信息
 	function initAddSubscribe() {
-		doMexSend('{"op":"subscribe","args":["instrument:XBTUSD","orderBook10:XBTUSD"]}');
+		doMexSend('{"op":"subscribe","args":["instrument:XBTZ17","orderBook10:XBTZ17"]}');
 	}
 	
 	// 间隔时间，20分钟内出现只算一次
@@ -149,7 +149,7 @@
 			//obj.startDt = "2017-10-12 21:20:00";
 			obj.endDt = edate;
 			$("#container").mLoading("show");//显示loading组件
-			var url = "getBtcXbtusdPriceData";
+			var url = "getBtcXbtqaePriceData";
 			$.ajax({
 		        url: url,  
 			    data:obj,  
@@ -206,7 +206,7 @@
 		}
 
 		function showPriceData(rawData){
-			var data = splitBtcData(rawData);
+			var data = splitBtcQaeData(rawData);
 			
 			// 单差价图表
 			myChartAgio.setOption(option = {
@@ -217,7 +217,7 @@
 					trigger : 'axis'
 				},
 				legend : {
-					data : [ 'BTC与XBT掉期差价' ]
+					data : [ 'BTC与XBT季度差价' ]
 				},
 				toolbox : {
 					show : true,
@@ -279,7 +279,7 @@
 					left : 0
 				},
 				legend : {
-					data : [ 'OKEX', 'XBT掉期' ]
+					data : [ 'OKEX', 'XBT季度' ]
 				},
 				tooltip : {
 					trigger : 'axis',
@@ -436,7 +436,7 @@
 						}
 					}
 				}, {
-					name : 'XBT掉期',
+					name : 'XBT季度',
 					type : 'line',
 					smooth : true,
 					data : data.usddata,
@@ -446,7 +446,7 @@
 						}
 					}
 				}, {
-					name : 'BTC与XBT掉期差价',
+					name : 'BTC与XBT季度差价',
 					type : 'bar',
 					xAxisIndex : 1,
 					yAxisIndex : 1,
@@ -487,7 +487,7 @@
 			var titleStr = "Okex-BTC委托信息";
 			if("two" == other){
 				tempChart = myChartDepthTwo;
-				titleStr = "Mex-XBT掉期委托信息";
+				titleStr = "Mex-XBT季度委托信息";
 			}
 			tempChart.setOption(option = {
 					title : {
