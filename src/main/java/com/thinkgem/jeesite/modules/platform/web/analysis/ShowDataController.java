@@ -53,6 +53,39 @@ public class ShowDataController extends BaseController {
 	@Autowired
 	private MexLtcDepthDataInterface MexLtcDepth;
 	
+	/**
+	 * ok-BTC 与 Mex XBT掉期 差价页面
+	* @Title: xbtUsdAgioDataPage
+	* @param @param request
+	* @param @param response
+	* @param @param model
+	 */
+	@RequiresPermissions("platform:trade:view")
+	@RequestMapping(value = {"xbtUsdAgioDataPage", ""})
+	public String xbtUsdAgioDataPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+		TradeTaskReq req = new TradeTaskReq();
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/hedge/analysis/xbtusdAgio";
+	}
+	
+	/**
+	 * ok-BTC 与 Mex XBT季度 差价页面
+	* @Title: xbtQaeAgioDataPage
+	* @param @param request
+	* @param @param response
+	* @param @param model
+	 */
+	@RequiresPermissions("platform:trade:view")
+	@RequestMapping(value = {"xbtQaeAgioDataPage", ""})
+	public String xbtQaeAgioDataPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+		TradeTaskReq req = new TradeTaskReq();
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/hedge/analysis/xbtqaeAgio";
+	}
+	
+	/**
+	 * ok-BTC 与 Mex XBT掉期 差价，委托量信息页面
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"xbtUsdDataPage", ""})
 	public String btcAndXbtUsdPage(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -61,6 +94,9 @@ public class ShowDataController extends BaseController {
 		return "modules/platform/hedge/analysis/xbtusd";
 	}
 	
+	/**
+	 * 获取ok-BTC 与 Mex XBT掉期 差价数据
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = "getBtcXbtusdPriceData")
 	@ResponseBody
@@ -83,6 +119,9 @@ public class ShowDataController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 获取委托量信息数据
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = "getDepthData")
 	@ResponseBody
@@ -116,6 +155,9 @@ public class ShowDataController extends BaseController {
 		}
 	}
 	
+	/**
+	 * ok-BTC 与 Mex XBT季度 差价，委托量信息页面
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"xbtQaeDataPage", ""})
 	public String xbtQaeDataPage(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -124,6 +166,9 @@ public class ShowDataController extends BaseController {
 		return "modules/platform/hedge/analysis/xbtqae";
 	}
 	
+	/**
+	 * 获取ok-BTC 与 Mex XBT季度 差价数据
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = "getBtcXbtqaePriceData")
 	@ResponseBody

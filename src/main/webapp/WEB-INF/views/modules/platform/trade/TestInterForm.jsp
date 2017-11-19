@@ -24,7 +24,27 @@
 			});
 		});
 	
-		
+		function cancelMexOrder(){
+			var url = "cancelMexOrder" ;
+			var orderID = $("#orderID").val();
+			var text = $("#text").val();
+			var obj = new Object();
+			obj.orderID = orderID;
+			obj.text = text;
+			$.ajax({
+		        url: url,  
+			    data:obj,  
+			    type: 'POST',
+			    cache: false,
+			    success: function (data) {  
+			    	$("#show_json").html(data);
+		    		top.$.jBox.tip('处理成功！','success');
+			    },
+			    error:function(xhr,errorText,errorType){
+			    	top.$.jBox.tip('请求网络异常！','error');
+			    }
+			});
+		}
 	
 	 
 	</script>
@@ -40,14 +60,8 @@
 				<form:input path="symbolA" htmlEscape="false" maxlength="20" class="input-xlarge required"  value="btc_usd" />
 				<span class="help-inline"><font color="red">*</font>btc_usd \ XBTUSD</span>
 			</div>
-		</div><%--
-		<div class="control-group">
-			<label class="control-label">A保证金：</label>
-			<div class="controls">
-				<form:input path="depositA" htmlEscape="false" class="input-xlarge "  value="20" />
-			</div>
 		</div>
-		--%><div class="control-group">
+		<div class="control-group">
 			<label class="control-label">杠杆：</label>
 			<div class="controls">
 				<form:input path="leverA" htmlEscape="false" class="input-xlarge "  value="10" />
@@ -78,5 +92,9 @@
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>
 	</form:form>
+	<input id="orderID"  type="text" value="" />
+	<input id="text"  type="text" value="mark_info_YY" />
+	<input class="btn" type="button" value="mex平仓" onclick="cancelMexOrder()"/>&nbsp;
+	<div id="show_json"></div>
 </body>
 </html>

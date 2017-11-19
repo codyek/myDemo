@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <head>
 	<meta charset="utf-8" />
-	<title>BTC与XBT永续分析</title>
+	<title>BTC与XBT季度分析</title>
 	<meta name="decorator" content="default"/>
 	<link href="${ctxStatic}/hedge/analysis/page.css" rel="stylesheet" />
 	<link href="${ctxStatic}/echarts/jquery.mloading.css" rel="stylesheet" type="text/css" />
@@ -25,8 +25,10 @@
 			  查询时段:<input id="sdate" class="Wdate" style="width: 140px;" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',readOnly:true,maxDate:'#F{$dp.$D(\'edate\')}',isShowClear:false})" />  
 	    	- <input id="edate" class="Wdate" style="width: 140px;" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',readOnly:true,maxDate:'%y-%M-{%d+1}',isShowClear:false})"/>
 	    	<input type="button" id="click" value="查询" onclick="getAllData()"/>
-	    	<div id="containerAgio" style="height: 260px"></div>
-			<div id="container" style="height: 320px"></div>
+	    	<div id="containerAgio" style="height: 480px"></div>
+		</div>
+		<div id="tradeInfo" class="floatLeft">
+			<div id="container" style="height: 460px"></div>
 			<table id="contentTable" class="table table-striped table-bordered table-condensed">
 			<thead>
 				<tr>
@@ -37,24 +39,16 @@
 			<tbody id="kuanlist"></tbody>
 			</table>
 		</div>
-		<div id="tradeInfo" class="floatLeft">
-			<div id="containerDepthOne" style="height: 300px"></div>
-			<div id="containerDepthTwo" style="height: 300px"></div>
-		</div>
 	</div>
 </div>
 
 	<script type="text/javascript">
 	var dom = document.getElementById("container");
 	var domAgio = document.getElementById("containerAgio");
-	var domDepthOne = document.getElementById("containerDepthOne");
-	var domDepthTwo = document.getElementById("containerDepthTwo");
 	var myChart = echarts.init(dom);
 	var myChartAgio = echarts.init(domAgio);
-	var myChartDepthOne = echarts.init(domDepthOne);
-	var myChartDepthTwo = echarts.init(domDepthTwo);
 	var symbolA = "btc_usd";
-	var symbolB = "XBTUSD";
+	var symbolB = "XBTZ17";
 	var app = {};
 	option = null;
 	var priceData = null;
@@ -69,27 +63,7 @@
 	    
 	    getAllData();
 		
-	    // 初始化websocket 显示实时价格和指数
-	    //  okex 
-	    //okCoinWebSocket.init("wss://real.okex.com:10440/websocket/okexapi");
-	    //  mex
-		//mexWebSocket.init("wss://www.bitmex.com/realtime");
 	});
-	
-	// okex 定义订阅信息
-	function initAddChannel() {
-		// 基本信息： {'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_quarter'}
-		// 委托信息： {'event':'addChannel','channel':'ok_sub_futureusd_btc_depth_quarter_20'}
-		// 指数信息： {'event':'addChannel','channel':'ok_sub_futureusd_btc_index'}
-		// 批量注册
-		doSend("[ {'event':'addChannel','channel':'ok_sub_futureusd_btc_ticker_quarter'},"
-				+ "{'event':'addChannel','channel':'ok_sub_futureusd_btc_index'}]");
-	}
-	
-	// BitMex 定义订阅信息
-	function initAddSubscribe() {
-		doMexSend('{"op":"subscribe","args":["instrument:XBTUSD","orderBook10:XBTUSD"]}');
-	}
 	
 	// 间隔时间，20分钟内出现只算一次
 	var intervalTime = 20;
@@ -137,8 +111,6 @@
 
 		function getAllData(){
 			getAllPraceData();
-			getDepthData(symbolA,"one");
-			getDepthData(symbolB,"two");
 		}
 		
 		function getAllPraceData(){
@@ -149,7 +121,7 @@
 			//obj.startDt = "2017-10-12 21:20:00";
 			obj.endDt = edate;
 			$("#container").mLoading("show");//显示loading组件
-			var url = "getBtcXbtusdPriceData";
+			var url = "getBtcXbtqaePriceData";
 			$.ajax({
 		        url: url,  
 			    data:obj,  
@@ -206,7 +178,7 @@
 		}
 
 		function showPriceData(rawData){
-			var data = splitBtcData(rawData);
+			var data = splitBtcQaeData(rawData);
 			
 			// 单差价图表
 			myChartAgio.setOption(option = {
@@ -217,7 +189,7 @@
 					trigger : 'axis'
 				},
 				legend : {
-					data : [ 'BTC与XBT永续差价' ]
+					data : [ 'BTC与XBT季度差价' ]
 				},
 				toolbox : {
 					show : true,
@@ -279,7 +251,7 @@
 					left : 0
 				},
 				legend : {
-					data : [ 'OKEX', 'XBT永续' ]
+					data : [ 'OKEX', 'XBT季度' ]
 				},
 				tooltip : {
 					trigger : 'axis',
@@ -436,7 +408,7 @@
 						}
 					}
 				}, {
-					name : 'XBT永续',
+					name : 'XBT季度',
 					type : 'line',
 					smooth : true,
 					data : data.usddata,
@@ -446,7 +418,7 @@
 						}
 					}
 				}, {
-					name : 'BTC与XBT永续差价',
+					name : 'BTC与XBT季度差价',
 					type : 'bar',
 					xAxisIndex : 1,
 					yAxisIndex : 1,
@@ -457,279 +429,6 @@
 			$("#OKEXAndXBTUSD").html(total(data.okToUSDAgio));
 		}
 		
-		function getDepthData(symbol,other){
-			var sdate = $("#sdate").val();
-		    var edate = $("#edate").val();
-			var obj = new Object();
-			obj.startDt = sdate;
-			//obj.startDt = "2017-10-12 21:20:00";
-			obj.endDt = edate;
-			obj.symbol = symbol;
-			var url = "getDepthData";
-			$.ajax({
-		        url: url,  
-			    data:obj,  
-			    dataType: 'json',
-			    type: 'GET',
-			    cache: false,
-			    success: function (data) {  
-			    	showDepthData(data,other);
-			    },
-			    error:function(xhr,errorText,errorType){
-			    	//console.log("errorText="+errorText+" , errorType="+errorType);
-			    }
-			});
-		}
-		
-		function showDepthData(depthData,other){
-			var data = splitDepthData(depthData);
-			var tempChart = myChartDepthOne;
-			var titleStr = "Okex-BTC委托信息";
-			if("two" == other){
-				tempChart = myChartDepthTwo;
-				titleStr = "Mex-XBT永续委托信息";
-			}
-			tempChart.setOption(option = {
-					title : {
-						text : titleStr,
-						left : 0
-					},
-					legend : {
-						data : [ '平均卖价', '平均买价' ]
-					},
-					tooltip : {
-						trigger : 'axis',
-						axisPointer : {
-							type : 'cross'
-						},
-						backgroundColor : 'rgba(245, 245, 245, 0.8)',
-						borderWidth : 1,
-						borderColor : '#ccc',
-						padding : 10,
-						textStyle : {
-							color : '#000'
-						},
-						position : function(pos, params, el,
-								elRect, size) {
-							var obj = {
-								top : 10
-							};
-							obj[[ 'left', 'right' ][+(pos[0] < size.viewSize[0] / 2)]] = 30;
-							return obj;
-						},
-						extraCssText : 'width: 210px'
-					},
-					axisPointer : {
-						link : {
-							xAxisIndex : 'all'
-						},
-						label : {
-							backgroundColor : '#777'
-						}
-					},
-					brush : {
-						xAxisIndex : 'all',
-						brushLink : 'all',
-						outOfBrush : {
-							colorAlpha : 0.1
-						}
-					},
-					visualMap : {
-						show : false,
-						seriesIndex : 3,
-						dimension : 2,
-						pieces : [ {
-							value : 1,
-							color : '#2f4554'
-						}, {
-							value : -1,
-							color : '#c23531'
-						} ]
-					},
-					grid : [ {
-						left : '8%',
-						right : '6%',
-						height : '46%'
-					}, {
-						left : '8%',
-						right : '6%',
-						top : '76%',
-						height : '12%'
-					} , {
-						left : '8%',
-						right : '6%',
-						top : '86%',
-						height : '12%'
-					} ],
-					xAxis : [
-							{
-								type : 'category',
-								scale : true,
-								boundaryGap : false,
-								axisLine : {
-									onZero : false
-								},//X/Y轴O刻度是否重合
-								splitLine : {
-									show : false
-								},//是否显示分割线
-								splitNumber : 20,//分割数量
-								min : 'dataMin',//坐标轴的最小刻目
-								max : 'dataMax',
-								data : data.depthTime
-							},
-							{
-								type : 'category',
-								gridIndex : 1,
-								data : data.depthTime,
-								scale : true,
-								boundaryGap : false,
-								axisLine : {
-									onZero : false
-								},
-								axisTick : {
-									show : false
-								},
-								splitLine : {
-									show : false
-								},
-								axisLabel : {
-									show : false
-								},
-								splitNumber : 20,
-								min : 'dataMin',
-								max : 'dataMax',
-								axisPointer : {
-									label : {
-										formatter : function(params) {
-											var seriesValue = (params.seriesData[0] || {}).value;
-											return params.value
-													+ (seriesValue != null ? '\n'
-															+ echarts.format
-																	.addCommas(seriesValue)
-															: '');
-										}
-									}
-								}
-							},{
-								type : 'category',
-								gridIndex : 2,
-								data : data.depthTime,
-								scale : true,
-								boundaryGap : false,
-								axisLine : {
-									onZero : false
-								},
-								axisTick : {
-									show : false
-								},
-								splitLine : {
-									show : false
-								},
-								axisLabel : {
-									show : false
-								},
-								splitNumber : 20,
-								min : 'dataMin',
-								max : 'dataMax',
-								axisPointer : {
-									label : {
-										formatter : function(params) {
-											var seriesValue = (params.seriesData[0] || {}).value;
-											return params.value
-													+ (seriesValue != null ? '\n'
-															+ echarts.format
-																	.addCommas(seriesValue)
-															: '');
-										}
-									}
-								}
-							} ],
-					yAxis : [ {
-						scale : true,
-						splitArea : {
-							show : true
-						}
-					}, {
-						scale : true,
-						gridIndex : 1,
-						splitNumber : 2,
-						axisLabel : {
-							show : false
-						},
-						axisLine : {
-							show : false
-						},
-						axisTick : {
-							show : false
-						},
-						splitLine : {
-							show : false
-						}
-					} , {
-						scale : true,
-						gridIndex : 2,
-						splitNumber : 3,
-						axisLabel : {
-							show : false
-						},
-						axisLine : {
-							show : false
-						},
-						axisTick : {
-							show : false
-						},
-						splitLine : {
-							show : false
-						}
-					} ],
-					dataZoom : [ {
-						type : 'inside',
-						xAxisIndex : [ 0, 1 ],
-						start : 70,
-						end : 100
-					},{
-						show : true,
-						xAxisIndex : [ 0, 1 ],
-						type : 'slider',
-						y : '90%',
-						start : 70,
-						end : 100
-					} ],
-					series : [ {
-						name : '平均卖价',
-						type : 'line',
-						smooth : true,
-						data : data.sellAvgPrice,
-						lineStyle : {
-							normal : {
-								opacity : 0.5
-							}
-						}
-					}, {
-						name : '平均买价',
-						type : 'line',
-						smooth : true,
-						data : data.buyAvgPrice,
-						lineStyle : {
-							normal : {
-								opacity : 0.5
-							}
-						}
-					}, {
-						name : '卖方委托总量(USD)',
-						type : 'bar',
-						xAxisIndex : 1,
-						yAxisIndex : 1,
-						data : data.sellAmount
-					}, {
-						name : '买方委托总量(USD)',
-						type : 'bar',
-						xAxisIndex : 1,
-						yAxisIndex : 1,
-						data : data.buyAmount
-					}  ]
-				}, true);
-		}
 	</script>
 	</body>
 </html>

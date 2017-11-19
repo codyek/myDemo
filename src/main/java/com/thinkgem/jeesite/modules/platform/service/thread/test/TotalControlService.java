@@ -57,13 +57,12 @@ public class TotalControlService {
 			}
 		}
 		User user = UserUtils.getUser();
+		log.info(">>Test control startJob user="+user.getName());
 		String code = DateUtils.getSysTimeMillisCode();
-		String cacheKey = getMonitorCacheKey(user.getId());
+		String cacheKey = getMonitorCacheKey(user.getId(),req.getSymbolA(),req.getSymbolB());
 		req.setMonitorCode(code);
 		// new 监控thread 
-		//Thread thread = new AutoMainThread(req,user,cacheKey);
-		Thread thread = new Thread(new NewAutoMainThread(req,user,cacheKey));
-		//Thread thread = new LtcAutoMainThread(req,user,cacheKey);
+		Thread thread = new Thread(new BTCAutoMainThread(req,user,cacheKey));
 		Long threadId = thread.getId();
 		// 保存缓存
 		String value = JSONObject.toJSONString(req);
@@ -80,8 +79,6 @@ public class TotalControlService {
 		entity.setStatusFlag(Constants.STATUS_RUN);
 		bitMonitorService.save(entity);
 		
-		
-		
 		return msg;
 	}
 	
@@ -89,16 +86,18 @@ public class TotalControlService {
 		String msg = "success";
 		// 保存缓存
 		User user = UserUtils.getUser();
-		String cacheKey = getMonitorCacheKey(user.getId());
+		log.info(">>Test updateData user="+user.getName());
+		String cacheKey = getMonitorCacheKey(user.getId(),req.getSymbolA(),req.getSymbolB());
 		String value = JSONObject.toJSONString(req);
 		EhCacheUtils.put(Constants.PRICE_CACHE,cacheKey, value);
 		return msg;
 	}
 	
-	public String stopJob(){
+	public String stopJob(String symbolA,String symbolB){
 		String msg = "success";
 		User user = UserUtils.getUser();
-		String cacheKey = getMonitorCacheKey(user.getId());
+		log.info(">>Test stopJob user="+user.getName());
+		String cacheKey = getMonitorCacheKey(user.getId(),symbolA,symbolB);
 		TradeTaskReq req = getMonitorCache(cacheKey);
 		if(null != req){
 			req.setStopJob("stop");
@@ -111,8 +110,8 @@ public class TotalControlService {
 		return msg;
 	}
 	
-	public static String getMonitorCacheKey(String uid){
-		return "monitorControl:"+uid;
+	public static String getMonitorCacheKey(String uid,String symbolA,String symbolB){
+		return "monitorControl:"+uid+":"+symbolA+symbolB;
 	}
 	
 	public static TradeTaskReq getMonitorCache(String key){

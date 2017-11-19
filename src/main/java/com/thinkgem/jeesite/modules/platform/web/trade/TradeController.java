@@ -156,9 +156,9 @@ public class TradeController extends BaseController {
 	 */
 	@RequestMapping(value = "stopJob")
 	@ResponseBody
-	public String stopJob(){
+	public String stopJob(String symbolA,String symbolB){
 		// 调service
-		String msg = totalControlService.stopJob();
+		String msg = totalControlService.stopJob(symbolA,symbolB);
 		return msg;
 	}
 }

@@ -318,7 +318,7 @@ public class InterTestController extends BaseController {
 				//logger.info(">>>　　post_leverage＝　"+msg);
 				String side = "";
 				if(Constants.DIRECTION_BUY_UP.equals(dir) || Constants.DIRECTION_SELL_DOWN.equals(dir)){
-					side = "Buy";  // 1开多,4平空
+					side = "Buy"; // 1开多,4平空
 				}else if(Constants.DIRECTION_BUY_DOWN.equals(dir) || Constants.DIRECTION_SELL_UP.equals(dir)){
 					side = "Sell"; // 2开空，3平多
 				}
@@ -332,6 +332,18 @@ public class InterTestController extends BaseController {
 		return msg;
 	}
 	
+	@RequestMapping("cancelMexOrder")
+	@ResponseBody
+    public String cancelMexOrder(String orderID,String text){
+		String msg = "";
+		try {
+			msg = mexOrderService.delete_order(orderID, text);
+		} catch (Exception e) {
+			msg = e.getMessage();
+			logger.error(">> cancelMexOrder error:",e);
+		}
+		return msg;
+	}
 	
 	@RequestMapping("getOkexOrders")
 	@ResponseBody
@@ -386,5 +398,13 @@ public class InterTestController extends BaseController {
 			e.printStackTrace();
 		}
 		return msg;
+	}
+	
+	/**
+	 *  计算收益页面
+	 */
+	@RequestMapping(value = {"showTool", ""})
+	public String showTool(HttpServletRequest request, HttpServletResponse response, Model model) {
+		return "modules/platform/tool/countIncome";
 	}
 }

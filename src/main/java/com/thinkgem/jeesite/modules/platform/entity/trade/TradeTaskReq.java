@@ -58,6 +58,9 @@ public class TradeTaskReq {
 	/**   监控主程序code  */
 	private String monitorCode;
 	
+	private Long queryStartTime = 0L; // 开始时间
+	private Long queryEndTime = 0L;   // 结束时间
+	
 	public String getSymbolA() {
 		return symbolA;
 	}
@@ -208,4 +211,17 @@ public class TradeTaskReq {
 	public void setStopJob(String stopJob) {
 		this.stopJob = stopJob;
 	}
+	public Long getQueryStartTime() {
+		return queryStartTime;
+	}
+	public void setQueryStartTime(Long queryStartTime) {
+		this.queryStartTime = queryStartTime;
+	}
+	public Long getQueryEndTime() {
+		return queryEndTime;
+	}
+	public void setQueryEndTime(Long queryEndTime) {
+		this.queryEndTime = queryEndTime;
+	}
+	
 }

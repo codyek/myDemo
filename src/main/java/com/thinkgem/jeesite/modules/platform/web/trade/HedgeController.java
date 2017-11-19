@@ -54,6 +54,9 @@ public class HedgeController extends BaseController {
 		return "modules/platform/trade/index";
 	}
 	
+	/**
+	 *  okex BTC与Mex XBT永续 对冲任务页面 v1
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"xbtUsdPage", ""})
 	public String btcAndXbtUsdPage(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -62,12 +65,26 @@ public class HedgeController extends BaseController {
 		return "modules/platform/hedge/xbtusd";
 	}
 	
+	/**
+	 *  okex BTC与Mex XBT永续 对冲任务页面 v2
+	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"btcAndXbtusdPage", ""})
 	public String btcAndXbtusdPage(HttpServletRequest request, HttpServletResponse response, Model model) {
 		TradeTaskReq req = new TradeTaskReq();
 		model.addAttribute("TradeTaskReq", req);
 		return "modules/platform/hedge/btcAndxbtusd";
+	}
+	
+	/**
+	 *  okex BTC与Mex XBT永续 对冲任务页面 v2
+	 */
+	@RequiresPermissions("platform:trade:view")
+	@RequestMapping(value = {"btcAndXbtqaePage", ""})
+	public String btcAndXbtqaePage(HttpServletRequest request, HttpServletResponse response, Model model) {
+		TradeTaskReq req = new TradeTaskReq();
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/hedge/btcAndxbtqae";
 	}
 	
 	@RequiresPermissions("platform:trade:view")
