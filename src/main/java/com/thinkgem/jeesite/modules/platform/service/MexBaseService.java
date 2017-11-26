@@ -46,6 +46,8 @@ public abstract class MexBaseService {
 	protected static final String CODE_401 = "401";
 	/** Not Found */
 	protected static final String CODE_404 = "404";
+	/** Service Unavailable */
+	protected static final String CODE_503 = "503";
 	
 	
 	@Autowired
@@ -112,13 +114,16 @@ public abstract class MexBaseService {
 			logger.error(">> post response status = "+status);
 			if(CODE_400.equals(status)){
 				// Parameter Error 参数错误
-				throw new ServiceException("Parameter Error 参数错误!");
+				throw new ServiceException("400 Parameter Error 参数错误!");
 			} else if(CODE_401.equals(status)){
 				// Unauthorized 授权失败
-				throw new ServiceException("Unauthorized 授权失败!");
+				throw new ServiceException("401 Unauthorized 授权失败!");
 			} else if(CODE_404.equals(status)){
 				// Not Found 
 				throw new Exception(e);
+			} else if(CODE_503.equals(status)){
+				// Service Unavailable
+				throw new ServiceException("503 Service Unavailable");
 			}else{
 				
 			}

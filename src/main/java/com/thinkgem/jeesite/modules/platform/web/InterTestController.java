@@ -310,7 +310,7 @@ public class InterTestController extends BaseController {
 				Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
 				// okex
 				msg = orderService.future_trade(symbol, "quarter", curPrice.toString(), req.getAmountA().toString(), dir, "1", "10");
-			}else if("XBTUSD".equals(symbol)){
+			}else if("XBTUSD".equals(symbol) || "XBTZ17".equals(symbol)){
 				// mex
 				// 设置杠杆倍数
 				//msg = mexOrderService.post_leverage(symbol,10D);
@@ -407,4 +407,14 @@ public class InterTestController extends BaseController {
 	public String showTool(HttpServletRequest request, HttpServletResponse response, Model model) {
 		return "modules/platform/tool/countIncome";
 	}
+	
+	/**
+	 *  数据回测页面
+	 */
+	@RequestMapping(value = {"backTest", ""})
+	public String backTest(TradeTaskReq req,HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute("TradeTaskReq", req);
+		return "modules/platform/backTest/backTest";
+	}
+	
 }

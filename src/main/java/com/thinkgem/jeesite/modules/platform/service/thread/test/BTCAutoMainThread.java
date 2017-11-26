@@ -510,6 +510,7 @@ public class BTCAutoMainThread extends Thread{
 	}
 	
 	private BtcTradeDataInterface btcTradeData;
+	
 	private BtcToXbtTradeData btcDate;
 	/**
 	 *  获取币种 A与B 实时差价 或 一币种实时价格
@@ -523,7 +524,7 @@ public class BTCAutoMainThread extends Thread{
 			btcTradeData = SpringContextHolder.getBean(BtcTradeDataInterface.class);
 		}
 		if(null == queryStartTime || queryStartTime == 0L){
-			queryStartTime = 20170720121212L;
+			queryStartTime = 20171012121212L;
 		}
 		
 		Direction direction = Direction.ASC;
@@ -535,7 +536,7 @@ public class BTCAutoMainThread extends Thread{
 		queryStartTime = btcDate.getTime();
 		/**  待开仓状态下  大于监控时间结束本次 监听  **/
 		if(Constants.CAN_OPEN.equals(status) && queryEndTime < btcDate.getTime()){
-			log.info(">> do over time = "+queryStartTime);
+			log.info(">> do over time = "+queryStartTime+"  ,queryEndTime="+ queryEndTime);
 			throw new Exception(">>>>>> do over <<<<<");
 		}
 		  
@@ -585,7 +586,7 @@ public class BTCAutoMainThread extends Thread{
 			BitMexAccountService MexBean = SpringContextHolder.getBean(BitMexAccountService.class);
 			BitMexAccount bitMexAccount = new BitMexAccount();
 			bitMexAccount.setUseId(user.getId());
-			bitMexAccount.setSymbol(symbol);
+			bitMexAccount.setSymbol("XBTUSD");
 			List<BitMexAccount> ret = MexBean.findList(bitMexAccount);
 			BitMexAccount mexAccount = ret.get(0);
 			balance = mexAccount.getAccountBalance();
@@ -811,7 +812,7 @@ public class BTCAutoMainThread extends Thread{
 		BigDecimal agio =  agioOld.abs();
 		BigDecimal priceA = getCachePrice(req.getSymbolA());
 		BigDecimal priceB = getCachePrice(req.getSymbolB());
-		log.info(">> Test AutoTask AGIO ="+df.format(agio)+" ,agioOld = "+df.format(agioOld)
+		log.info(">> Test AutoTask time="+queryStartTime+" ,AGIO ="+df.format(agio)+" ,agioOld = "+df.format(agioOld)
 				+",priceA="+df.format(priceA)+",priceB="+df.format(priceB));
 		TradeTaskReq cacheReq = HedgeTotalControlService.getMonitorCache(cacheKey);
 		if(null != cacheReq){

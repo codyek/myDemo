@@ -58,6 +58,9 @@ public class HedgeAutoMainThread implements Runnable{
 		this.user = user;
 		this.cacheKey = cacheKey;
 	}
+	
+	// 两位小数格式
+	private DecimalFormat pDF = new DecimalFormat("#.00");
 
 	@Override
 	public void run() {
@@ -80,9 +83,8 @@ public class HedgeAutoMainThread implements Runnable{
 						//}
 					}
 					// 获取差价
-					BigDecimal agioOld = getAgio(req.getSymbolA(), req.getSymbolB());
-					BigDecimal agio =  agioOld.abs();
-					//log.info(">> new montiro agio ="+df.format(agio)+" ,agioOld = "+df.format(agioOld) );
+					BigDecimal agio = getAgio(req.getSymbolA(), req.getSymbolB());
+					//log.info(">> new montiro agio ="+df.format(agio));
 					// 比较差价与最大值、最小值
 					if(agio.compareTo(max) > 0){
 						// 差价 > 最大值   操作：宽开 或 宽平
@@ -92,7 +94,7 @@ public class HedgeAutoMainThread implements Runnable{
 							// 可开仓
 							if(Constants.TRADE_TYPE_WIDEOPEN.equals(type)
 									|| Constants.TRADE_TYPE_BOTH.equals(type)){
-								// 宽开  
+								// 宽开   TODO 添加T+n 回撤率开仓策略
 								openTrade(true,type);
 							}
 						}else if(Constants.CAN_CLOSE.equals(status)){
@@ -119,7 +121,7 @@ public class HedgeAutoMainThread implements Runnable{
 							// 可平仓
 							if(Constants.TRADE_TYPE_WIDEOPEN.equals(type)
 									|| Constants.TRADE_TYPE_BOTH.equals(type)){
-								// 窄平
+								// 窄平  TODO 添加T+n 回撤率平仓策略
 								closeTrade(false,type);
 							}
 						}
@@ -442,7 +444,7 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	/**
-	 *  获取币种 A与B 实时差价 或 一币种实时价格
+	 *  获取币种 A与B 实时差价 或 一币种实时价格  (绝对值)
 	* @return BigDecimal
 	 */
 	private BigDecimal getAgio(String symbolA, String symbolB) throws Exception{
@@ -450,7 +452,7 @@ public class HedgeAutoMainThread implements Runnable{
 		BigDecimal priceA = getCachePrice(symbolA);
 		BigDecimal priceB = getCachePrice(symbolB);
 		agio = priceA.subtract(priceB);
-		return agio;
+		return agio.abs();
 	}
 	
 	/**
@@ -585,17 +587,19 @@ public class HedgeAutoMainThread implements Runnable{
 			// TODO 
 			//flage = true;
 		} catch (ServiceException e) {
+			Thread.sleep(10000); // 休眠10秒防止频繁调用超过次数
 			// 参数失败
 			flage = false;
 			log.error(">> postMex Biz_error :",e.getMessage());
 			return flage;
 		} catch (Exception e) {
+			log.info(">> !!okex Post isAgain = "+isAgain);
+			log.error(">> postMex error :",e);
 			// 网络异常，重试一次
 			if(!isAgain){
 				flage = postMex(detailEty,true);
 			}else{
 				flage = false;
-				log.error(">> postMex error :",e);
 				return flage;
 			}
 		}
@@ -629,7 +633,7 @@ public class HedgeAutoMainThread implements Runnable{
 			if(StringUtils.isNotBlank(json)){
 				JSONObject jobJ = JSONObject.parseObject(json);
 				if(jobJ.containsKey("result") && jobJ.containsKey("order_id") && jobJ.getBooleanValue("result")){
-					Integer orderId = jobJ.getInteger("order_id");
+					Long orderId = jobJ.getLong("order_id");
 					log.info(">> okex Post success oId = "+orderId);
 					detailEty.setRemarks(orderId.toString());
 					flage = true;
@@ -638,6 +642,7 @@ public class HedgeAutoMainThread implements Runnable{
 			// TODO
 			//flage = true;
 		} catch (Exception e) {
+			log.info(">> !!okex Post isAgain = "+isAgain);
 			// 重试一次
 			if(!isAgain){
 				flage = postOkex(detailEty,true);
@@ -870,13 +875,11 @@ public class HedgeAutoMainThread implements Runnable{
 	 * @throws
 	 */
 	private void AutoTask() throws Exception{
-		DecimalFormat df = new DecimalFormat("#.00");
-		BigDecimal agioOld = getAgio(req.getSymbolA(), req.getSymbolB());
-		BigDecimal agio =  agioOld.abs();
+		BigDecimal agio = getAgio(req.getSymbolA(), req.getSymbolB());
 		BigDecimal priceA = getCachePrice(req.getSymbolA());
 		BigDecimal priceB = getCachePrice(req.getSymbolB());
-		log.info(">> AutoTask AGIO ="+df.format(agio)+" ,agioOld = "+df.format(agioOld)
-				+",priceA="+df.format(priceA)+",priceB="+df.format(priceB));
+		log.info(">> AutoTask AGIO ="+pDF.format(agio) +",priceA="+pDF.format(priceA)
+				+",priceB="+pDF.format(priceB));
 		TradeTaskReq cacheReq = HedgeTotalControlService.getMonitorCache(cacheKey);
 		if(null != cacheReq){
 			req.setDepositA(cacheReq.getDepositA());

@@ -49,6 +49,16 @@ public class TradeTaskReq {
 	/**  B换算成价格对应的数量  */
 	private BigDecimal priceAmountB;
 	
+	/**  T+n 开仓差价回撤率%   */
+	private Integer withdrawRate;
+	
+	/**  是否按收益率平仓  */
+	private Boolean closeByProfit;
+	/**  正收益率 %  */
+	private Integer earnProfit;
+	/**  负收益率 %  */
+	private Integer deficitProfit;
+	
 	/**   监控操作方式 - 宽开窄平、窄开宽平or两者  */
 	private String type;
 	
@@ -223,5 +233,30 @@ public class TradeTaskReq {
 	public void setQueryEndTime(Long queryEndTime) {
 		this.queryEndTime = queryEndTime;
 	}
+	public Integer getWithdrawRate() {
+		return withdrawRate;
+	}
+	public void setWithdrawRate(Integer withdrawRate) {
+		this.withdrawRate = withdrawRate;
+	}
+	public Boolean getCloseByProfit() {
+		return closeByProfit;
+	}
+	public void setCloseByProfit(Boolean closeByProfit) {
+		this.closeByProfit = closeByProfit;
+	}
+	public Integer getEarnProfit() {
+		return earnProfit;
+	}
+	public void setEarnProfit(Integer earnProfit) {
+		this.earnProfit = earnProfit;
+	}
+	public Integer getDeficitProfit() {
+		return deficitProfit;
+	}
+	public void setDeficitProfit(Integer deficitProfit) {
+		this.deficitProfit = deficitProfit;
+	}
+	
 	
 }
