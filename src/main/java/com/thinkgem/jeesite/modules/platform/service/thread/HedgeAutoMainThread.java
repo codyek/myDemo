@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.service.ServiceException;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.EhCacheUtils;
+import com.thinkgem.jeesite.common.utils.HedgeUtils;
 import com.thinkgem.jeesite.common.utils.SpringContextHolder;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
@@ -61,6 +62,9 @@ public class HedgeAutoMainThread implements Runnable{
 	
 	// 两位小数格式
 	private DecimalFormat pDF = new DecimalFormat("#.00");
+	
+	// 设置Mex 杠杆倍数
+	private boolean setMexLeverage = false;
 
 	@Override
 	public void run() {
@@ -145,6 +149,39 @@ public class HedgeAutoMainThread implements Runnable{
 		}
 		// 结束监控更新监控表数据
 		setStopJob();
+	}
+	
+	/** 
+	 * 是否下单
+	* @Title: isOrder
+	* @return String
+	 * @throws Exception 
+	 */
+	private String isOrder() throws Exception{
+		String flag = "";
+		BigDecimal max = req.getMaxAgio();
+		BigDecimal min = req.getMinAgio();
+		// 获取差价
+		BigDecimal agio = getAgio(req.getSymbolA(), req.getSymbolB());
+		// 比较差价与最大值、最小值
+		if(agio.compareTo(max) > 0){
+			// 差价 > 最大值   操作：宽开 
+			String type = req.getType();
+			if(Constants.CAN_OPEN.equals(status)){
+				// 宽开   TODO 添加T+n 回撤率开仓策略
+				flag = Constants.OPEN;
+				//openTrade(true,type);
+			}
+		}
+		if(agio.compareTo(min) < 0){
+			// 差价  < 最大值   操作： 窄平
+			if(Constants.CAN_CLOSE.equals(status)){
+				// 窄平  TODO 添加T+n 回撤率平仓策略
+				flag = Constants.CLOSE;
+				//closeTrade(false,type);
+			}
+		}
+		return flag;
 	}
 	
 	/**
@@ -547,6 +584,9 @@ public class HedgeAutoMainThread implements Runnable{
 			flage = postOkex(detailEty,false);
 			log.info(">>>>>>>>　　　Post Okex flage ="+flage);
 		}
+		if(!flage){
+			Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数
+		}
 		return flage;
 	}
 	
@@ -563,8 +603,11 @@ public class HedgeAutoMainThread implements Runnable{
 		long startTime = System.currentTimeMillis();
 		log.info(">> mex post Amount =  "+detailEty.getAmount());
 		try {
-			// 设置杠杆倍数
-			service.post_leverage(detailEty.getSymbol(),10D);
+			if(!setMexLeverage){
+				// 设置杠杆倍数
+				service.post_leverage(detailEty.getSymbol(),10D);
+				setMexLeverage = true;
+			}
 			String direction = detailEty.getDirection();
 			String side = "";
 			if(Constants.DIRECTION_BUY_UP.equals(direction) || Constants.DIRECTION_SELL_DOWN.equals(direction)){
@@ -583,31 +626,36 @@ public class HedgeAutoMainThread implements Runnable{
 					flage = true;
 				}
 			}
-			
+			if(!flage){
+				// 失败，检查下单后保证金变化
+			}
+			if(flage){
+				// 成功，保存保证金变化
+			}
 			// TODO 
 			//flage = true;
 		} catch (ServiceException e) {
-			Thread.sleep(10000); // 休眠10秒防止频繁调用超过次数
 			// 参数失败
 			flage = false;
 			log.error(">> postMex Biz_error :",e.getMessage());
-			return flage;
 		} catch (Exception e) {
 			log.info(">> !!okex Post isAgain = "+isAgain);
 			log.error(">> postMex error :",e);
 			// 网络异常，重试一次
 			if(!isAgain){
+				Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数
 				flage = postMex(detailEty,true);
 			}else{
 				flage = false;
-				return flage;
 			}
 		}
 		long endTime = System.currentTimeMillis();
 		log.info(">> postMex used time ="+(endTime-startTime));
-		//save DB
-		BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
-		bean.save(detailEty);
+		if(flage){
+			//save DB
+			BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
+			bean.save(detailEty);
+		}
 		
 		return flage;
 	}
@@ -639,24 +687,32 @@ public class HedgeAutoMainThread implements Runnable{
 					flage = true;
 				}
 			}
+			if(!flage){
+				// 失败，检查下单后保证金变化
+			}
+			if(flage){
+				// 成功，保存保证金变化
+			}
 			// TODO
 			//flage = true;
 		} catch (Exception e) {
 			log.info(">> !!okex Post isAgain = "+isAgain);
 			// 重试一次
 			if(!isAgain){
+				Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数
 				flage = postOkex(detailEty,true);
 			}else{
 				flage = false;
 				log.error(">> postOkex error :",e);
-				return flage;
 			}
 		}
 		long endTime = System.currentTimeMillis();
 		log.info(">> postOkex used time ="+(endTime-startTime));
-		//save DB
-		BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
-		bean.save(detailEty);
+		if(flage){
+			//save DB
+			BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
+			bean.save(detailEty);
+		}
 		return flage;
 	}
 
@@ -847,6 +903,20 @@ public class HedgeAutoMainThread implements Runnable{
 		det.setDetailType(detailType);
 		det.setIfBurstBarn(Constants.STATUS_CLOSE);
 		return det;
+	}
+	
+	/**
+	 * 检查是否下单成功
+	* @return boolean
+	 */
+	private boolean checkOrder(){
+		Boolean flag = false;
+		// 1. http 获取账户可用保证金
+		
+		// 2. socket 获取账户可用保证金
+		
+		
+		return flag;
 	}
 	
 	/** 

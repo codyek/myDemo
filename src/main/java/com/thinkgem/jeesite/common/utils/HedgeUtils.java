@@ -2,6 +2,9 @@ package com.thinkgem.jeesite.common.utils;
 
 import java.math.BigDecimal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *  对冲工具类
 * @ClassName: HedgeUtils 
@@ -10,7 +13,12 @@ import java.math.BigDecimal;
 *
  */
 public class HedgeUtils {
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	// 休眠6秒防止频繁调用超过次数
+	public static final long sleepTime_6 = 6000;
+	// 休眠15秒防止频繁调用超过次数
+	public static final long sleepTime_15 = 15000;
 	/**
 	 * 计算收益率 
 	 * @return Double
@@ -41,6 +49,32 @@ public class HedgeUtils {
 	// 计算净收益
 	public static BigDecimal countProfit(BigDecimal openBuy, Double profitRate){
 		return openBuy.multiply(new BigDecimal(profitRate));
+	}
+	
+	
+	public static BigDecimal getAccountBySocket(){
+		
+		return null;
+	}
+	
+	/**
+	* @Title: 获取签名
+	* A signature is HMAC_SHA256(secret, verb + path + nonce + data), hex encoded.
+	* @param @param verb
+	* @param @param path
+	* @param @param nonce = String.valueOf(System.currentTimeMillis());
+	* @param @param apiSecret
+	* @return String
+	* @throws
+	 */
+	public static String getMexSocketSign(String nonce, String apiSecret){
+		String verb = "GET";
+		String path = "/realtime";
+		String content = verb + path + nonce;
+		System.out.println(">> sign content = "+content);
+		String signature = MexHMACSHA256.HMACSHA256(content.getBytes(), apiSecret.getBytes());
+		System.out.println(">> signature = "+signature);
+		return signature;
 	}
 	
 }

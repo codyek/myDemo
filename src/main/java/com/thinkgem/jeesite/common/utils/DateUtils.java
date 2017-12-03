@@ -187,6 +187,17 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 		return String.valueOf(System.currentTimeMillis());
 	}
 	
+	/** 
+     * 将时间戳转换为时间
+     */
+    public static String stampToDate(long lt){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
+    }
+	
 	/**
 	 * @param args
 	 * @throws ParseException

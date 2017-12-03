@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -31,6 +32,8 @@ import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceServic
 import com.thinkgem.jeesite.modules.platform.service.okex.InfoInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.socket.bitmex.WebsocketClientEndpoint;
+import com.thinkgem.jeesite.modules.platform.task.MexAccountSocket;
+import com.thinkgem.jeesite.modules.platform.task.MexTask;
 
 /**
  * inter测试Controller
@@ -417,4 +420,45 @@ public class InterTestController extends BaseController {
 		return "modules/platform/backTest/backTest";
 	}
 	
+	@Autowired
+    @Qualifier("mexAccountSocket") 
+    private MexAccountSocket mexAccountSocket;
+	
+	
+	@RequestMapping("mexAccountSocket")
+	@ResponseBody
+    public String mexAccountSocket(){
+		String msg = "success";
+		try {
+			mexAccountSocket.mexAccountsocket();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return msg;
+	}
+	
+	@RequestMapping("mexAccountSocketClose")
+	@ResponseBody
+    public String mexAccountSocketClose(){
+		String msg = "success";
+		try {
+			mexAccountSocket.onClose();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return msg;
+	}
+	
+	@RequestMapping("getMexMargin")
+	@ResponseBody
+    public String getMexMargin(){
+		String msg = "success";
+		try {
+			Object oo = EhCacheUtils.get(Constants.MARGIN_CACHE, Constants.MARGIN_CACHE);
+			msg+=" = "+oo;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return msg;
+	}
 }

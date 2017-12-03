@@ -30,6 +30,12 @@ public class Constants {
 	
 	public static final String SYMBOL_MEX_TIME = "SYMBOL:MEX:TIME:KEY";
 	
+	/** 保证金缓存   */
+	public static final String MARGIN_CACHE = "marginCache";
+	/** mex 保证金缓存  */
+	public static final String CACHE_MEX_MARGIN_KEY = "cache:mex:marginCache:key";
+	
+	
 	/** 监控操作方式 - 宽开窄平  */
 	public static final String TRADE_TYPE_WIDEOPEN = "1"; 
 	/** 监控操作方式 - 窄开宽平   */
@@ -39,6 +45,10 @@ public class Constants {
 	
 	public static final BigDecimal BIGDECIMAL_ZERO = new BigDecimal(0);
 	
+	// 开仓
+	public static final String OPEN = "open";
+	// 平仓
+	public static final String CLOSE = "close";
 	/**  可开仓  */
 	public static final String CAN_OPEN = "canOpen";
 	/**  可平仓  */

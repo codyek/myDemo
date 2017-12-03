@@ -66,6 +66,12 @@
 			<url>http://maven.aliyun.com/nexus/content/groups/public</url>
 		</repository>
 		
+		<repository>
+			<id>mvnrepository-repos</id>
+			<name>mvnrepository</name>
+			<url>http://dist.wso2.org/maven2</url>
+		</repository>
+		
 	</repositories>
 	
 	<!-- 设定插件仓库 -->
@@ -76,7 +82,11 @@
 			<name>Jeesite Repository</name>
 			<url>http://maven.aliyun.com/nexus/content/groups/public</url>
 		</pluginRepository>
-		
+		<pluginRepository>
+			<id>mvnrepository-repos</id>
+			<name>mvnrepository</name>
+			<url>http://dist.wso2.org/maven2</url>
+		</pluginRepository>
 	</pluginRepositories> 
 	
 	<!-- 依赖项定义 -->
@@ -660,6 +670,24 @@
             <artifactId>spring-data-mongodb</artifactId>  
             <version>1.8.4.RELEASE</version>  
         </dependency>
+        <!-- Okex FIX api 引入 start   -->  
+        <dependency>
+            <groupId>quickfixj</groupId>
+            <artifactId>quickfixj-all</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        <dependency>
+		  <groupId>org.apache.mina</groupId>
+		  <artifactId>mina-core</artifactId>
+		  <version>1.0.3</version>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.mina</groupId>
+		  <artifactId>mina-filter-ssl</artifactId>
+		  <version>1.0.3</version>
+		</dependency>
+		<!-- Okex FIX api 引入 end   -->  
+		
 	</dependencies>
 
 	<build>
