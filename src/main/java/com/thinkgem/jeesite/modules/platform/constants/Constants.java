@@ -30,8 +30,6 @@ public class Constants {
 	
 	public static final String SYMBOL_MEX_TIME = "SYMBOL:MEX:TIME:KEY";
 	
-	/** 保证金缓存   */
-	public static final String MARGIN_CACHE = "marginCache";
 	/** mex 保证金缓存  */
 	public static final String CACHE_MEX_MARGIN_KEY = "cache:mex:marginCache:key";
 	

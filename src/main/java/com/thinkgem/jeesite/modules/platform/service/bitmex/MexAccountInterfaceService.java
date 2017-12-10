@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstants;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitMexAccount;
+import com.thinkgem.jeesite.modules.platform.entity.account.MarginBalance;
 import com.thinkgem.jeesite.modules.platform.service.MexBaseService;
 import com.thinkgem.jeesite.modules.platform.service.account.BitMexAccountService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -64,6 +65,40 @@ public class MexAccountInterfaceService extends MexBaseService{
 		bitMexAccount.setAccountBalance(balance);
 		bitMexAccountService.save(bitMexAccount);
 		logger.info(">>>　save BitMex Account ok!");
+	}
+	
+	/**
+	* 获取您帐户的保证金余额
+	 * @throws Exception 
+	*/
+	public MarginBalance getMargin() throws Exception{
+		MarginBalance margin = null;
+		String json = get_user_margin("XBt");
+		//logger.info(">>  bitmex get_user_margin = "+json);
+		if(StringUtils.isNotBlank(json)){
+			JSONObject jobJ = JSONObject.parseObject(json);
+			if(jobJ.containsKey("availableMargin")){
+				margin = new MarginBalance();
+				BigDecimal balance = jobJ.getBigDecimal("availableMargin");
+				// mex XBt 转 XBT 1XBt = 0.00000001XBT
+				balance = balance.multiply(new BigDecimal(0.00000001));
+				balance = balance.setScale(6,BigDecimal.ROUND_HALF_UP);
+				margin.setAvailableMargin(balance);
+				if(jobJ.containsKey("walletBalance")){
+					BigDecimal walBalance = jobJ.getBigDecimal("walletBalance");
+					walBalance = walBalance.multiply(new BigDecimal(0.00000001));
+					walBalance = walBalance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					margin.setWalletBalance(walBalance);
+				}
+				if(jobJ.containsKey("marginBalance")){
+					BigDecimal marBalance = jobJ.getBigDecimal("marginBalance");
+					marBalance = marBalance.multiply(new BigDecimal(0.00000001));
+					marBalance = marBalance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					margin.setMarginBalance(marBalance);
+				}
+			}
+		}
+		return margin;
 	}
 	
 	/**

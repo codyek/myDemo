@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitOkAccount;
+import com.thinkgem.jeesite.modules.platform.entity.account.MarginBalance;
 import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
 import com.thinkgem.jeesite.modules.platform.service.account.BitOkAccountService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -68,6 +69,34 @@ public class AccountInterfaceService extends OkexBaseService{
 		bitOkAccount.setAccountBalance(balance);
 		bitOkAccountService.save(bitOkAccount);
 		logger.info(">>>　save okex Account ok!");
+	}
+	
+	/**
+	* 获取您帐户的保证金余额
+	 * @throws Exception 
+	*/
+	public MarginBalance getMargin() throws Exception{
+		MarginBalance margin = null;
+		String json = future_userinfo_4fix();
+		if(StringUtils.isNotBlank(json)){
+			JSONObject jobJ = JSONObject.parseObject(json);
+			if(jobJ.containsKey("result") && jobJ.containsKey("info") && jobJ.getBooleanValue("result")){
+				JSONObject infoObject = jobJ.getJSONObject("info");
+				if(infoObject.containsKey("btc")){
+					margin = new MarginBalance();
+					JSONObject btcObj = infoObject.getJSONObject("btc");
+					BigDecimal balance = btcObj.getBigDecimal("balance");
+					balance = balance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					margin.setAvailableMargin(balance);
+					if(jobJ.containsKey("rights")){
+						BigDecimal walBalance = jobJ.getBigDecimal("rights");
+						walBalance = walBalance.setScale(6,BigDecimal.ROUND_HALF_UP);
+						margin.setWalletBalance(walBalance);
+					}
+				}
+			}
+		}
+		return margin;
 	}
 	
 	/**

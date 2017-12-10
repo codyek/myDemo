@@ -49,7 +49,7 @@ public class TradeTaskReq {
 	/**  B换算成价格对应的数量  */
 	private BigDecimal priceAmountB;
 	
-	/**  T+n 开仓差价回撤率%   */
+	/**  T+n 差价回撤率%   */
 	private Integer withdrawRate;
 	
 	/**  是否按收益率平仓  */

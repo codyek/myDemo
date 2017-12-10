@@ -77,7 +77,7 @@ public class HedgeController extends BaseController {
 	}
 	
 	/**
-	 *  okex BTC与Mex XBT永续 对冲任务页面 v2
+	 *  okex BTC与Mex XBT季度 对冲任务页面 v2
 	 */
 	@RequiresPermissions("platform:trade:view")
 	@RequestMapping(value = {"btcAndXbtqaePage", ""})

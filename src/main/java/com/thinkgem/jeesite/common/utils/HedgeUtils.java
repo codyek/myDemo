@@ -5,6 +5,10 @@ import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thinkgem.jeesite.modules.platform.constants.Constants;
+import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
+import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
+
 /**
  *  对冲工具类
 * @ClassName: HedgeUtils 
@@ -13,7 +17,7 @@ import org.slf4j.LoggerFactory;
 *
  */
 public class HedgeUtils {
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected static Logger log = LoggerFactory.getLogger(HedgeUtils.class);
 
 	// 休眠6秒防止频繁调用超过次数
 	public static final long sleepTime_6 = 6000;
@@ -51,10 +55,59 @@ public class HedgeUtils {
 		return openBuy.multiply(new BigDecimal(profitRate));
 	}
 	
-	
-	public static BigDecimal getAccountBySocket(){
-		
+	// 获取mex可用保证金
+	public static BigDecimal getMexMarginByHttp(){
+		try {
+			MexAccountInterfaceService mexAccountSer = SpringContextHolder.getBean(MexAccountInterfaceService.class);
+			if(null != mexAccountSer && null != mexAccountSer.getMargin()){
+				return mexAccountSer.getMargin().getAvailableMargin();
+			}
+		} catch (Exception e) {
+			log.error(">> 获取mex http可用保证金余额信息  error:",e);
+		}
 		return null;
+	}
+	
+	// 获取mex可用保证金
+	public static BigDecimal getMexMarginBySocket(){
+		try {
+			Object obj = EhCacheUtils.get(Constants.PRICE_CACHE, Constants.CACHE_MEX_MARGIN_KEY);
+			if(null != obj){
+				return new BigDecimal(obj.toString());
+			}
+		} catch (Exception e) {
+			log.error(">> 获取mex socket可用保证金余额信息  error:",e);
+		}
+		return null;
+	}
+	
+	// 获取okex可用保证金
+	public static BigDecimal getOkexMarginByHttp(){
+		try {
+			AccountInterfaceService okAccountSer = SpringContextHolder.getBean(AccountInterfaceService.class);
+			if(null != okAccountSer && null != okAccountSer.getMargin()){
+				return okAccountSer.getMargin().getAvailableMargin();
+			}
+		} catch (Exception e) {
+			log.error(">> 获取Okex http可用保证金余额信息  error:",e);
+		}
+		return null;
+	}
+	
+	/**
+	 * 更新账户余额
+	* @Title: updateAccount
+	* @throws
+	 */
+	public static void updateAccount() {
+		try {
+			MexAccountInterfaceService mexAccountSer = SpringContextHolder.getBean(MexAccountInterfaceService.class);
+			AccountInterfaceService okAccountSer = SpringContextHolder.getBean(AccountInterfaceService.class);
+			mexAccountSer.getAccountbalance();
+			okAccountSer.getAccountbalance();
+		} catch (Exception e) {
+			log.error(">> 获取账户余额信息  error:",e);
+		}
 	}
 	
 	/**
@@ -71,9 +124,9 @@ public class HedgeUtils {
 		String verb = "GET";
 		String path = "/realtime";
 		String content = verb + path + nonce;
-		System.out.println(">> sign content = "+content);
+		//System.out.println(">> sign content = "+content);
 		String signature = MexHMACSHA256.HMACSHA256(content.getBytes(), apiSecret.getBytes());
-		System.out.println(">> signature = "+signature);
+		//System.out.println(">> signature = "+signature);
 		return signature;
 	}
 	

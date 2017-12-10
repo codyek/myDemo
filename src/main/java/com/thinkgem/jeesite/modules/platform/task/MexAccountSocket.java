@@ -67,8 +67,10 @@ public class MexAccountSocket {
 		if(null != cep){
 			cep.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
 				public void handleMessage(String message) {
-					//log.info(">>> MexAccount --- message="+message);
+					log.info(">>> MexAccount --- message="+message);
 					if(StringUtils.isNotBlank(message)){
+						// 响应  更新监控时间
+						accountMoniter.updateTime();
 						//EhCacheUtils.put(Constants.PRICE_CACHE,Constants.SYMBOL_MEX_TIME, System.currentTimeMillis());
 						if(message.contains("pong")){
 						}else{
@@ -84,7 +86,7 @@ public class MexAccountSocket {
 										String key = Constants.CACHE_MEX_MARGIN_KEY;
 										double price = data.getDoubleValue("availableMargin");
 										// 实时价格写入缓存
-										EhCacheUtils.put(Constants.MARGIN_CACHE,key, price);
+										EhCacheUtils.put(Constants.PRICE_CACHE,key, price);
 									}
 								}
 							}
@@ -159,12 +161,17 @@ public class MexAccountSocket {
 	
 	public void onClose(){
 		if(null != timerTask){
+			System.out.println(" >>>>>>　stooo 11");
 			timerTask.cancel();
 		}
 		if(null != cep){
-			Session userSession = null;
-			CloseReason reason = null;
+			String msg = "{\"op\":\"unsubscribe\",\"args\":\"margin\"}";;
+			cep.sendMessage(msg);
+			System.out.println(" >>>>>>　stooo 1222");
+			Session userSession = cep.userSession;
+			CloseReason reason = new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY,"close socket");
 			cep.onClose(userSession, reason);
+			cep = null;
 		}
 	}
 }

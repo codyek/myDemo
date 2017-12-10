@@ -454,11 +454,28 @@ public class InterTestController extends BaseController {
     public String getMexMargin(){
 		String msg = "success";
 		try {
-			Object oo = EhCacheUtils.get(Constants.MARGIN_CACHE, Constants.MARGIN_CACHE);
+			Object oo = EhCacheUtils.get(Constants.PRICE_CACHE, Constants.CACHE_MEX_MARGIN_KEY);
 			msg+=" = "+oo;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return msg;
 	}
+	
+	@RequestMapping("mexAccountSocketOne")
+	@ResponseBody
+    public String mexAccountSocketOne(){
+		String msg = "success";
+		try {
+			mexAccountSocket.mexAccountsocket();
+			System.out.println("  >>  sss  ");
+			Thread.sleep(12000);  // 
+			mexAccountSocket.onClose();
+			System.out.println("  >>  sssaaa  ");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return msg;
+	}
+	
 }

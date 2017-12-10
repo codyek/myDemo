@@ -65,6 +65,18 @@ public class HedgeAutoMainThread implements Runnable{
 	
 	// 设置Mex 杠杆倍数
 	private boolean setMexLeverage = false;
+	
+	// T+n 高延伸价
+	private BigDecimal extendMax = new BigDecimal(0);
+	// T+n 低延伸价
+	private BigDecimal extendMin = new BigDecimal(0);
+	
+	// 是否已初始化
+	private boolean initFlag = false;
+	/**  okex 可用保证金  */
+	private BigDecimal okexMargin;
+	/**  bitmex 可用保证金  */
+	private BigDecimal mexMargin;
 
 	@Override
 	public void run() {
@@ -78,66 +90,30 @@ public class HedgeAutoMainThread implements Runnable{
 						AutoTask();
 						startTime = currTime;
 					}
-					BigDecimal max = req.getMaxAgio();
-					BigDecimal min = req.getMinAgio();
-					// 关闭自动任务：关闭命令+可开仓状态
+					// 关闭自动任务：关闭命令+//可开仓状态
 					if ("stop".equals(req.getStopJob())) {
 						//if(Constants.CAN_OPEN.equals(status)){
 							break;
 						//}
 					}
-					// 获取差价
-					BigDecimal agio = getAgio(req.getSymbolA(), req.getSymbolB());
-					//log.info(">> new montiro agio ="+df.format(agio));
-					// 比较差价与最大值、最小值
-					if(agio.compareTo(max) > 0){
-						// 差价 > 最大值   操作：宽开 或 宽平
-						// 获取type 宽开窄平、窄开宽平或 两者
-						String type = req.getType();
-						if(Constants.CAN_OPEN.equals(status)){
-							// 可开仓
-							if(Constants.TRADE_TYPE_WIDEOPEN.equals(type)
-									|| Constants.TRADE_TYPE_BOTH.equals(type)){
-								// 宽开   TODO 添加T+n 回撤率开仓策略
-								openTrade(true,type);
-							}
-						}else if(Constants.CAN_CLOSE.equals(status)){
-							// 可平仓
-							if(Constants.TRADE_TYPE_NARROWOPEN.equals(type)
-									|| Constants.TRADE_TYPE_BOTH.equals(type)){
-								// 宽平
-								closeTrade(true,type);
-							}
+					// 初始化数据
+					if(!initFlag){
+						init();
+					}
+					// 是否交易
+					String flag = isOrder();
+					if(StringUtils.isNotBlank(flag)){
+						if(Constants.OPEN.equals(flag)){
+							openTrade();
+						}else if(Constants.CLOSE.equals(flag)){
+							closeTrade();
 						}
 					}
-					if(agio.compareTo(min) < 0){
-						// 差价  < 最大值   操作：窄开 或 窄平
-						// 获取type 宽开窄平、窄开宽平 或 两者
-						String type = req.getType();
-						if(Constants.CAN_OPEN.equals(status)){
-							// 可开仓
-							if(Constants.TRADE_TYPE_NARROWOPEN.equals(type)
-									|| Constants.TRADE_TYPE_BOTH.equals(type)){
-								// 窄开
-								openTrade(false,type);
-							}
-						}else if(Constants.CAN_CLOSE.equals(status)){
-							// 可平仓
-							if(Constants.TRADE_TYPE_WIDEOPEN.equals(type)
-									|| Constants.TRADE_TYPE_BOTH.equals(type)){
-								// 窄平  TODO 添加T+n 回撤率平仓策略
-								closeTrade(false,type);
-							}
-						}
-					}
-					
 					/**  待平仓状态下 判断是否爆仓   **/
 					if(Constants.CAN_CLOSE.equals(status)){
 						checkBurst();
 					}
-					
 				} catch (Exception e) {
-					//e.printStackTrace();
 					log.error(">>>> auto thread error : ",e);
 					break;
 				}
@@ -150,6 +126,18 @@ public class HedgeAutoMainThread implements Runnable{
 		// 结束监控更新监控表数据
 		setStopJob();
 	}
+	// 初始数据
+	private void init(){
+		// 初始可用保证金
+		okexMargin = HedgeUtils.getOkexMarginByHttp();
+		mexMargin = HedgeUtils.getMexMarginByHttp();
+		if(null == mexMargin){
+			mexMargin = HedgeUtils.getMexMarginBySocket();
+		}
+		if(null != okexMargin && null != mexMargin){
+			initFlag = true;
+		}
+	}
 	
 	/** 
 	 * 是否下单
@@ -161,25 +149,89 @@ public class HedgeAutoMainThread implements Runnable{
 		String flag = "";
 		BigDecimal max = req.getMaxAgio();
 		BigDecimal min = req.getMinAgio();
+		Integer drawRate = req.getWithdrawRate(); // 回测率 %
 		// 获取差价
 		BigDecimal agio = getAgio(req.getSymbolA(), req.getSymbolB());
 		// 比较差价与最大值、最小值
 		if(agio.compareTo(max) > 0){
 			// 差价 > 最大值   操作：宽开 
-			String type = req.getType();
 			if(Constants.CAN_OPEN.equals(status)){
-				// 宽开   TODO 添加T+n 回撤率开仓策略
-				flag = Constants.OPEN;
-				//openTrade(true,type);
+				// 宽开 
+				/** T+n 差价延伸策略  */
+				// 回撤价格 = max * (drawRate/100)
+				BigDecimal drawPrice  = max.multiply(new BigDecimal(drawRate).divide(new BigDecimal(100)));
+				if(extendPloy(true,drawPrice,agio)){
+					flag = Constants.OPEN;
+				}
 			}
 		}
 		if(agio.compareTo(min) < 0){
-			// 差价  < 最大值   操作： 窄平
+			// 差价  < 最小值   操作： 窄平
 			if(Constants.CAN_CLOSE.equals(status)){
-				// 窄平  TODO 添加T+n 回撤率平仓策略
-				flag = Constants.CLOSE;
-				//closeTrade(false,type);
+				// 窄平 
+				/** T+n 差价延伸策略  */
+				// 回撤价格 = min * (drawRate/100)
+				BigDecimal drawPrice  = min.multiply(new BigDecimal(drawRate).divide(new BigDecimal(100)));
+				if(extendPloy(false,drawPrice,agio)){
+					flag = Constants.CLOSE;
+				}
+				/** 盈利率策略  */
+				if(req.getCloseByProfit()){
+					// TODO
+				}
 			}
+		}
+		return flag;
+	}
+	
+	/** 
+	 * T+n 差价延伸策略 
+	 * del true 开仓，false 平仓
+	 * drawPrice 高回撤价格
+	 * agio  当前差价
+	 */
+	private boolean extendPloy(boolean del,BigDecimal drawPrice,BigDecimal agio){
+		boolean flag = false;
+		if (del) {
+			// 开仓
+			if(extendMax.compareTo(new BigDecimal(0))==0){
+				extendMax = agio;
+			}else if(extendMax.compareTo(new BigDecimal(0))>=0){
+				if(agio.compareTo(extendMax)>0){
+					//当前差价>高延伸价,更新高延伸价
+					extendMax = agio;
+				}else{
+					//当前差价<高延伸价，且当前差价<标记价格,则可开仓
+					// 标记价格
+					BigDecimal flagPice = extendMax.subtract(drawPrice);
+					if(agio.compareTo(flagPice)<0){
+						flag = true;
+					}
+				}
+			}
+		} else {
+			// 平仓
+			/** 差价小于10 平仓  */
+			if(agio.compareTo(new BigDecimal(10))<0){
+				flag = true;
+				return flag;
+			}
+			if(extendMin.compareTo(new BigDecimal(0))==0){
+				extendMin = agio;
+			}else if(extendMin.compareTo(new BigDecimal(0))>=0){
+				if(agio.compareTo(extendMin)<0){
+					//当前差价<低延伸价,更新低延伸价
+					extendMin = agio;
+				}else{
+					//当前差价>低延伸价，且当前差价>标记价格,则可平仓
+					// 标记价格
+					BigDecimal flagPice = extendMax.add(drawPrice);
+					if(agio.compareTo(flagPice)>0){
+						flag = true;
+					}
+				}
+			}
+			
 		}
 		return flag;
 	}
@@ -292,22 +344,16 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	/** 开仓
-	 * isWide TRUE 宽开， FALSE 窄开
-	 * type 监听类型
 	 */
-	private void openTrade(Boolean isWide,String type) throws Exception{
-		log.info(">> openTrade isWide ="+isWide+" , type="+type);
+	private void openTrade() throws Exception{
+		log.info(">> openTrade Wide");
 		
-		BitTrade entity = getTradeEty(type,true); // 交易主表信息
+		String detailType = "";
+		detailType = Constants.DETAIL_TYPE_KK; // 宽开
+		BitTrade entity = getTradeEty(detailType,true); // 交易主表信息
 		this.setTradeCode();
 		entity.setCode(tradeCode);
 		
-		String detailType = "";
-		if(isWide){
-			detailType = Constants.DETAIL_TYPE_KK;
-		}else {
-			detailType = Constants.DETAIL_TYPE_ZK;
-		}
 		BigDecimal priceA = getCachePrice(req.getSymbolA());
 		BigDecimal priceB = getCachePrice(req.getSymbolB());
 		
@@ -322,39 +368,20 @@ public class HedgeAutoMainThread implements Runnable{
 		BigDecimal areaB = priceB.multiply(new BigDecimal((0.01 * req.getLeverB())));
 		if(priceA.compareTo(priceB) > 0){
 			// A  >  B  
-			if(isWide){
-				// 宽开   A买空，B买多
-				openDirA = Constants.DIRECTION_BUY_DOWN;
-				openDirB = Constants.DIRECTION_BUY_UP;
-				// 计算爆仓价格
-				BurstPiceA = priceA.add(areaA);
-				BurstPiceB = priceB.subtract(areaB);
-			}else{
-				// 窄开  A买多，B买空
-				openDirA = Constants.DIRECTION_BUY_UP;
-				openDirB = Constants.DIRECTION_BUY_DOWN;
-				// 计算爆仓价格
-				BurstPiceA = priceA.subtract(areaA);
-				BurstPiceB = priceB.add(areaB);
-			}
+			// 宽开   A买空，B买多
+			openDirA = Constants.DIRECTION_BUY_DOWN;
+			openDirB = Constants.DIRECTION_BUY_UP;
+			// 计算爆仓价格
+			BurstPiceA = priceA.add(areaA);
+			BurstPiceB = priceB.subtract(areaB);
 		}else {
 			// A  <  B  
-			if(isWide){
-				// 宽开 B买空，A买多
-				openDirA = Constants.DIRECTION_BUY_UP;
-				openDirB = Constants.DIRECTION_BUY_DOWN;
-				// 计算爆仓价格
-				BurstPiceA = priceA.subtract(areaA);
-				BurstPiceB = priceB.add(areaB);
-			}else {
-				// 窄开  B买多，A买空
-				// A  <  B  
-				openDirA = Constants.DIRECTION_BUY_DOWN;
-				openDirB = Constants.DIRECTION_BUY_UP;
-				// 计算爆仓价格
-				BurstPiceA = priceA.add(areaA);
-				BurstPiceB = priceB.subtract(areaB);
-			}
+			// 宽开 B买空，A买多
+			openDirA = Constants.DIRECTION_BUY_UP;
+			openDirB = Constants.DIRECTION_BUY_DOWN;
+			// 计算爆仓价格
+			BurstPiceA = priceA.subtract(areaA);
+			BurstPiceB = priceB.add(areaB);
 		}
 		req.setOpenDirA(openDirA);
 		req.setOpenDirB(openDirB);
@@ -407,18 +434,12 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	/** 平仓
-	 * isWide TRUE 宽平， FALSE 窄平
-	 * type 监听类型
 	 */
-	private void closeTrade(Boolean isWide,String type) throws Exception{
-		log.info(">> CCcloseTrade  isWide ="+isWide +" ,type="+type);
-		BitTrade entity = getTradeEty(type,false); // 交易主表信息
+	private void closeTrade() throws Exception{
+		log.info(">> CloseTrade  zhai");
 		String detailType = "";
-		if(isWide){
-			detailType = Constants.DETAIL_TYPE_KP;
-		}else {
-			detailType = Constants.DETAIL_TYPE_ZP;
-		}
+		detailType = Constants.DETAIL_TYPE_ZP;  //窄平
+		BitTrade entity = getTradeEty(detailType,false); // 交易主表信息
 		// 获取 A B 监控时价格
 		BigDecimal priceA = getCachePrice(req.getSymbolA());
 		BigDecimal priceB = getCachePrice(req.getSymbolB());
@@ -626,12 +647,8 @@ public class HedgeAutoMainThread implements Runnable{
 					flage = true;
 				}
 			}
-			if(!flage){
-				// 失败，检查下单后保证金变化
-			}
-			if(flage){
-				// 成功，保存保证金变化
-			}
+			// 检查下单后保证金变化,保存下单后保证金
+			flage = checkOrder(BitMexInterConstants.PLATFORM_CODE,flage);
 			// TODO 
 			//flage = true;
 		} catch (ServiceException e) {
@@ -687,12 +704,10 @@ public class HedgeAutoMainThread implements Runnable{
 					flage = true;
 				}
 			}
-			if(!flage){
-				// 失败，检查下单后保证金变化
-			}
-			if(flage){
-				// 成功，保存保证金变化
-			}
+			
+			// 检查下单后保证金变化,保存下单后保证金
+			flage = checkOrder(OkexInterConstants.PLATFORM_CODE,flage);
+		
 			// TODO
 			//flage = true;
 		} catch (Exception e) {
@@ -848,17 +863,6 @@ public class HedgeAutoMainThread implements Runnable{
 		return balance;
 	}
 	
-	private void updateAccount() {
-		try {
-			MexAccountInterfaceService mexAccountSer = SpringContextHolder.getBean(MexAccountInterfaceService.class);
-			AccountInterfaceService okAccountSer = SpringContextHolder.getBean(AccountInterfaceService.class);
-			mexAccountSer.getAccountbalance();
-			okAccountSer.getAccountbalance();
-		} catch (Exception e) {
-			log.error(">> 获取账户余额信息  error:",e);
-		}
-	}
-	
 	/**
 	 * 获取新/旧交易主表对象
 	 * isNew  true 新  false 旧
@@ -906,16 +910,38 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	/**
-	 * 检查是否下单成功
+	 * 检查是否下单成功,并保存下单后保证金
 	* @return boolean
 	 */
-	private boolean checkOrder(){
-		Boolean flag = false;
-		// 1. http 获取账户可用保证金
-		
-		// 2. socket 获取账户可用保证金
-		
-		
+	private boolean checkOrder(String platform, boolean flag){
+		BigDecimal curMargin = new BigDecimal(0);
+		if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
+			// okex
+			// http 获取账户可用保证金
+			curMargin = HedgeUtils.getOkexMarginByHttp();
+			if(!flag && curMargin != null && curMargin.compareTo(okexMargin)!=0){
+				// 当前保证金与上次保证金不相等，下单成功
+				flag = true;
+			}
+			if(flag && curMargin != null){
+				okexMargin = curMargin;
+			}
+		}else if(BitMexInterConstants.PLATFORM_CODE.equals(platform)){
+			// mex 
+			// 1. http 获取账户可用保证金
+			curMargin = HedgeUtils.getMexMarginByHttp();
+			if(null == curMargin){
+				// 2. socket 获取账户可用保证金
+				curMargin = HedgeUtils.getMexMarginBySocket();
+			}
+			if(!flag && curMargin != null && curMargin.compareTo(mexMargin)!=0){
+				// 当前保证金与上次保证金不相等，下单成功
+				flag = true;
+			}
+			if(flag && curMargin != null){
+				mexMargin = curMargin;
+			}
+		}
 		return flag;
 	}
 	
@@ -963,7 +989,7 @@ public class HedgeAutoMainThread implements Runnable{
 		// 查询账户余额信息
 		long currTimeAccount = System.currentTimeMillis();
 		if(currTimeAccount - startTimeAccount > 300000){// 300秒查一次
-			updateAccount();
+			HedgeUtils.updateAccount();
 			startTimeAccount = currTimeAccount;
 		}
 	}
