@@ -13,6 +13,7 @@ import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.task.MexTask;
 import com.thinkgem.jeesite.modules.platform.task.OkexTask;
+import com.thinkgem.jeesite.modules.platform.task.OkexTaskOne;
 import com.thinkgem.jeesite.modules.platform.task.RestartMonitor;
 
 @Component
@@ -23,6 +24,10 @@ public class BitPriceInitListener implements ApplicationListener{
 	@Autowired
     @Qualifier("okexTask") 
     private OkexTask okexTask;
+	
+	/*@Autowired
+	@Qualifier("okexTaskOne") 
+	private OkexTaskOne okexTaskOne;*/
 	
 	@Autowired
     @Qualifier("mexTask") 
@@ -39,6 +44,7 @@ public class BitPriceInitListener implements ApplicationListener{
 		if (!isStart) {// 这个可以解决项目启动加载两次的问题
 			isStart = true;
 			okexTask.okexWebsocketTask();
+			//okexTaskOne.okexWebsocketTask();
 			
 			mexTask.mexWebsocketTask();
 			
@@ -58,6 +64,7 @@ public class BitPriceInitListener implements ApplicationListener{
 		if(null == okTime || okTime < curTime){
 			log.error(">> ok price no run! rerunning。");
 			okexTask.okexWebsocketTask();
+			//okexTaskOne.okexWebsocketTask();
 		}
 		// Mex time
 		Long mexTime = (Long)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.SYMBOL_MEX_TIME);

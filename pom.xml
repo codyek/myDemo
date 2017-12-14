@@ -670,7 +670,7 @@
             <artifactId>spring-data-mongodb</artifactId>  
             <version>1.8.4.RELEASE</version>  
         </dependency>
-        <!-- Okex FIX api 引入 start   -->  
+        <!-- Okex FIX api 引入 start   
         <dependency>
             <groupId>quickfixj</groupId>
             <artifactId>quickfixj-all</artifactId>
@@ -686,8 +686,21 @@
 		  <artifactId>mina-filter-ssl</artifactId>
 		  <version>1.0.3</version>
 		</dependency>
-		<!-- Okex FIX api 引入 end   -->  
+		 Okex FIX api 引入 end   -->  
 		
+		<!--  ali SMS  start  -->
+		<dependency>
+		  <groupId>com.aliyun</groupId>
+		  <artifactId>aliyun-java-sdk-core</artifactId>
+		  <version>3.5.0</version>
+		  <type>pom</type>
+		</dependency>
+		<dependency>
+		  <groupId>com.github.1991wangliang</groupId>
+		  <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+		  <version>1.0.0</version>
+		</dependency>
+		<!--  ali SMS end  -->
 	</dependencies>
 
 	<build>
