@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
+import com.thinkgem.jeesite.modules.sms.SmsService;
+import com.thinkgem.jeesite.modules.sms.entity.BitSms;
+import com.thinkgem.jeesite.modules.sms.service.BitSmsService;
 
 /**
  *  对冲工具类
@@ -130,4 +133,29 @@ public class HedgeUtils {
 		return signature;
 	}
 	
+	/**
+	* @Title: sendSMS 发送短信提醒
+	* @param @param uid
+	* @param @param mobile
+	* @param @param content
+	 */
+	public static void sendSMS(String uid, String mobile, String content){
+		boolean sendFlag = false;
+		try {
+			SmsService smsService = SpringContextHolder.getBean(SmsService.class);
+			sendFlag = smsService.batchSend(mobile, content);
+		} catch (Exception e) {
+		}
+		BitSmsService BitSmsService = SpringContextHolder.getBean(BitSmsService.class);
+		BitSms smsEty = new BitSms();
+		smsEty.setUseId(uid);
+		smsEty.setMobile(mobile);
+		smsEty.setContent(content);
+		if(sendFlag){
+			smsEty.setSendFlag("1");// 成功
+		}else{
+			smsEty.setSendFlag("0");
+		}
+		BitSmsService.save(smsEty);
+	}
 }

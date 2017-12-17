@@ -34,7 +34,6 @@ import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
-import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 
 public class HedgeAutoMainThread implements Runnable{
 
@@ -77,6 +76,7 @@ public class HedgeAutoMainThread implements Runnable{
 	private BigDecimal okexMargin;
 	/**  bitmex 可用保证金  */
 	private BigDecimal mexMargin;
+	
 
 	@Override
 	public void run() {
@@ -113,6 +113,8 @@ public class HedgeAutoMainThread implements Runnable{
 					if(Constants.CAN_CLOSE.equals(status)){
 						checkBurst();
 					}
+					/**  检查健康状态  */
+					checkHealth();
 				} catch (Exception e) {
 					log.error(">>>> auto thread error : ",e);
 					break;
@@ -437,6 +439,7 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private void closeTrade() throws Exception{
 		log.info(">> CloseTrade  zhai");
+		againTime = 0;
 		String detailType = "";
 		detailType = Constants.DETAIL_TYPE_ZP;  //窄平
 		BitTrade entity = getTradeEty(detailType,false); // 交易主表信息
@@ -600,10 +603,18 @@ public class HedgeAutoMainThread implements Runnable{
 			// MEX
 			flage = postMex(detailEty,false);
 			log.info(">>>>>>>>　　　Post Mex flage ="+flage);
+			if(!flage){
+				// 设置健康状态
+				mexOrderHealth = false;
+			}
 		}else if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
 			// OKEX
 			flage = postOkex(detailEty,false);
 			log.info(">>>>>>>>　　　Post Okex flage ="+flage);
+			if(!flage){
+				// 设置健康状态
+				okOrderHealth = false;
+			}
 		}
 		if(!flage){
 			Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数
@@ -677,6 +688,8 @@ public class HedgeAutoMainThread implements Runnable{
 		return flage;
 	}
 	
+	// okex 20016\20018 重试6次
+	private int againTime = 0;
 	/**
 	 * 下Okex 订单并保存
 	* @param @param detailEty
@@ -702,6 +715,16 @@ public class HedgeAutoMainThread implements Runnable{
 					log.info(">> okex Post success oId = "+orderId);
 					detailEty.setRemarks(orderId.toString());
 					flage = true;
+					againTime = 0;
+				}
+				if(jobJ.containsKey("result") && jobJ.containsKey("error_code")){
+					 int code = jobJ.getInteger("error_code");
+					 if(20016==code || 20018==code && againTime<=5){
+						 log.info(">> okex Post 1618 try againTime="+againTime);
+						 // okex 平台bug,需要重复调用多次
+						 flage = postOkex(detailEty,false);
+						 againTime +=1;
+					 }
 				}
 			}
 			
@@ -836,7 +859,6 @@ public class HedgeAutoMainThread implements Runnable{
 	
 	private BigDecimal getAccountBalance(String symbol,String platform) throws Exception{
 		BigDecimal balance = this.ZERO;
-		User user = UserUtils.getUser();
 		BigDecimal price = getCachePrice(symbol);
 		if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
 			// okex 账户
@@ -967,7 +989,7 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	private long startTimeAccount = System.currentTimeMillis();
-	/** 每十秒打印一次日志，更新 TradeTaskReq
+	/** 每二十秒打印一次日志，更新 TradeTaskReq
 	 * @throws
 	 */
 	private void AutoTask() throws Exception{
@@ -991,6 +1013,57 @@ public class HedgeAutoMainThread implements Runnable{
 		if(currTimeAccount - startTimeAccount > 300000){// 300秒查一次
 			HedgeUtils.updateAccount();
 			startTimeAccount = currTimeAccount;
+			// 检查获取价格是否健康
+			Long threeMinute = currTimeAccount - 3*60*1000; // 3分钟前
+			// ok time
+			Long okTime = (Long)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.SYMBOL_OKEX_TIME);
+			if(null == okTime || okTime < threeMinute){
+				okPriceHealth = false;
+			}
+			// Mex time
+			Long mexTime = (Long)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.SYMBOL_MEX_TIME);
+			if(null == mexTime || mexTime < threeMinute){
+				mexPriceHealth = false;
+			}
+		}
+	}
+	
+	// 短信发送时间
+	private long smsSendTime = 0L;
+	// okex获取价格是否健康
+	boolean okPriceHealth = true;
+	// mex获取价格是否健康
+	boolean mexPriceHealth = true;
+	// okex下单是否健康
+	boolean okOrderHealth = true;
+	// mex下单是否健康
+	boolean mexOrderHealth = true;
+	//监控健康检查，发送短信提醒
+	private void checkHealth(){
+		String msg = null;
+		if (!okPriceHealth) {
+			msg = "平台：okex,无法获取实时价格。";
+		} else if (!mexPriceHealth) {
+			msg = "平台：mex,无法获取实时价格。";
+		} else if (!okOrderHealth) {
+			msg = "平台：okex，未操作项：test，数量：10";
+		} else if (!mexOrderHealth) {
+			msg = "平台：mex，未操作项：test，数量：10";
+		}
+		if(null != msg){
+			long currTimeAccount = System.currentTimeMillis();
+			if(smsSendTime == 0L){
+				smsSendTime = currTimeAccount;
+			}
+			if(currTimeAccount - smsSendTime > 180000){// 180秒查一次
+				msg = "平台：test，未操作项：test，数量：10";
+				HedgeUtils.sendSMS(user.getId(), user.getMobile(), msg);
+				smsSendTime = currTimeAccount;
+				okPriceHealth = true;
+				mexPriceHealth = true;
+				okOrderHealth = true;
+				mexOrderHealth = true;
+			}
 		}
 	}
 }

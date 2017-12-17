@@ -688,7 +688,7 @@
 		</dependency>
 		 Okex FIX api 引入 end   -->  
 		
-		<!--  ali SMS  start  -->
+		<!--  ali SMS  start 
 		<dependency>
 		  <groupId>com.aliyun</groupId>
 		  <artifactId>aliyun-java-sdk-core</artifactId>
@@ -700,7 +700,7 @@
 		  <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
 		  <version>1.0.0</version>
 		</dependency>
-		<!--  ali SMS end  -->
+		  ali SMS end  -->
 	</dependencies>
 
 	<build>
