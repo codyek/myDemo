@@ -110,8 +110,8 @@ public class MexTask {
 	public void connect() throws Exception{
 		// 订阅 XBTUSD,XBTU17，LTCU17 实时价格
 		String msg = "{\"op\":\"subscribe\",\"args\":[\"instrument:XBTUSD\"," +
-				"\"instrument:XBTZ17\"," +
-				"\"instrument:LTCZ17\"]}";
+				"\"instrument:XBTH18\"," +
+				"\"instrument:LTCH18\"]}";
 		// open websocket
 		if(null == cep){
 			cep = new WebsocketClientEndpoint(new URI(URL));

@@ -58,7 +58,7 @@
 			<form:form id="inputForm" modelAttribute="TradeTaskReq" action="${ctx}/trade/startJob" method="post" class="form-horizontal">
 				<form:hidden path="type"  value="1"  />
 				<form:hidden path="symbolA"  value="btc_usd" />
-				<form:hidden path="symbolB"  value="XBTZ17" />
+				<form:hidden path="symbolB"  value="XBTH18" />
 				<sys:message content="${message}"/>	
 				<div class="control-group">
 						<span style="width: 50%; display: block;" class="floatLeft">
@@ -83,7 +83,7 @@
 							<form:input path="leverB" htmlEscape="false" class="inputWidth" readonly="true"  value="10" />
 							头寸：<span id="pstB">0</span>
 							<label class="marginLeft">是否按收益率平仓：</label>
-							<form:input path="closeByProfit" htmlEscape="false" class="inputWidth"  value="50"  />
+							<form:input path="closeByProfit" htmlEscape="false" class="inputWidth"  value="false"  />
 							<label class="marginLeft">负收益率 %：</label>
 							<form:input path="deficitProfit" htmlEscape="false" class="inputWidth"  value="50"  />
 						</span>
@@ -148,7 +148,7 @@
 
 	<script type="text/javascript">
 	var symbolA = "btc_usd";
-	var symbolB = "XBTZ17";
+	var symbolB = "XBTH18";
 	var accountBTC = "XBTUSD";
 	
 	$(document).ready(function() {
@@ -180,7 +180,7 @@
 	}
 	// BitMex 定义订阅信息
 	function initAddSubscribe() {
-		doMexSend('{"op":"subscribe","args":["instrument:XBTZ17","orderBook10:XBTZ17"]}');
+		doMexSend('{"op":"subscribe","args":["instrument:XBTH18","orderBook10:XBTH18"]}');
 	}
 	
 	// 遮罩效果

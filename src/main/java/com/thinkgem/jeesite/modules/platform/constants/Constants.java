@@ -18,11 +18,11 @@ public class Constants {
 	/**   */
 	public static final String CACHE_XBTUSDMEX_PRICE_KEY = "cache:xbtusdmex:price:key"; 
 	
-	public static final String SYMBOL_XBTQAE = "XBTZ17";
+	public static final String SYMBOL_XBTQAE = "XBTH18";
 	/**   */
 	public static final String CACHE_XBTQAEMEX_PRICE_KEY = "cache:xbtqaemex:price:key"; 
 	
-	public static final String SYMBOL_LTCQAE = "LTCZ17";
+	public static final String SYMBOL_LTCQAE = "LTCH18";
 	/**   */
 	public static final String CACHE_LTCQAEMEX_PRICE_KEY = "cache:ltcqaemex:price:key";
 	

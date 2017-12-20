@@ -104,8 +104,10 @@ public class HedgeAutoMainThread implements Runnable{
 					String flag = isOrder();
 					if(StringUtils.isNotBlank(flag)){
 						if(Constants.OPEN.equals(flag)){
+							extendMax = new BigDecimal(0);// 重置
 							openTrade();
 						}else if(Constants.CLOSE.equals(flag)){
+							extendMin = new BigDecimal(0);// 重置
 							closeTrade();
 						}
 					}
@@ -205,8 +207,11 @@ public class HedgeAutoMainThread implements Runnable{
 				}else{
 					//当前差价<高延伸价，且当前差价<标记价格,则可开仓
 					// 标记价格
+					BigDecimal max = req.getMaxAgio();
 					BigDecimal flagPice = extendMax.subtract(drawPrice);
-					if(agio.compareTo(flagPice)<0){
+					if(flagPice.compareTo(max) < 0 && agio.compareTo(max) > 0){
+						flag = true;
+					}else if(agio.compareTo(flagPice)<=0){
 						flag = true;
 					}
 				}
@@ -227,8 +232,11 @@ public class HedgeAutoMainThread implements Runnable{
 				}else{
 					//当前差价>低延伸价，且当前差价>标记价格,则可平仓
 					// 标记价格
+					BigDecimal min = req.getMinAgio();
 					BigDecimal flagPice = extendMax.add(drawPrice);
-					if(agio.compareTo(flagPice)>0){
+					if(flagPice.compareTo(min) > 0 && agio.compareTo(min) < 0){
+						flag = true;
+					}else if(agio.compareTo(flagPice)>0){
 						flag = true;
 					}
 				}
