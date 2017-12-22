@@ -17,6 +17,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -26,6 +28,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class CHttpPost {
 
+	protected static Logger log = LoggerFactory.getLogger(CHttpPost.class);
 	// http请求失败
 	public static int ERROR_310099 = -310099;
 
@@ -88,7 +91,7 @@ public class CHttpPost {
 				return returnInt;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(">> singleSend err:"+e);
 			// returnInt不为0，则代表提交失败。否则，提交成功。
 			if (returnInt != 0) {
 				returnInt = ERROR_310099;
@@ -149,7 +152,7 @@ public class CHttpPost {
 				return returnInt;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(">> batchSend err:"+e);
 			// returnInt不为0，则代表提交失败。否则，提交成功。
 			if (returnInt != 0) {
 				returnInt = ERROR_310099;
@@ -214,7 +217,7 @@ public class CHttpPost {
 				return 0;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(">> sendSmsByNotKeepAlive err:"+e);
 			// 返回错误码 单条发送失败
 			return failCode;
 		}
@@ -424,12 +427,12 @@ public class CHttpPost {
 				}
 
 			} catch (Exception e) {
+				log.error(">> executeNotKeepAliveNotUrlEncodePost err:"+e);
 				result = String.valueOf(ERROR_310099);
-				e.printStackTrace();
 			}
 		} catch (Exception e) {
+			log.error(">> executeNotKeepAliveNotUrlEncodePost2 err:"+e);
 			result = String.valueOf(ERROR_310099);
-			e.printStackTrace();
 		} finally {
 			// 关闭连接
 			if (httpclient != null) {

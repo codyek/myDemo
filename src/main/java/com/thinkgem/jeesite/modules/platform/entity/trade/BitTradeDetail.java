@@ -24,7 +24,8 @@ public class BitTradeDetail extends DataEntity<BitTradeDetail> {
 	private String direction;		// 交易方向：1:开多, 2:开空,  3:平多,  4:平空
 	private BigDecimal position;		// 头寸
 	private BigDecimal deposit;		// 保证金
-	private BigDecimal price;		// 成交价格
+	private BigDecimal price;		// 下单价格
+	private BigDecimal tradePrice;		// 成交价格
 	private BigDecimal priceAmount;		// 换算成价格对应的数量
 	private BigDecimal monitorPice;		// 监控时价格
 	private BigDecimal burstPice;		// 爆仓价格
@@ -175,6 +176,14 @@ public class BitTradeDetail extends DataEntity<BitTradeDetail> {
 
 	public void setPriceAmount(BigDecimal priceAmount) {
 		this.priceAmount = priceAmount;
+	}
+
+	public BigDecimal getTradePrice() {
+		return tradePrice;
+	}
+
+	public void setTradePrice(BigDecimal tradePrice) {
+		this.tradePrice = tradePrice;
 	}
 	
 }
