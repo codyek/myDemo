@@ -1,12 +1,21 @@
 package com.thinkgem.jeesite.modules.platform.service.bitmex;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstants;
+import com.thinkgem.jeesite.modules.platform.entity.order.MexOrder;
 import com.thinkgem.jeesite.modules.platform.service.MexBaseService;
 
 
@@ -65,7 +74,7 @@ public class MexOrderInterfaceService extends MexBaseService{
 	/**
 	 * 获取你的订单
 	 * @param symbol
-	 *            XBTUSD：比特币， ltc_usd：莱特币
+	 *            XBTUSD：比特币， ltc：莱特币
 	 * @param count
 	 *            要获取的结果数
 	 * @return String
@@ -78,6 +87,49 @@ public class MexOrderInterfaceService extends MexBaseService{
 		param.put("count", count);
 		param.put("reverse", true);
 		return exchange(url, HttpMethod.GET, true, param);
+	}
+	
+	/**
+	 * 获取你的订单
+	 * @param symbol
+	 *            XBTUSD：比特币， ltc：莱特币
+	 * @param count
+	 *            要获取的结果数
+	 * @return String
+	 * @throws Exception
+	 */
+	public List<MexOrder> getOrderInfo(String symbol, Double count) throws Exception {
+		List<MexOrder> orders = null;
+		String json = get_order(symbol,count);
+		if(StringUtils.isNotBlank(json)){
+			JSONArray jsonArr = JSONObject.parseArray(json);
+			if(null != jsonArr && !jsonArr.isEmpty()){
+				orders = new ArrayList<MexOrder>();
+				for (int i = 0; i < jsonArr.size(); i++) {
+					JSONObject js = jsonArr.getJSONObject(i);
+					MexOrder order = new MexOrder();
+					order.setOrderID(js.getString("orderID"));
+					order.setSymbol(js.getString("symbol"));
+					order.setSide(js.getString("side"));
+					BigDecimal px = js.getBigDecimal("avgPx");
+					if(null != px){
+						order.setAvgPx(px);
+					}else{
+						order.setAvgPx(new BigDecimal(0));
+					}
+					order.setCumeQty(js.getInteger("cumQty"));
+					java.sql.Timestamp time = js.getTimestamp("transactTime");
+					if(null != time){
+						order.setTransactTime(time.toString());
+					}else{
+						order.setTransactTime("");
+					}
+					order.setText(js.getString("text"));
+					orders.add(order);
+				}
+			}
+		}
+		return orders;
 	}
 	
 	/**

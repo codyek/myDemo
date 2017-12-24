@@ -19,7 +19,9 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	$("#show_json").html(data);
+		    	var str = "<p>OKEX钱包余额："+data.walletBalance+"，可用保证金余额："
+		    	+data.availableMargin+"</p>";
+		    	$("#Okex_Aco").html(str);
 	    		top.$.jBox.tip('处理成功！','success');
 		    },
 		    error:function(xhr,errorText,errorType){
@@ -39,7 +41,9 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	$("#show_json").html(data);
+		    	var str = "<p>MEX钱包余额："+data.walletBalance+"，可用保证金余额："
+		    	+data.availableMargin+"，保证金余额："+data.marginBalance+"</p>";
+		    	$("#Mex_Aco").html(str);
 	    		top.$.jBox.tip('处理成功！','success');
 		    },
 		    error:function(xhr,errorText,errorType){
@@ -53,6 +57,7 @@
 <body>
 	<input class="btn" type="button" value="获取Okex账户信息"  onclick="getOkexAccount()"/>
 	<input class="btn" type="button" value="获取Mex账户信息"  onclick="getMexAccount()"/>
-	<div id="show_json"></div>
+	<div id="Okex_Aco"></div>
+	<div id="Mex_Aco"></div>
 </body>
 </html>

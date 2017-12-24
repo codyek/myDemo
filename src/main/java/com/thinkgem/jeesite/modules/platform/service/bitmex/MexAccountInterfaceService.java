@@ -82,18 +82,18 @@ public class MexAccountInterfaceService extends MexBaseService{
 				BigDecimal balance = jobJ.getBigDecimal("availableMargin");
 				// mex XBt 转 XBT 1XBt = 0.00000001XBT
 				balance = balance.multiply(new BigDecimal(0.00000001));
-				balance = balance.setScale(6,BigDecimal.ROUND_HALF_UP);
+				balance = balance.setScale(8,BigDecimal.ROUND_HALF_UP);
 				margin.setAvailableMargin(balance);
 				if(jobJ.containsKey("walletBalance")){
 					BigDecimal walBalance = jobJ.getBigDecimal("walletBalance");
 					walBalance = walBalance.multiply(new BigDecimal(0.00000001));
-					walBalance = walBalance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					walBalance = walBalance.setScale(8,BigDecimal.ROUND_HALF_UP);
 					margin.setWalletBalance(walBalance);
 				}
 				if(jobJ.containsKey("marginBalance")){
 					BigDecimal marBalance = jobJ.getBigDecimal("marginBalance");
 					marBalance = marBalance.multiply(new BigDecimal(0.00000001));
-					marBalance = marBalance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					marBalance = marBalance.setScale(8,BigDecimal.ROUND_HALF_UP);
 					margin.setMarginBalance(marBalance);
 				}
 			}

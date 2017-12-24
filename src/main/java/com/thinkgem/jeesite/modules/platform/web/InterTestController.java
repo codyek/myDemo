@@ -19,12 +19,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.EhCacheUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.mongodb.model.LtcTradeData;
 import com.thinkgem.jeesite.modules.mongodb.service.LtcTradeDataInterface;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
+import com.thinkgem.jeesite.modules.platform.entity.account.MarginBalance;
+import com.thinkgem.jeesite.modules.platform.entity.order.MexOrder;
+import com.thinkgem.jeesite.modules.platform.entity.order.OkexOrder;
 import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
@@ -350,28 +354,27 @@ public class InterTestController extends BaseController {
 	
 	@RequestMapping("getOkexOrders")
 	@ResponseBody
-    public String getOkexOrders(String symbol,String status){
-		String msg = "";
+    public List<OkexOrder> getOkexOrders(String symbol,String status){
+		List<OkexOrder> list = null;
 		try {
-			msg = orderService.future_order_info(symbol, "quarter", "-1", status, "0", "20");
+			list = orderService.getOrderInfo(symbol, "quarter", "-1", status, "0", "20");
 		} catch (Exception e) {
 			logger.error(">> getOkexOrders error:",e);
 		}
-		
-		return msg;
+		return list;
 	}
 		
 	@RequestMapping("getMexOrders")
 	@ResponseBody
-    public String getMexOrders(String symbol){
-		String msg = "";
+    public List<MexOrder> getMexOrders(String symbol){
+		List<MexOrder> list = null;
 		try {
-			msg = mexOrderService.get_order(symbol, 20D);
+			list = mexOrderService.getOrderInfo(symbol, 20D);
 		} catch (Exception e) {
 			logger.error(">> getMexOrders error:",e);
 		}
 		
-		return msg;
+		return list;
 	}
 	
 	@RequestMapping(value = {"testGetAccount", ""})
@@ -381,10 +384,10 @@ public class InterTestController extends BaseController {
 	
 	@RequestMapping("getMexAccount")
 	@ResponseBody
-    public String getMexAccount(){
-		String msg = "";
+    public MarginBalance getMexAccount(){
+		MarginBalance msg = null;
 		try {
-			msg = mexAccountService.get_user_margin("XBt");
+			msg = mexAccountService.getMargin();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -393,10 +396,10 @@ public class InterTestController extends BaseController {
 	
 	@RequestMapping("getOkexAccount")
 	@ResponseBody
-    public String getOkexAccount(){
-		String msg = "";
+    public MarginBalance getOkexAccount(){
+		MarginBalance msg = null;
 		try {
-			msg = accountService.future_userinfo_4fix();
+			msg = accountService.getMargin();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -82,4 +82,9 @@ public class Constants {
 	/** 状态：-1撤销   */
 	public static final String STATUS_CANCEL = "-1"; 
 	
+	/** 监控类型：monitor监控,trade交易   */
+	public static final String LOG_TYPE_MONITOR = "monitor";
+	/** 监控类型：monitor监控,trade交易   */
+	public static final String LOG_TYPE_TRADE = "trade";
+	
 }

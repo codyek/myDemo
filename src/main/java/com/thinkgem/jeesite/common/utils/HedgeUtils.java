@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thinkgem.jeesite.modules.log.entity.BitMonitorLog;
+import com.thinkgem.jeesite.modules.log.service.BitMonitorLogService;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
@@ -157,5 +159,21 @@ public class HedgeUtils {
 			smsEty.setSendFlag("0");
 		}
 		BitSmsService.save(smsEty);
+	}
+	
+	/**
+	* @Title: saveLog 保存监控记录
+	* @param @param uid
+	* @param @param mobile
+	* @param @param content
+	 */
+	public static void saveLog(String uid, String type, String content, String status){
+		BitMonitorLogService service = SpringContextHolder.getBean(BitMonitorLogService.class);
+		BitMonitorLog log = new BitMonitorLog();
+		log.setUseId(uid);
+		log.setTypeFlag(type);
+		log.setLogContent(content);
+		log.setStatusFlag(status);
+		service.save(log);
 	}
 }

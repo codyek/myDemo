@@ -86,11 +86,11 @@ public class AccountInterfaceService extends OkexBaseService{
 					margin = new MarginBalance();
 					JSONObject btcObj = infoObject.getJSONObject("btc");
 					BigDecimal balance = btcObj.getBigDecimal("balance");
-					balance = balance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					balance = balance.setScale(8,BigDecimal.ROUND_HALF_UP);
 					margin.setAvailableMargin(balance);
-					if(jobJ.containsKey("rights")){
-						BigDecimal walBalance = jobJ.getBigDecimal("rights");
-						walBalance = walBalance.setScale(6,BigDecimal.ROUND_HALF_UP);
+					if(btcObj.containsKey("rights")){
+						BigDecimal walBalance = btcObj.getBigDecimal("rights");
+						walBalance = walBalance.setScale(8,BigDecimal.ROUND_HALF_UP);
 						margin.setWalletBalance(walBalance);
 					}
 				}

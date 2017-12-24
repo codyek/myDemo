@@ -1,12 +1,19 @@
 package com.thinkgem.jeesite.modules.platform.service.okex;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
+import com.thinkgem.jeesite.modules.platform.entity.order.OkexOrder;
 import com.thinkgem.jeesite.modules.platform.service.OkexBaseService;
 
 
@@ -114,6 +121,70 @@ public class OrderInterfaceService extends OkexBaseService{
 		params.put("current_page", current_page);
 		params.put("page_length", page_length);
 		return doPost(url, params);
+	}
+	
+	/**
+	* 获取合约订单信息
+	* @param symbol btc_usd：比特币， ltc_usd：莱特币
+    * @param contractType 合约类型。this_week：当周；next_week：下周；quarter：季度
+    * @param order_id 订单ID -1:查询指定状态的订单，否则查询相应订单号的订单
+    * @param status 查询状态 1:未完成的订单 2:已经完成的订单
+    * @param current_page 当前页数
+    * @param page_length 每页获取条数，最多不超过50
+	* @return String
+	* @throws Exception
+	 */
+	public List<OkexOrder> getOrderInfo(String symbol, String contractType,
+			String order_id, String status, String current_page, String page_length) throws Exception {
+		List<OkexOrder> orderInfos = null;
+		String json = future_order_info(symbol,contractType,order_id,status,current_page,page_length);
+		if(StringUtils.isNotBlank(json)){
+			JSONObject jobJ = JSONObject.parseObject(json);
+			if(jobJ.containsKey("result") && jobJ.containsKey("orders") && jobJ.getBooleanValue("result")){
+				JSONArray arrJs = jobJ.getJSONArray("orders");
+				orderInfos = new ArrayList<OkexOrder>();
+				for (int i = 0; i < arrJs.size(); i++) {
+					JSONObject js = arrJs.getJSONObject(i);
+					OkexOrder order = new OkexOrder();
+					order.setOrder_id(js.getString("order_id"));
+					order.setSymbol(js.getString("symbol"));
+					String type = js.getString("type");
+					String typeStr = "";
+					if ("1".equals(type)) {
+						typeStr = "开多";
+					} else if ("2".equals(type)) {
+						typeStr = "开空";
+					} else if ("3".equals(type)) {
+						typeStr = "平多";
+					} else if ("4".equals(type)) {
+						typeStr = "平空";
+					}
+					order.setType(typeStr);
+					order.setPrice_avg(js.getBigDecimal("price_avg"));
+					order.setDeal_amount(js.getInteger("deal_amount"));
+					order.setFee(js.getBigDecimal("fee"));
+					String statusInt = js.getString("status");
+					String statusStr = "";//订单状态(0等待成交 1部分成交 2全部成交 -1撤单 4撤单处理中 5撤单中)
+					if ("0".equals(statusInt)) {
+						statusStr = "等待成交";
+					} else if ("1".equals(statusInt)) {
+						statusStr = "部分成交";
+					} else if ("2".equals(statusInt)) {
+						statusStr = "全部成交";
+					} else {
+						statusStr = "撤单";
+					}
+					order.setStatus(statusStr);
+					Long time = js.getLong("create_date");
+					if(null != time){
+						order.setCreate_date(DateUtils.stampToDate(time));
+					}
+					orderInfos.add(order);
+				}
+			}
+		}
+		
+		return orderInfos;
 	}
 	
 	/**
