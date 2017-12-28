@@ -146,38 +146,18 @@ public class OrderInterfaceService extends OkexBaseService{
 				for (int i = 0; i < arrJs.size(); i++) {
 					JSONObject js = arrJs.getJSONObject(i);
 					OkexOrder order = new OkexOrder();
-					order.setOrder_id(js.getString("order_id"));
+					order.setOrderId(js.getString("order_id"));
 					order.setSymbol(js.getString("symbol"));
-					String type = js.getString("type");
-					String typeStr = "";
-					if ("1".equals(type)) {
-						typeStr = "开多";
-					} else if ("2".equals(type)) {
-						typeStr = "开空";
-					} else if ("3".equals(type)) {
-						typeStr = "平多";
-					} else if ("4".equals(type)) {
-						typeStr = "平空";
-					}
-					order.setType(typeStr);
-					order.setPrice_avg(js.getBigDecimal("price_avg"));
-					order.setDeal_amount(js.getInteger("deal_amount"));
+					order.setType(js.getString("type"));
+					order.setTypeString(OkexOrder.getTypeStr(js.getString("type")));
+					order.setPriceAvg(js.getBigDecimal("price_avg"));
+					order.setDealAmount(js.getInteger("deal_amount"));
 					order.setFee(js.getBigDecimal("fee"));
-					String statusInt = js.getString("status");
-					String statusStr = "";//订单状态(0等待成交 1部分成交 2全部成交 -1撤单 4撤单处理中 5撤单中)
-					if ("0".equals(statusInt)) {
-						statusStr = "等待成交";
-					} else if ("1".equals(statusInt)) {
-						statusStr = "部分成交";
-					} else if ("2".equals(statusInt)) {
-						statusStr = "全部成交";
-					} else {
-						statusStr = "撤单";
-					}
-					order.setStatus(statusStr);
+					order.setStatus(OkexOrder.getStatusStr(js.getString("status")));
 					Long time = js.getLong("create_date");
 					if(null != time){
-						order.setCreate_date(DateUtils.stampToDate(time));
+						order.setCreateDateLong(time);
+						order.setCreateDate(DateUtils.stampToDate(time));
 					}
 					orderInfos.add(order);
 				}

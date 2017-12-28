@@ -121,6 +121,7 @@ public class MexOrderInterfaceService extends MexBaseService{
 					java.sql.Timestamp time = js.getTimestamp("transactTime");
 					if(null != time){
 						order.setTransactTime(time.toString());
+						order.setTransactTimeLong(time.getTime());
 					}else{
 						order.setTransactTime("");
 					}

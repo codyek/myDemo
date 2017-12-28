@@ -8,6 +8,7 @@ public class MexOrder {
 	private String symbol;
 	private String side;              // 方向  Buy，Sell
 	private String transactTime;    //交易时间
+	private Long transactTimeLong;    //交易时间
 	private BigDecimal avgPx;		// 平均成交价格
 	private Integer cumeQty;		// 成交数量
 	private String text;
@@ -53,6 +54,12 @@ public class MexOrder {
 	}
 	public void setText(String text) {
 		this.text = text;
+	}
+	public Long getTransactTimeLong() {
+		return transactTimeLong;
+	}
+	public void setTransactTimeLong(Long transactTimeLong) {
+		this.transactTimeLong = transactTimeLong;
 	}
 	
 }

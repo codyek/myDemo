@@ -24,11 +24,11 @@
 		        	$("#info").append(
 					"<tr><td>" + item.symbol + "</td>" +
 					"<td>" + item.type + "</td>" +
-					"<td>" + item.price_avg + "</td>" +
-					"<td>" + item.deal_amount + "</td>" +
+					"<td>" + item.priceAvg + "</td>" +
+					"<td>" + item.dealAmount + "</td>" +
 					//"<td>" + item.fee + "</td>" +
-					"<td>" + item.create_date + "</td>" +
-					"<td>" + item.status + "</td></tr>");
+					"<td>" + item.createDate + "</td>" +
+					"<td>" + item.statusString + "</td></tr>");
 		        });
 	    		top.$.jBox.tip('处理成功！','success');
 		    },

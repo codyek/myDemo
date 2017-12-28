@@ -15,6 +15,7 @@
 		a.position AS "position",
 		a.deposit AS "deposit",
 		a.price AS "price",
+		a.trade_price AS "tradePrice",
 		a.price_amount AS "priceAmount",
 		a.monitor_pice AS "monitorPice",
 		a.burst_pice AS "burstPice",
@@ -60,6 +61,9 @@
 			<if test="tradeCode != null and tradeCode != ''">
 				AND a.trade_code = #{tradeCode}
 			</if>
+			<if test="tradePrice != null and tradePrice != ''">
+				AND a.trade_price = #{tradePrice}
+			</if>
 			<if test="statusFlag != null and statusFlag != ''">
 				AND a.status_flag = #{statusFlag}
 			</if>
@@ -76,6 +80,7 @@
 			</otherwise>
 		</choose>
 	</select>
+	
 	
 	<select id="findAllList" resultType="BitTradeDetail">
 		SELECT 
@@ -109,6 +114,7 @@
 			position,
 			deposit,
 			price,
+			trade_price,
 			price_amount,
 			monitor_pice,
 			burst_pice,
@@ -133,6 +139,7 @@
 			#{position},
 			#{deposit},
 			#{price},
+			#{tradePrice},
 			#{priceAmount},
 			#{monitorPice},
 			#{burstPice},
@@ -160,6 +167,7 @@
 			position = #{position},
 			deposit = #{deposit},
 			price = #{price},
+			trade_price = #{tradePrice},
 			price_amount = #{priceAmount},
 			monitor_pice = #{monitorPice},
 			burst_pice = #{burstPice},

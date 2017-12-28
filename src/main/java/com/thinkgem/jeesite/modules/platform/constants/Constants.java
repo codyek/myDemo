@@ -86,5 +86,7 @@ public class Constants {
 	public static final String LOG_TYPE_MONITOR = "monitor";
 	/** 监控类型：monitor监控,trade交易   */
 	public static final String LOG_TYPE_TRADE = "trade";
+	/** 监控类型：monitor监控,trade交易 ,syncorder同步订单  */
+	public static final String LOG_TYPE_SYNCORDER = "syncorder";
 	
 }
