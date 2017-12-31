@@ -20,6 +20,7 @@ import com.thinkgem.jeesite.modules.platform.constants.inter.BitMexInterConstant
 import com.thinkgem.jeesite.modules.platform.constants.inter.OkexInterConstants;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitMexAccount;
 import com.thinkgem.jeesite.modules.platform.entity.account.BitOkAccount;
+import com.thinkgem.jeesite.modules.platform.entity.order.OkexOrder;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitMonitor;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTrade;
 import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
@@ -141,6 +142,7 @@ public class HedgeAutoMainThread implements Runnable{
 		if(null != okexMargin && null != mexMargin){
 			initFlag = true;
 		}
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, "初始可用保证金成功！", "1");
 	}
 	
 	/** 
@@ -196,6 +198,8 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private boolean extendPloy(boolean del,BigDecimal drawPrice,BigDecimal agio){
 		boolean flag = false;
+		BigDecimal flagPice = new BigDecimal(0);
+		String msg = "";
 		if (del) {
 			// 开仓
 			if(extendMax.compareTo(new BigDecimal(0))==0){
@@ -208,7 +212,7 @@ public class HedgeAutoMainThread implements Runnable{
 					//当前差价<高延伸价，且当前差价<标记价格,则可开仓
 					// 标记价格
 					BigDecimal max = req.getMaxAgio();
-					BigDecimal flagPice = extendMax.subtract(drawPrice);
+					flagPice = extendMax.subtract(drawPrice);
 					if(flagPice.compareTo(max) < 0 && agio.compareTo(max) > 0){
 						flag = true;
 					}else if(agio.compareTo(flagPice)<=0){
@@ -216,6 +220,8 @@ public class HedgeAutoMainThread implements Runnable{
 					}
 				}
 			}
+			msg = "开仓监控：当前差价："+agio+"，最大差价："+req.getMaxAgio()+"，标记差价："+flagPice+"，是否开仓："+flag;
+			
 		} else {
 			// 平仓
 			/** 差价小于10 平仓  */
@@ -233,7 +239,7 @@ public class HedgeAutoMainThread implements Runnable{
 					//当前差价>低延伸价，且当前差价>标记价格,则可平仓
 					// 标记价格
 					BigDecimal min = req.getMinAgio();
-					BigDecimal flagPice = extendMax.add(drawPrice);
+					flagPice = extendMax.add(drawPrice);
 					if(flagPice.compareTo(min) > 0 && agio.compareTo(min) < 0){
 						flag = true;
 					}else if(agio.compareTo(flagPice)>0){
@@ -241,8 +247,9 @@ public class HedgeAutoMainThread implements Runnable{
 					}
 				}
 			}
-			
+			msg = "平仓监控：当前差价："+agio+",最小差价："+req.getMinAgio()+"标记差价："+flagPice+""+flag;
 		}
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
 		return flag;
 	}
 	
@@ -639,6 +646,7 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private Boolean postMex(BitTradeDetail detailEty,boolean isAgain) throws Exception{
 		Boolean flage = false;
+		StringBuilder logMsg = new StringBuilder("BitMex下单监控：");
 		MexOrderInterfaceService service = SpringContextHolder.getBean(MexOrderInterfaceService.class);
 		long startTime = System.currentTimeMillis();
 		log.info(">> mex post Amount =  "+detailEty.getAmount());
@@ -655,6 +663,7 @@ public class HedgeAutoMainThread implements Runnable{
 			}else if(Constants.DIRECTION_BUY_DOWN.equals(direction) || Constants.DIRECTION_SELL_UP.equals(direction)){
 				side = "Sell"; // 2开空，3平多
 			}
+			logMsg.append("币种：").append(detailEty.getSymbol()).append("，方向："+side).append("，数量：").append(detailEty.getAmount());
 			// doPost
 			String json = service.post_order(detailEty.getSymbol(),"Market",0D,detailEty.getAmount().doubleValue(), side, detailEty.getTradeCode());
 			if(StringUtils.isNotBlank(json)){
@@ -668,15 +677,18 @@ public class HedgeAutoMainThread implements Runnable{
 			}
 			// 检查下单后保证金变化,保存下单后保证金
 			flage = checkOrder(BitMexInterConstants.PLATFORM_CODE,flage);
+			
 			// TODO 
 			//flage = true;
 		} catch (ServiceException e) {
 			// 参数失败
 			flage = false;
+			logMsg.append(",异常信息：").append(e.getMessage());
 			log.error(">> postMex Biz_error :",e.getMessage());
 		} catch (Exception e) {
 			log.info(">> !!okex Post isAgain = "+isAgain);
 			log.error(">> postMex error :",e);
+			logMsg.append(",重试前异常信息：").append(e.getMessage());
 			// 网络异常，重试一次
 			if(!isAgain){
 				Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数
@@ -692,7 +704,8 @@ public class HedgeAutoMainThread implements Runnable{
 			BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
 			bean.save(detailEty);
 		}
-		
+		logMsg.append(",交易结果：").append(flage);
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
 		return flage;
 	}
 	
@@ -707,12 +720,15 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private Boolean postOkex(BitTradeDetail detailEty,boolean isAgain) throws Exception{
 		Boolean flage = false;
+		StringBuilder logMsg = new StringBuilder("Okex下单监控：");
 		OrderInterfaceService service = SpringContextHolder.getBean(OrderInterfaceService.class);
 		long startTime = System.currentTimeMillis();
 		log.info(">> mex Okex Amount =  "+detailEty.getAmount());
 		try {
 			String direction = detailEty.getDirection();
 			Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
+			String side = OkexOrder.getTypeStr(direction);
+			logMsg.append("币种：").append(detailEty.getSymbol()).append("，方向："+side).append("，数量：").append(detailEty.getAmount());
 			// doPost
 			String json = service.future_trade(detailEty.getSymbol(), "quarter", curPrice.toString(),
 					detailEty.getAmount().toString(), direction, "1", "10");
@@ -728,6 +744,9 @@ public class HedgeAutoMainThread implements Runnable{
 				if(jobJ.containsKey("result") && jobJ.containsKey("error_code")){
 					 int code = jobJ.getInteger("error_code");
 					 if(20016==code || 20018==code && againTime<=5){
+						 if(0==againTime){
+							 logMsg.append(",okex接口服务出现1618错误！");
+						 }
 						 log.info(">> okex Post 1618 try againTime="+againTime);
 						 // okex 平台bug,需要重复调用多次
 						 flage = postOkex(detailEty,false);
@@ -743,6 +762,7 @@ public class HedgeAutoMainThread implements Runnable{
 			//flage = true;
 		} catch (Exception e) {
 			log.info(">> !!okex Post isAgain = "+isAgain);
+			logMsg.append(",异常信息：").append(e.getMessage());
 			// 重试一次
 			if(!isAgain){
 				Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数
@@ -759,6 +779,8 @@ public class HedgeAutoMainThread implements Runnable{
 			BitTradeDetailService bean = SpringContextHolder.getBean(BitTradeDetailService.class);
 			bean.save(detailEty);
 		}
+		logMsg.append(",交易结果：").append(flage);
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
 		return flage;
 	}
 
@@ -1034,6 +1056,10 @@ public class HedgeAutoMainThread implements Runnable{
 				mexPriceHealth = false;
 			}
 		}
+		// 监控记录
+		StringBuilder logMsg = new StringBuilder("自动任务运行：健康，时间：");
+		logMsg.append(DateUtils.stampToDate(currTimeAccount));
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
 	}
 	
 	// 短信发送时间
