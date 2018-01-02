@@ -72,6 +72,24 @@
 		</choose>
 	</select>
 	
+	<select id="findAllSendList" resultType="BitMonitorLog">
+		SELECT 
+			<include refid="bitMonitorLogColumns"/>
+		FROM bit_monitor_log a
+		<include refid="bitMonitorLogJoins"/>
+		<where>
+			a.status_flag != '9'
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
 	<insert id="insert">
 		INSERT INTO bit_monitor_log(
 			id,

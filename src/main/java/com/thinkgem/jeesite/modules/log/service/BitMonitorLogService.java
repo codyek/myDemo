@@ -19,6 +19,10 @@ import com.thinkgem.jeesite.modules.log.dao.BitMonitorLogDao;
 @Transactional(readOnly = true)
 public class BitMonitorLogService extends CrudService<BitMonitorLogDao, BitMonitorLog> {
 
+	public List<BitMonitorLog> findAllSendList(){
+		return dao.findAllSendList();
+	}
+	
 	public BitMonitorLog get(String id) {
 		return super.get(id);
 	}

@@ -15,6 +15,8 @@ import com.thinkgem.jeesite.modules.platform.task.MexTask;
 import com.thinkgem.jeesite.modules.platform.task.OkexTask;
 import com.thinkgem.jeesite.modules.platform.task.OkexTaskOne;
 import com.thinkgem.jeesite.modules.platform.task.RestartMonitor;
+import com.thinkgem.jeesite.modules.wechat.common.AccessTokenUtil;
+import com.thinkgem.jeesite.modules.wechat.service.SendMessageService;
 
 @Component
 public class BitPriceInitListener implements ApplicationListener{
@@ -36,6 +38,10 @@ public class BitPriceInitListener implements ApplicationListener{
 	@Autowired
 	@Qualifier("restartMonitor") 
 	private RestartMonitor restartMonitor;
+	
+	@Autowired
+    @Qualifier("sendMessageService") 
+    private SendMessageService sendMessageService;
 	
 	private static boolean isStart = false;
 
@@ -77,4 +83,16 @@ public class BitPriceInitListener implements ApplicationListener{
 		// TODO 同步交易价格：10分钟内  交易价格为空的订单
 	}
 
+	// 定时Task 发送微信消息
+	@Scheduled(cron = "0/30 * * * * ?") //30秒
+	//@Scheduled(fixedRate=10000) // 上一次开始执行时间点后30秒再次执行
+	public void sendMessage(){
+		sendMessageService.taskSendMessages();
+	}
+	
+	// 定时Task 更新accessToken
+	@Scheduled(cron = "0 0 * * * ?") // 1小时
+	public void updateToken(){
+		AccessTokenUtil.getToken();
+	}
 }

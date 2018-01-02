@@ -145,6 +145,7 @@ public class HedgeAutoMainThread implements Runnable{
 		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, "初始可用保证金成功！", "1");
 	}
 	
+	
 	/** 
 	 * 是否下单
 	* @Title: isOrder
@@ -190,6 +191,7 @@ public class HedgeAutoMainThread implements Runnable{
 		return flag;
 	}
 	
+	private long extendPloyTime = System.currentTimeMillis();
 	/** 
 	 * T+n 差价延伸策略 
 	 * del true 开仓，false 平仓
@@ -249,7 +251,14 @@ public class HedgeAutoMainThread implements Runnable{
 			}
 			msg = "平仓监控：当前差价："+agio+",最小差价："+req.getMinAgio()+"标记差价："+flagPice+""+flag;
 		}
-		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
+		long currTimeAccount = System.currentTimeMillis();
+		
+		if(flag){
+			HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
+		}else if(currTimeAccount - extendPloyTime > 10000){// 10秒查一次
+			HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
+			extendPloyTime = currTimeAccount;
+		}
 		return flag;
 	}
 	
@@ -958,6 +967,7 @@ public class HedgeAutoMainThread implements Runnable{
 		det.setTradeCode(tradeCode);
 		det.setDetailType(detailType);
 		det.setIfBurstBarn(Constants.STATUS_CLOSE);
+		det.setTradePrice(ZERO);// 默认0
 		return det;
 	}
 	
@@ -1019,6 +1029,7 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	private long startTimeAccount = System.currentTimeMillis();
+	private long startTimeLog = System.currentTimeMillis();
 	/** 每二十秒打印一次日志，更新 TradeTaskReq
 	 * @throws
 	 */
@@ -1056,10 +1067,13 @@ public class HedgeAutoMainThread implements Runnable{
 				mexPriceHealth = false;
 			}
 		}
-		// 监控记录
-		StringBuilder logMsg = new StringBuilder("自动任务运行：健康，时间：");
-		logMsg.append(DateUtils.stampToDate(currTimeAccount));
-		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
+		if(currTimeAccount - startTimeLog > 300000){// 300\60秒查一次
+			startTimeLog = currTimeAccount;
+			// 监控记录
+			StringBuilder logMsg = new StringBuilder("自动任务运行：健康，时间：");
+			logMsg.append(DateUtils.stampToDate(currTimeAccount));
+			HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
+		}
 	}
 	
 	// 短信发送时间
@@ -1091,6 +1105,7 @@ public class HedgeAutoMainThread implements Runnable{
 			}
 			if(currTimeAccount - smsSendTime > 180000){// 180秒查一次
 				msg = "平台：test，未操作项：test，数量：10";
+				HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, msg, "1");
 				HedgeUtils.sendSMS(user.getId(), user.getMobile(), msg);
 				smsSendTime = currTimeAccount;
 				okPriceHealth = true;
