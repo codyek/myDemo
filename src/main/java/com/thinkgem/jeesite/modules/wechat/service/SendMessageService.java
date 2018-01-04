@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.HttpUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.log.entity.BitMonitorLog;
@@ -43,17 +44,22 @@ public class SendMessageService {
 			if(StringUtils.isNotBlank(opens)){
 				String[] arrOpenID = opens.split(",");
 				for (BitMonitorLog log : logs) {
-					boolean flag = false;
+					String flag = "";
+					String date = DateUtils.formatDateTime(log.getCreateDate());
 					String content = log.getLogContent();
+					content = date+"\n"+content;
 					for (int i = 0; i < arrOpenID.length; i++) {
 						String openID = arrOpenID[i];
 						ResponseTextMessage msg = new ResponseTextMessage(openID,content);
 						flag = sendMessage(msg.toCustJsonString());
 						//flag = sendTemplateMessage(msg.toTemplateJsonString());
 					}
-					if(flag){
+					if("0".equals(flag)){
 						log.setStatusFlag("9");
 						bitMonitorLogService.save(log);
+					}else if("45011".equals(flag) || "45015".equals(flag)|| "45047".equals(flag)){
+						// 推出循环
+						break;
 					}
 				}
 			}
@@ -97,8 +103,8 @@ public class SendMessageService {
 	* @param @param postJson
 	* @return boolean
 	 */
-	private boolean sendMessage(String postJson){
-		boolean ret = false;
+	private String sendMessage(String postJson){
+		String ret = "";
 		log.debug(">> sendMessage wechat JSON:"+postJson);
 		if(null == AccessTokenUtil.ACTOKEN){
 			AccessTokenUtil.getToken();
@@ -110,11 +116,12 @@ public class SendMessageService {
 			Map<String, Object> retMap = JSONObject.parseObject(retStr, Map.class);
 			WechatApiResponseBean bean = handleWechatResponse(retMap);
 			Long code = bean.getCode();
-			if(0 == code.intValue()){
-				ret = true;
-			}
-			else{
-				log.error("Wechat error :"+retStr);
+			if(null != code){
+				ret = code.toString();
+				if(0 == code.intValue()){
+				} else{
+					log.error("Wechat error :"+retStr);
+				}
 			}
 		}
 		log.debug("Wechat return:"+retStr);

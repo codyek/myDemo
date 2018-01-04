@@ -27,9 +27,7 @@ import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
 import com.thinkgem.jeesite.modules.platform.entity.trade.TradeTaskReq;
 import com.thinkgem.jeesite.modules.platform.service.account.BitMexAccountService;
 import com.thinkgem.jeesite.modules.platform.service.account.BitOkAccountService;
-import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
-import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitMonitorService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
@@ -222,7 +220,7 @@ public class HedgeAutoMainThread implements Runnable{
 					}
 				}
 			}
-			msg = "开仓监控：当前差价："+agio+"，最大差价："+req.getMaxAgio()+"，标记差价："+flagPice+"，是否开仓："+flag;
+			msg = "开仓监控：当前差价："+pDF.format(agio)+"，最大差价："+req.getMaxAgio()+"，标记差价："+flagPice+"，是否开仓："+flag;
 			
 		} else {
 			// 平仓
@@ -249,7 +247,7 @@ public class HedgeAutoMainThread implements Runnable{
 					}
 				}
 			}
-			msg = "平仓监控：当前差价："+agio+",最小差价："+req.getMinAgio()+"标记差价："+flagPice+""+flag;
+			msg = "平仓监控：当前差价："+pDF.format(agio)+",最小差价："+req.getMinAgio()+"标记差价："+flagPice+""+flag;
 		}
 		long currTimeAccount = System.currentTimeMillis();
 		
@@ -463,7 +461,7 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private void closeTrade() throws Exception{
 		log.info(">> CloseTrade  zhai");
-		againTime = 0;
+		//againTime = 0;
 		String detailType = "";
 		detailType = Constants.DETAIL_TYPE_ZP;  //窄平
 		BitTrade entity = getTradeEty(detailType,false); // 交易主表信息
@@ -719,7 +717,7 @@ public class HedgeAutoMainThread implements Runnable{
 	}
 	
 	// okex 20016\20018 重试6次
-	private int againTime = 0;
+	//private int againTime = 0;
 	/**
 	 * 下Okex 订单并保存
 	* @param @param detailEty
@@ -748,19 +746,23 @@ public class HedgeAutoMainThread implements Runnable{
 					log.info(">> okex Post success oId = "+orderId);
 					detailEty.setRemarks(orderId.toString());
 					flage = true;
-					againTime = 0;
+					//againTime = 0;
 				}
 				if(jobJ.containsKey("result") && jobJ.containsKey("error_code")){
 					 int code = jobJ.getInteger("error_code");
-					 if(20016==code || 20018==code && againTime<=5){
+					 if(20004==code || 20003== code){
+						 // 爆仓账户冻结
+						 flage = true;
+					 }
+					 /*else if(20016==code || 20018==code && againTime<=5){
 						 if(0==againTime){
 							 logMsg.append(",okex接口服务出现1618错误！");
 						 }
 						 log.info(">> okex Post 1618 try againTime="+againTime);
 						 // okex 平台bug,需要重复调用多次
 						 flage = postOkex(detailEty,false);
-						 againTime +=1;
-					 }
+						 againTime ++;
+					 }*/
 				}
 			}
 			
@@ -976,11 +978,22 @@ public class HedgeAutoMainThread implements Runnable{
 	* @return boolean
 	 */
 	private boolean checkOrder(String platform, boolean flag){
+		log.error(">> checkOrder checkOrder="+platform+",flag="+flag);
+		if(!flag){
+			try {
+				// 休眠3秒 等待 平台保证金变化
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				log.error(">> checkOrder sleep:",e);
+			}
+		}
 		BigDecimal curMargin = new BigDecimal(0);
+		BigDecimal oldMargin = new BigDecimal(0);
 		if(OkexInterConstants.PLATFORM_CODE.equals(platform)){
 			// okex
 			// http 获取账户可用保证金
 			curMargin = HedgeUtils.getOkexMarginByHttp();
+			oldMargin = okexMargin;
 			if(!flag && curMargin != null && curMargin.compareTo(okexMargin)!=0){
 				// 当前保证金与上次保证金不相等，下单成功
 				flag = true;
@@ -992,6 +1005,7 @@ public class HedgeAutoMainThread implements Runnable{
 			// mex 
 			// 1. http 获取账户可用保证金
 			curMargin = HedgeUtils.getMexMarginByHttp();
+			oldMargin = mexMargin;
 			if(null == curMargin){
 				// 2. socket 获取账户可用保证金
 				curMargin = HedgeUtils.getMexMarginBySocket();
@@ -1004,6 +1018,9 @@ public class HedgeAutoMainThread implements Runnable{
 				mexMargin = curMargin;
 			}
 		}
+		// 记录日志
+		String msg = "验证下单-平台："+platform+"，最新保证金："+curMargin+"，原保证金："+oldMargin+"，下单状态："+flag;
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, msg, "1");
 		return flag;
 	}
 	
@@ -1070,8 +1087,8 @@ public class HedgeAutoMainThread implements Runnable{
 		if(currTimeAccount - startTimeLog > 300000){// 300\60秒查一次
 			startTimeLog = currTimeAccount;
 			// 监控记录
-			StringBuilder logMsg = new StringBuilder("自动任务运行：健康，时间：");
-			logMsg.append(DateUtils.stampToDate(currTimeAccount));
+			StringBuilder logMsg = new StringBuilder("自动任务运行：健康，当前差价：");
+			logMsg.append(pDF.format(agio));
 			HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
 		}
 	}

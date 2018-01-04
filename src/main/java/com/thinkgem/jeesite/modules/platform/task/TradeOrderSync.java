@@ -125,14 +125,14 @@ public class TradeOrderSync {
 									bitTradeDetail.setTradePrice(priceAvg);
 									//if(Constants.DIRECTION_BUY_UP.equals(type) || Constants.DIRECTION_SELL_DOWN.equals(type)){
 									if(Constants.DIRECTION_BUY_UP.equals(type)){
-										// 1开多,4平空  爆仓价格 = 成交价格 - 9.5%
-										BigDecimal area = priceAvg.multiply(new BigDecimal(0.095));
+										// 1开多,4平空  爆仓价格 = 成交价格 - 9.3%
+										BigDecimal area = priceAvg.multiply(new BigDecimal(0.093));
 										BigDecimal burstPice = priceAvg.subtract(area);
 										bitTradeDetail.setBurstPice(burstPice);
 									//}else if(Constants.DIRECTION_BUY_DOWN.equals(type) || Constants.DIRECTION_SELL_UP.equals(type)){
 									}else if(Constants.DIRECTION_BUY_DOWN.equals(type)){
-										// 2开空，3平多  爆仓价格 = 成交价格 + 9.5%
-										BigDecimal area = priceAvg.multiply(new BigDecimal(0.095));
+										// 2开空，3平多  爆仓价格 = 成交价格 + 9.3%
+										BigDecimal area = priceAvg.multiply(new BigDecimal(0.093));
 										BigDecimal burstPice = priceAvg.add(area);
 										bitTradeDetail.setBurstPice(burstPice);
 									}
