@@ -301,6 +301,14 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private void doBurst(Boolean isBurstA, Boolean isBurstB) throws Exception{
 		log.info(">>> doBurst isBurstA="+isBurstA +", isBurstB="+isBurstB);
+		String msg = "爆仓平单，币种：";
+		if(isBurstA){
+			msg = msg+req.getSymbolA();
+		}
+		if(isBurstB){
+			msg = msg+req.getSymbolB();
+		}
+		HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
 		// 窄平
 		BitTrade entity = getTradeEty(null,false); // 交易主表信息
 		
@@ -327,6 +335,7 @@ public class HedgeAutoMainThread implements Runnable{
 			detailEtyA.setIfBurstBarn(Constants.STATUS_RUN);
 			isSuccess = doTradeDetailOrder(detailEtyA,false,true);
 			if(isSuccess){
+				Thread.sleep(5000); // 休眠5秒
 				isSuccess = doTradeDetailOrder(detailEtyB,false,false);
 				if(!isSuccess){
 					// 失败，前一币种回撤(开仓)
@@ -343,6 +352,7 @@ public class HedgeAutoMainThread implements Runnable{
 			detailEtyB.setIfBurstBarn(Constants.STATUS_RUN);
 			isSuccess = doTradeDetailOrder(detailEtyB,false,false);
 			if(isSuccess){
+				Thread.sleep(5000); // 休眠5秒
 				isSuccess = doTradeDetailOrder(detailEtyA,false,true);
 				if(!isSuccess){
 					// 失败，前一币种回撤(开仓)

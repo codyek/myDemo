@@ -79,8 +79,6 @@ public class BitPriceInitListener implements ApplicationListener{
 			mexTask.mexWebsocketTask();
 		}
 		
-		log.info(">>>>> syncOrderTradePrice    <<< ");
-		// TODO 同步交易价格：10分钟内  交易价格为空的订单
 	}
 
 	// 定时Task 发送微信消息

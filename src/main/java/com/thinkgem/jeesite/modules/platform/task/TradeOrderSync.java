@@ -42,6 +42,8 @@ public class TradeOrderSync {
 	 */
 	@Async
 	public void tradeOrderSync(){
+		log.info(">>>>> syncOrderTradePrice    <<< ");
+		// TODO 同步交易价格：10分钟内  交易价格为空的订单
 		// 查询所有下单价格是0的订单明细
 		BitTradeDetail detail = new BitTradeDetail();
 		detail.setTradePrice(new BigDecimal(0));
