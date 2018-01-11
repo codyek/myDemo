@@ -204,46 +204,43 @@ public class HedgeAutoMainThread implements Runnable{
 			// 开仓
 			if(extendMax.compareTo(new BigDecimal(0))==0){
 				extendMax = agio;
-			}else if(extendMax.compareTo(new BigDecimal(0))>=0){
-				if(agio.compareTo(extendMax)>0){
+			}else {
+				if(agio.compareTo(extendMax)>=0){
 					//当前差价>高延伸价,更新高延伸价
 					extendMax = agio;
 				}else{
-					//当前差价<高延伸价，且当前差价<标记价格,则可开仓
-					// 标记价格
+					//当前差价<高延伸价
+					// 标记价格>=max, 且当前差价<标记价格,则可开仓
 					BigDecimal max = req.getMaxAgio();
 					flagPice = extendMax.subtract(drawPrice);
-					if(flagPice.compareTo(max) < 0 && agio.compareTo(max) > 0){
-						flag = true;
-					}else if(agio.compareTo(flagPice)<=0){
+					if(flagPice.compareTo(max) >= 0 && agio.compareTo(flagPice)<=0){
 						flag = true;
 					}
 				}
 			}
-			msg = "开仓监控：当前差价："+pDF.format(agio)+"，最大差价："+req.getMaxAgio()+"，标记差价："+flagPice+"，是否开仓："+flag;
+			msg = "开仓监控：当前差价："+pDF.format(agio)+"，定义差价："+req.getMaxAgio()
+					+"，标记差价："+pDF.format(flagPice)+"，最高差价："+pDF.format(extendMax)+"，是否开仓："+flag;
 			
 		} else {
 			// 平仓
 			/** 差价小于10 平仓  */
-			if(agio.compareTo(new BigDecimal(10))<0){
+			if(agio.compareTo(new BigDecimal(10))<=0){
 				flag = true;
-				return flag;
-			}
-			if(extendMin.compareTo(new BigDecimal(0))==0){
-				extendMin = agio;
-			}else if(extendMin.compareTo(new BigDecimal(0))>=0){
-				if(agio.compareTo(extendMin)<0){
-					//当前差价<低延伸价,更新低延伸价
+			}else{
+				if(extendMin.compareTo(new BigDecimal(0))==0){
 					extendMin = agio;
-				}else{
-					//当前差价>低延伸价，且当前差价>标记价格,则可平仓
-					// 标记价格
-					BigDecimal min = req.getMinAgio();
-					flagPice = extendMax.add(drawPrice);
-					if(flagPice.compareTo(min) > 0 && agio.compareTo(min) < 0){
-						flag = true;
-					}else if(agio.compareTo(flagPice)>0){
-						flag = true;
+				}else {
+					if(agio.compareTo(extendMin)<0){
+						//当前差价<低延伸价,更新低延伸价
+						extendMin = agio;
+					}else{
+						//当前差价>低延伸价
+						// 标记价格<min，且当前差价>标记价格,则可平仓
+						BigDecimal min = req.getMinAgio();
+						flagPice = extendMax.add(drawPrice);
+						if(flagPice.compareTo(min) <= 0 && agio.compareTo(flagPice)>=0){
+							flag = true;
+						}
 					}
 				}
 			}
@@ -1097,7 +1094,7 @@ public class HedgeAutoMainThread implements Runnable{
 		if(currTimeAccount - startTimeLog > 300000){// 300\60秒查一次
 			startTimeLog = currTimeAccount;
 			// 监控记录
-			StringBuilder logMsg = new StringBuilder("自动任务运行：健康，当前差价：");
+			StringBuilder logMsg = new StringBuilder("运行：健康，当前差价：");
 			logMsg.append(pDF.format(agio));
 			HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, logMsg.toString(), "1");
 		}
