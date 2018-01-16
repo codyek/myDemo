@@ -38,6 +38,7 @@ import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.socket.bitmex.WebsocketClientEndpoint;
 import com.thinkgem.jeesite.modules.platform.task.MexAccountSocket;
 import com.thinkgem.jeesite.modules.platform.task.MexTask;
+import com.thinkgem.jeesite.modules.sms.SmsService;
 
 /**
  * inter测试Controller
@@ -62,6 +63,9 @@ public class InterTestController extends BaseController {
 	
 	@Autowired
 	private MexAccountInterfaceService mexAccountService;
+	
+	@Autowired
+	private SmsService smsService;
 	
 	@RequestMapping(value = {"gets", ""})
 	@ResponseBody
@@ -357,7 +361,7 @@ public class InterTestController extends BaseController {
     public List<OkexOrder> getOkexOrders(String symbol,String status){
 		List<OkexOrder> list = null;
 		try {
-			list = orderService.getOrderInfo(symbol, "quarter", "-1", status, "0", "20");
+			list = orderService.getOrderInfo(symbol, "quarter", "-1", status, "0", "50");
 		} catch (Exception e) {
 			logger.error(">> getOkexOrders error:",e);
 		}
@@ -369,7 +373,7 @@ public class InterTestController extends BaseController {
     public List<MexOrder> getMexOrders(String symbol){
 		List<MexOrder> list = null;
 		try {
-			list = mexOrderService.getOrderInfo(symbol, 20D);
+			list = mexOrderService.getOrderInfo(symbol, 50D);
 		} catch (Exception e) {
 			logger.error(">> getMexOrders error:",e);
 		}
@@ -481,4 +485,19 @@ public class InterTestController extends BaseController {
 		return msg;
 	}
 	
+	@RequestMapping("sendSMS")
+	@ResponseBody
+    public String sendSMS(String code){
+		String msg = "error";
+		if("mima6688".equals(code)){
+			try {
+				String mg = "[BITHEG]平台：测试，未操作项：测试，数量：10，勿回复。";
+				boolean red = smsService.batchSend("18620932500,18588615911", mg);
+				msg = "sendRet="+red;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return msg;
+	}
 }

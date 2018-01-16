@@ -103,6 +103,8 @@ public class SmsService {
 		boolean retFlag = false;
 		log.info("  >>>> batchSend start mobile="+mobiles);
 		try {
+			// 初始化
+			init();
 			// 参数类
 			Message message = new Message();
 			// 实例化短信处理对象

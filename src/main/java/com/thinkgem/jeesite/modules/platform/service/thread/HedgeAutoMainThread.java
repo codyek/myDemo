@@ -1128,7 +1128,7 @@ public class HedgeAutoMainThread implements Runnable{
 				smsSendTime = currTimeAccount;
 			}
 			if(currTimeAccount - smsSendTime > 180000){// 180秒查一次
-				msg = "平台：test，未操作项：test，数量：10";
+				//msg = "平台：test，未操作项：test，数量：10";
 				HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_TRADE, msg, "1");
 				HedgeUtils.sendSMS(user.getId(), user.getMobile(), msg);
 				smsSendTime = currTimeAccount;

@@ -178,7 +178,7 @@ public class CHttpPost {
 		try {
 			// 未设置IP
 			if (!ConfigManager.ipIsSet) {
-				return ERROR_310099;
+				return 100017;
 			}
 
 			// 通过账号密码获取可用的IP
@@ -188,7 +188,7 @@ public class CHttpPost {
 
 			// 未获取到IP
 			if (availableAddress == null || "".equals(availableAddress.trim())) {
-				return failCode;
+				return 200017;
 			}
 
 			String requestHost = "http://" + availableAddress;
