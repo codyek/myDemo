@@ -5,6 +5,7 @@
 	<sql id="bitTradeDetailColumns">
 		a.id AS "id",
 		a.code AS "code",
+		a.use_id AS "useId",
 		a.trade_code AS "tradeCode",
 		a.detail_type AS "detailType",
 		a.platform AS "platform",
@@ -16,6 +17,7 @@
 		a.deposit AS "deposit",
 		a.price AS "price",
 		a.trade_price AS "tradePrice",
+		a.fee AS "fee",
 		a.price_amount AS "priceAmount",
 		a.monitor_pice AS "monitorPice",
 		a.burst_pice AS "burstPice",
@@ -57,6 +59,9 @@
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			<if test="code != null and code != ''">
 				AND a.code = #{code}
+			</if>
+			<if test="useId != null and useId != ''">
+				AND a.use_id = #{useId}
 			</if>
 			<if test="tradeCode != null and tradeCode != ''">
 				AND a.trade_code = #{tradeCode}
@@ -104,6 +109,7 @@
 		INSERT INTO bit_trade_detail(
 			id,
 			code,
+			use_id,
 			trade_code,
 			detail_type,
 			platform,
@@ -115,6 +121,7 @@
 			deposit,
 			price,
 			trade_price,
+			fee,
 			price_amount,
 			monitor_pice,
 			burst_pice,
@@ -129,6 +136,7 @@
 		) VALUES (
 			#{id},
 			#{code},
+			#{useId},
 			#{tradeCode},
 			#{detailType},
 			#{platform},
@@ -140,6 +148,7 @@
 			#{deposit},
 			#{price},
 			#{tradePrice},
+			#{fee},
 			#{priceAmount},
 			#{monitorPice},
 			#{burstPice},
@@ -157,6 +166,7 @@
 	<update id="update">
 		UPDATE bit_trade_detail SET 	
 			code = #{code},
+			use_id = #{useId},
 			trade_code = #{tradeCode},
 			detail_type = #{detailType},
 			platform = #{platform},
@@ -168,6 +178,7 @@
 			deposit = #{deposit},
 			price = #{price},
 			trade_price = #{tradePrice},
+			fee = #{fee},
 			price_amount = #{priceAmount},
 			monitor_pice = #{monitorPice},
 			burst_pice = #{burstPice},

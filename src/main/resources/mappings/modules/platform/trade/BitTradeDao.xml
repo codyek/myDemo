@@ -10,6 +10,8 @@
 		a.type_flag AS "typeFlag",
 		a.max_agio AS "maxAgio",
 		a.min_agio AS "minAgio",
+		a.open_agio AS "openAgio",
+		a.close_agio AS "closeAgio",
 		a.symbol_a AS "symbolA",
 		a.symbol_b AS "symbolB",
 		a.deposit_rate_a AS "depositRateA",
@@ -63,6 +65,12 @@
 			<if test="monitorCode != null and monitorCode != ''">
 				AND a.monitor_code = #{monitorCode}
 			</if>
+			<if test="openAgio != null and openAgio != ''">
+				AND a.open_agio = #{openAgio}
+			</if>
+			<if test="closeAgio != null and closeAgio != ''">
+				AND a.close_agio = #{closeAgio}
+			</if>
 			<if test="openBarnTime != null and openBarnTime != ''">
 				AND a.open_barn_time = #{openBarnTime}
 			</if>
@@ -113,6 +121,8 @@
 			type_flag,
 			max_agio,
 			min_agio,
+			open_agio,
+			close_agio,
 			symbol_a,
 			symbol_b,
 			deposit_rate_a,
@@ -138,6 +148,8 @@
 			#{typeFlag},
 			#{maxAgio},
 			#{minAgio},
+			#{openAgio},
+			#{closeAgio},
 			#{symbolA},
 			#{symbolB},
 			#{depositRateA},
@@ -166,6 +178,8 @@
 			type_flag = #{typeFlag},
 			max_agio = #{maxAgio},
 			min_agio = #{minAgio},
+			open_agio = #{openAgio},
+			close_agio = #{closeAgio},
 			symbol_a = #{symbolA},
 			symbol_b = #{symbolB},
 			deposit_rate_a = #{depositRateA},

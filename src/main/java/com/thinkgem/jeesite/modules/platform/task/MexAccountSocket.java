@@ -133,7 +133,6 @@ public class MexAccountSocket {
 		// {"op": "authKey", "args": ["<APIKey>", <nonce>, "<signature>"]}
 		String authMsg = "{\"op\":\"authKey\",\"args\":[\""+appkey+"\"," +
 				nonce + ",\""+signature+"\"]}";
-		System.out.println("authMsg = "+authMsg);
 		// open websocket
 		if(null == cep){
 			cep = new WebsocketClientEndpoint(new URI(URL));
@@ -143,7 +142,6 @@ public class MexAccountSocket {
 			// {"op": "subscribe", "args": "margin"} 你账户的余额和保证金要求的更新,    "position" 你仓位的更新
 			//String msg = "{\"op\":\"subscribe\",\"args\":[\"margin\",\"position\"]}";
 			String msg = "{\"op\":\"subscribe\",\"args\":\"margin\"}";
-			System.out.println("msg = "+msg);
 			cep.sendMessage(msg);
 		}
 	}
@@ -161,13 +159,11 @@ public class MexAccountSocket {
 	
 	public void onClose(){
 		if(null != timerTask){
-			System.out.println(" >>>>>>　stooo 11");
 			timerTask.cancel();
 		}
 		if(null != cep){
 			String msg = "{\"op\":\"unsubscribe\",\"args\":\"margin\"}";;
 			cep.sendMessage(msg);
-			System.out.println(" >>>>>>　stooo 1222");
 			Session userSession = cep.userSession;
 			CloseReason reason = new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY,"close socket");
 			cep.onClose(userSession, reason);

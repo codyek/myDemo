@@ -14,23 +14,25 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 public class BitTradeDetail extends DataEntity<BitTradeDetail> {
 	
 	private static final long serialVersionUID = 1L;
-	private String code;		// 编码
-	private String tradeCode;		// 交易主表编码
-	private String detailType;		// 明细类型：1 宽开, 2 窄平, 3 窄开, 4 宽平
-	private String platform;		// 平台
-	private String symbol;		// 币种
-	private Integer lever;		// 杠杆
-	private Integer amount;		// 数量
-	private String direction;		// 交易方向：1:开多, 2:开空,  3:平多,  4:平空
+	private String code;				// 编码
+	private String useId;				// 用户id
+	private String tradeCode;			// 交易主表编码
+	private String detailType;			// 明细类型：1 宽开, 2 窄平, 3 窄开, 4 宽平
+	private String platform;			// 平台
+	private String symbol;				// 币种
+	private Integer lever;				// 杠杆
+	private Integer amount;				// 数量
+	private String direction;			// 交易方向：1:开多, 2:开空,  3:平多,  4:平空
 	private BigDecimal position;		// 头寸
-	private BigDecimal deposit;		// 保证金
-	private BigDecimal price;		// 下单价格
+	private BigDecimal deposit;			// 保证金
+	private BigDecimal price;			// 下单价格
 	private BigDecimal tradePrice;		// 成交价格
+	private BigDecimal fee;				// 费用
 	private BigDecimal priceAmount;		// 换算成价格对应的数量
 	private BigDecimal monitorPice;		// 监控时价格
 	private BigDecimal burstPice;		// 爆仓价格
-	private String statusFlag;		// 状态：1 已成交, 0 委托中, -1 已撤销
-	private String ifBurstBarn;		// 是否爆仓：1 是， 0 否
+	private String statusFlag;			// 状态：1 已成交, 0 委托中, -1 已撤销
+	private String ifBurstBarn;			// 是否爆仓：1 是， 0 否
 	
 	public BitTradeDetail() {
 		super();
@@ -181,9 +183,25 @@ public class BitTradeDetail extends DataEntity<BitTradeDetail> {
 	public BigDecimal getTradePrice() {
 		return tradePrice;
 	}
-
+	
 	public void setTradePrice(BigDecimal tradePrice) {
 		this.tradePrice = tradePrice;
+	}
+
+	public String getUseId() {
+		return useId;
+	}
+
+	public void setUseId(String useId) {
+		this.useId = useId;
+	}
+
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
 	}
 	
 }

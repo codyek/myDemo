@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,12 +77,18 @@ public class HedgeAutoMainThread implements Runnable{
 	/**  bitmex 可用保证金  */
 	private BigDecimal mexMargin;
 	
+	private Timer timerTask = null;
+	private HedgeAutoTask hedgeAutoTask = null;
 
 	@Override
 	public void run() {
 		try {
 			log.info(">> start runing ....");
 			long startTime = System.currentTimeMillis();
+			//hedgeAutoTask = new HedgeAutoTask(user);
+			//timerTask = new Timer();
+			//timerTask.schedule(hedgeAutoTask, 1000, 10*1000); // 设置一个 10 秒钟的ping定时器 
+			
 			while (true) {
 				try {
 					long currTime = System.currentTimeMillis();
@@ -123,7 +130,6 @@ public class HedgeAutoMainThread implements Runnable{
 			}
 			log.info(">>>  The end auto thread .");
 		} catch (Exception ee) {
-			//ee.printStackTrace();
 			log.error(">>>> Thread error : ",ee);
 		}
 		// 结束监控更新监控表数据
@@ -161,6 +167,7 @@ public class HedgeAutoMainThread implements Runnable{
 		if(agio.compareTo(max) > 0){
 			// 差价 > 最大值   操作：宽开 
 			if(Constants.CAN_OPEN.equals(status)){
+				log.info("----> agio > max, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				// 宽开 
 				/** T+n 差价延伸策略  */
 				// 回撤价格 = max * (drawRate/100)
@@ -173,6 +180,7 @@ public class HedgeAutoMainThread implements Runnable{
 		if(agio.compareTo(min) < 0){
 			// 差价  < 最小值   操作： 窄平
 			if(Constants.CAN_CLOSE.equals(status)){
+				log.info("----> agio < min, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				// 窄平 
 				/** T+n 差价延伸策略  */
 				// 回撤价格 = min * (drawRate/100)
@@ -377,8 +385,7 @@ public class HedgeAutoMainThread implements Runnable{
 	/** 开仓
 	 */
 	private void openTrade() throws Exception{
-		log.info(">> openTrade Wide");
-		
+		log.info("----> openTrade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 		String detailType = "";
 		detailType = Constants.DETAIL_TYPE_KK; // 宽开
 		BitTrade entity = getTradeEty(detailType,true); // 交易主表信息
@@ -425,8 +432,10 @@ public class HedgeAutoMainThread implements Runnable{
 		// A,B 交易  bitme 先交易  TODO 
 		boolean isSuccess = false;
 		if(req.getPlatformA().equals(BitMexInterConstants.PLATFORM_CODE)){
+			log.info("----> open A Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 			isSuccess = doTradeDetailOrder(detailEtyA,true,true);
 			if(isSuccess){
+				log.info("----> open B Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				isSuccess = doTradeDetailOrder(detailEtyB,true,false);
 				if(!isSuccess){
 					// 失败，前一币种回撤(平仓)
@@ -435,12 +444,15 @@ public class HedgeAutoMainThread implements Runnable{
 					}else{
 						detailEtyA.setDirection(Constants.DIRECTION_SELL_DOWN);
 					}
+					log.info("----> open ret A Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 					doTradeDetailOrder(detailEtyA,false,true);
 				}
 			}
 		}else{
+			log.info("----> open B Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 			isSuccess = doTradeDetailOrder(detailEtyB,true,false);
 			if(isSuccess){
+				log.info("----> open A Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				isSuccess = doTradeDetailOrder(detailEtyA,true,true);
 				if(!isSuccess){
 					// 失败，前一币种回撤(平仓)
@@ -449,10 +461,12 @@ public class HedgeAutoMainThread implements Runnable{
 					}else{
 						detailEtyB.setDirection(Constants.DIRECTION_SELL_DOWN);
 					}
+					log.info("----> open ret B Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 					doTradeDetailOrder(detailEtyB,false,false);
 				}
 			}
 		}
+		log.info("----> openTrade over, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 		if(isSuccess){
 			// 保存交易主表信息
 			entity.setOpenBarnTime(new Date());
@@ -467,7 +481,7 @@ public class HedgeAutoMainThread implements Runnable{
 	/** 平仓
 	 */
 	private void closeTrade() throws Exception{
-		log.info(">> CloseTrade  zhai");
+		log.info("----> closeTrade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 		//againTime = 0;
 		String detailType = "";
 		detailType = Constants.DETAIL_TYPE_ZP;  //窄平
@@ -492,8 +506,10 @@ public class HedgeAutoMainThread implements Runnable{
 		// TODO 判断亏损方先交易  + 短信提醒
 		boolean isSuccess = false;
 		if(req.getPlatformA().equals(BitMexInterConstants.PLATFORM_CODE)){
+			log.info("----> close  A Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 			isSuccess = doTradeDetailOrder(detailEtyA,false,true);
 			if(isSuccess){
+				log.info("----> close  B Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				isSuccess = doTradeDetailOrder(detailEtyB,false,false);
 				if(!isSuccess){
 					// 失败，前一币种回撤(开仓)
@@ -502,13 +518,16 @@ public class HedgeAutoMainThread implements Runnable{
 					}else{
 						detailEtyA.setDirection(Constants.DIRECTION_BUY_DOWN);
 					}
+					log.info("----> close ret A Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 					doTradeDetailOrder(detailEtyA,true,true);
 				}
 			}
 				
 		}else{
+			log.info("----> close  B Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 			isSuccess = doTradeDetailOrder(detailEtyB,false,false);
 			if(isSuccess){
+				log.info("----> close  A Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				isSuccess = doTradeDetailOrder(detailEtyA,false,true);
 				if(!isSuccess){
 					// 失败，前一币种回撤(开仓)
@@ -517,10 +536,12 @@ public class HedgeAutoMainThread implements Runnable{
 					}else{
 						detailEtyB.setDirection(Constants.DIRECTION_BUY_DOWN);
 					}
+					log.info("----> close ret B Trade, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 					doTradeDetailOrder(detailEtyB,true,false);
 				}
 			}
 		}
+		log.info("----> closeTrade over, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 		if(isSuccess){
 			// 计算费用、利润
 			calculateOrder(entity);
@@ -660,7 +681,10 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private Boolean postMex(BitTradeDetail detailEty,boolean isAgain) throws Exception{
 		Boolean flage = false;
-		StringBuilder logMsg = new StringBuilder("BitMex下单监控：");
+		StringBuilder logMsg = new StringBuilder("BitMex下单：");
+		if(isAgain){
+			logMsg.append("重试下单,");
+		}
 		MexOrderInterfaceService service = SpringContextHolder.getBean(MexOrderInterfaceService.class);
 		long startTime = System.currentTimeMillis();
 		log.info(">> mex post Amount =  "+detailEty.getAmount());
@@ -734,7 +758,10 @@ public class HedgeAutoMainThread implements Runnable{
 	 */
 	private Boolean postOkex(BitTradeDetail detailEty,boolean isAgain) throws Exception{
 		Boolean flage = false;
-		StringBuilder logMsg = new StringBuilder("Okex下单监控：");
+		StringBuilder logMsg = new StringBuilder("Okex下单：");
+		if(isAgain){
+			logMsg.append("重试下单,");
+		}
 		OrderInterfaceService service = SpringContextHolder.getBean(OrderInterfaceService.class);
 		long startTime = System.currentTimeMillis();
 		log.info(">> mex Okex Amount =  "+detailEty.getAmount());
@@ -761,15 +788,24 @@ public class HedgeAutoMainThread implements Runnable{
 						 // 爆仓账户冻结
 						 flage = true;
 					 }
-					 /*else if(20016==code || 20018==code && againTime<=5){
-						 if(0==againTime){
-							 logMsg.append(",okex接口服务出现1618错误！");
+					 else if(20016==code || 20018==code){
+						 // 循环10次
+						 for (int i = 0; i < 10; i++) {
+							 log.info(">> okex Post 1618 error! i="+i);
+							 String jsStr = service.future_trade(detailEty.getSymbol(), "quarter", curPrice.toString(),
+									 detailEty.getAmount().toString(), direction, "1", "10");
+							 if(StringUtils.isNotBlank(jsStr)){
+								JSONObject jObj = JSONObject.parseObject(jsStr);
+								if(jObj.containsKey("result") && jObj.containsKey("order_id") && jObj.getBooleanValue("result")){
+									Long orderId = jObj.getLong("order_id");
+									log.info(">> okex Post 1618 success oId = "+orderId);
+									detailEty.setRemarks(orderId.toString());
+									flage = true;
+									break;
+								}
+							 }
 						 }
-						 log.info(">> okex Post 1618 try againTime="+againTime);
-						 // okex 平台bug,需要重复调用多次
-						 flage = postOkex(detailEty,false);
-						 againTime ++;
-					 }*/
+					 }
 				}
 			}
 			
@@ -972,6 +1008,7 @@ public class HedgeAutoMainThread implements Runnable{
 			det.setLever(req.getLeverB());
 			det.setPlatform(req.getPlatformB());
 		}
+		det.setUseId(user.getId());
 		det.setMonitorPice(price);
 		det.setTradeCode(tradeCode);
 		det.setDetailType(detailType);
@@ -988,8 +1025,8 @@ public class HedgeAutoMainThread implements Runnable{
 		log.error(">> checkOrder checkOrder="+platform+",flag="+flag);
 		if(!flag){
 			try {
-				// 休眠3秒 等待 平台保证金变化
-				Thread.sleep(3000);
+				// 休眠2秒 等待 平台保证金变化
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				log.error(">> checkOrder sleep:",e);
 			}

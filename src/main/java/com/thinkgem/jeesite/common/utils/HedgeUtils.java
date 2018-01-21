@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.thinkgem.jeesite.modules.log.entity.BitMonitorLog;
 import com.thinkgem.jeesite.modules.log.service.BitMonitorLogService;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
+import com.thinkgem.jeesite.modules.platform.entity.account.MarginBalance;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexAccountInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.AccountInterfaceService;
 import com.thinkgem.jeesite.modules.sms.SmsService;
@@ -64,8 +65,9 @@ public class HedgeUtils {
 	public static BigDecimal getMexMarginByHttp(){
 		try {
 			MexAccountInterfaceService mexAccountSer = SpringContextHolder.getBean(MexAccountInterfaceService.class);
-			if(null != mexAccountSer && null != mexAccountSer.getMargin()){
-				return mexAccountSer.getMargin().getAvailableMargin();
+			MarginBalance mb = mexAccountSer.getMargin();
+			if(null != mb){
+				return mb.getAvailableMargin();
 			}
 		} catch (Exception e) {
 			log.error(">> 获取mex http可用保证金余额信息  error:",e);
@@ -90,8 +92,9 @@ public class HedgeUtils {
 	public static BigDecimal getOkexMarginByHttp(){
 		try {
 			AccountInterfaceService okAccountSer = SpringContextHolder.getBean(AccountInterfaceService.class);
-			if(null != okAccountSer && null != okAccountSer.getMargin()){
-				return okAccountSer.getMargin().getAvailableMargin();
+			MarginBalance mb = okAccountSer.getMargin();
+			if(null != mb){
+				return mb.getAvailableMargin();
 			}
 		} catch (Exception e) {
 			log.error(">> 获取Okex http可用保证金余额信息  error:",e);

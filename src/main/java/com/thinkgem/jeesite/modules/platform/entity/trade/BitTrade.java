@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.thinkgem.jeesite.modules.platform.entity.trade;
 
 import org.hibernate.validator.constraints.Length;
@@ -21,23 +18,25 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 public class BitTrade extends DataEntity<BitTrade> {
 	
 	private static final long serialVersionUID = 1L;
-	private String code;		// 编码
-	private User user;		// 用户id
-	private String monitorCode;		// 监控编码
-	private String typeFlag;		// 类型：1 宽开窄平, 2 窄开宽平, 3 两者
-	private BigDecimal maxAgio;		// 最大差价
-	private BigDecimal minAgio;		// 最小差价
-	private String symbolA;		// 币种A
-	private String symbolB;		// 币种B
+	private String code;					// 编码
+	private User user;						// 用户id
+	private String monitorCode;				// 监控编码
+	private String typeFlag;				// 类型：1 宽开窄平, 2 窄开宽平, 3 两者
+	private BigDecimal maxAgio;				// 最大差价
+	private BigDecimal minAgio;				// 最小差价
+	private BigDecimal openAgio;			// 开仓差价
+	private BigDecimal closeAgio;			// 平仓差价
+	private String symbolA;					// 币种A
+	private String symbolB;					// 币种B
 	private BigDecimal depositRateA;		// A保证金比率
 	private BigDecimal depositRateB;		// B保证金比率
-	private Date openBarnTime;		// 开仓时间
-	private Date closeBarnTime;		// 平仓时间
-	private BigDecimal revenue;		// 收入
-	private BigDecimal fee;		// 费用
-	private BigDecimal profit;		// 净收入
-	private String ifClose;		// 是否已平仓：1 是， 0 否
-	private String ifBurstBarn;		// 是否爆仓：1 是， 0 否
+	private Date openBarnTime;				// 开仓时间
+	private Date closeBarnTime;				// 平仓时间
+	private BigDecimal revenue;				// 收入
+	private BigDecimal fee;					// 费用
+	private BigDecimal profit;				// 净收入
+	private String ifClose;					// 是否已平仓：1 是， 0 否
+	private String ifBurstBarn;				// 是否爆仓：1 是， 0 否
 	
 	public BitTrade() {
 		super();
@@ -192,5 +191,22 @@ public class BitTrade extends DataEntity<BitTrade> {
 	public void setIfBurstBarn(String ifBurstBarn) {
 		this.ifBurstBarn = ifBurstBarn;
 	}
+
+	public BigDecimal getOpenAgio() {
+		return openAgio;
+	}
+
+	public void setOpenAgio(BigDecimal openAgio) {
+		this.openAgio = openAgio;
+	}
+
+	public BigDecimal getCloseAgio() {
+		return closeAgio;
+	}
+
+	public void setCloseAgio(BigDecimal closeAgio) {
+		this.closeAgio = closeAgio;
+	}
+	
 	
 }

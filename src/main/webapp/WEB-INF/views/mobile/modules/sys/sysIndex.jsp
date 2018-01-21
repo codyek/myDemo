@@ -3,20 +3,28 @@
 <section id="index_section">
 	<header>
         <h1 class="title">${fns:getConfig('productName')}</h1>
+        <link rel="stylesheet" href="${ctxStatic}/jingle/css/Jingle.css">
+    	<link rel="stylesheet" href="${ctxStatic}/jingle/css/app.css">
         <nav class="right">
             <a data-icon="arrow-down-left-2" href="#" id="btnLogout">退出</a>
         </nav>
     </header>
     <article class="active" data-scroll="true">
         <div style="padding: 10px 0 20px;">
-        <ul class="list inset demo-list">
+        <div class="input-row">
+                   <label>停止机器人:</label>
+                   <input id="btnCancel" type="button" value="确定" onclick="stopJob()"/>
+        </div>
+        
+        <%--<ul class="list inset demo-list">
             <li data-icon="next" data-selected="selected">
                 <span class="icon user"></span>
+                
                 <a href="#user_section?test=abc" data-target="section">
-                    <strong>用户管理</strong>
+                    <strong>停止机器人</strong>
                 </a>
             </li>
-        </ul>
+        </ul>--%>
         </div>
     </article>
     <script type="text/javascript">
@@ -29,5 +37,31 @@
    				});
    			});
    		});
+   		
+   	// 停止Job
+   		function stopJob(){
+   			var url = "${ctx}/hedge/stopJob" ;
+   			var obj = new Object();
+   			var symbolA = "btc_usd";
+   			var symbolB = "XBTH18";
+   			obj.symbolA=symbolA;
+   			obj.symbolB=symbolB;
+   			$.ajax({
+   		        url: url,  
+   			    data:obj,  
+   			    type: 'POST',
+   			    cache: false,
+   			    success: function (data) {  
+   			    	if("success" == data){
+   			    		top.$.jBox.tip('处理成功！','success');
+   			    	}else{
+   			    		top.$.jBox.tip('处理失败！','error');
+   			    	}
+   			    },
+   			    error:function(xhr,errorText,errorType){
+   			    	top.$.jBox.tip('请求网络异常！','error');
+   			    }
+   			});
+   		}
     </script>
 </section>
