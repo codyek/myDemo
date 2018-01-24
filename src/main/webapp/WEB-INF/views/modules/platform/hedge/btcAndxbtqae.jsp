@@ -71,8 +71,6 @@
 							头寸：<span id="pstA">0</span>
 							<label class="marginLeft">T+n回撤率%：</label>
 							<form:input path="withdrawRate" htmlEscape="false" class="inputWidth"  value="50"  />
-							<label class="marginLeft">正收益率 %：</label>
-							<form:input path="earnProfit" htmlEscape="false" class="inputWidth"  value="50"  />
 						</span>
 						<span style="width: 50%; display: block;" class="floatLeft">
 							<label class="marginLeft">最小差价：</label>
@@ -84,6 +82,8 @@
 							头寸：<span id="pstB">0</span>
 							<label class="marginLeft">是否按收益率平仓：</label>
 							<form:input path="closeByProfit" htmlEscape="false" class="inputWidth"  value="false"  />
+							<label class="marginLeft">正收益率 %：</label>
+							<form:input path="earnProfit" htmlEscape="false" class="inputWidth"  value="50"  />
 							<label class="marginLeft">负收益率 %：</label>
 							<form:input path="deficitProfit" htmlEscape="false" class="inputWidth"  value="50"  />
 						</span>

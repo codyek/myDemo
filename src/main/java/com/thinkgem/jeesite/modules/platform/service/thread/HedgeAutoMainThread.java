@@ -85,9 +85,9 @@ public class HedgeAutoMainThread implements Runnable{
 		try {
 			log.info(">> start runing ....");
 			long startTime = System.currentTimeMillis();
-			//hedgeAutoTask = new HedgeAutoTask(user);
-			//timerTask = new Timer();
-			//timerTask.schedule(hedgeAutoTask, 1000, 10*1000); // 设置一个 10 秒钟的ping定时器 
+			hedgeAutoTask = new HedgeAutoTask(user);
+			timerTask = new Timer();
+			timerTask.schedule(hedgeAutoTask, 1000, 10*1000); // 设置一个 10 秒钟的ping定时器 
 			
 			while (true) {
 				try {
@@ -104,7 +104,7 @@ public class HedgeAutoMainThread implements Runnable{
 					}
 					// 初始化数据
 					if(!initFlag){
-						init();
+						//init();
 					}
 					// 是否交易
 					String flag = isOrder();
@@ -167,12 +167,15 @@ public class HedgeAutoMainThread implements Runnable{
 		if(agio.compareTo(max) > 0){
 			// 差价 > 最大值   操作：宽开 
 			if(Constants.CAN_OPEN.equals(status)){
-				log.info("----> agio > max, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				// 宽开 
 				/** T+n 差价延伸策略  */
 				// 回撤价格 = max * (drawRate/100)
 				BigDecimal drawPrice  = max.multiply(new BigDecimal(drawRate).divide(new BigDecimal(100)));
-				if(extendPloy(true,drawPrice,agio)){
+				if(drawRate.intValue()==0){
+					flag = Constants.OPEN;
+					String msg = "开仓监控：当前差价："+pDF.format(agio)+"，定义差价："+req.getMaxAgio()+"，是否开仓："+flag;
+					HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
+				}else if(extendPloy(true,drawPrice,agio)){
 					flag = Constants.OPEN;
 				}
 			}
@@ -180,18 +183,21 @@ public class HedgeAutoMainThread implements Runnable{
 		if(agio.compareTo(min) < 0){
 			// 差价  < 最小值   操作： 窄平
 			if(Constants.CAN_CLOSE.equals(status)){
-				log.info("----> agio < min, time="+DateUtils.getDate("hh:mm:ss:SSS"));
 				// 窄平 
 				/** T+n 差价延伸策略  */
 				// 回撤价格 = min * (drawRate/100)
 				BigDecimal drawPrice  = min.multiply(new BigDecimal(drawRate).divide(new BigDecimal(100)));
-				if(extendPloy(false,drawPrice,agio)){
+				if(drawRate.intValue()==0){
+					flag = Constants.CLOSE;
+					String msg = "平仓监控：当前差价："+pDF.format(agio)+",定义差价："+req.getMinAgio()+"，是否平仓："+flag;
+					HedgeUtils.saveLog(user.getId(), Constants.LOG_TYPE_MONITOR, msg, "1");
+				}else if(extendPloy(false,drawPrice,agio)){
 					flag = Constants.CLOSE;
 				}
-				/** 盈利率策略  */
+				/** 盈利率策略
 				if(req.getCloseByProfit()){
 					// TODO
-				}
+				}  */
 			}
 		}
 		return flag;
@@ -245,14 +251,15 @@ public class HedgeAutoMainThread implements Runnable{
 						//当前差价>低延伸价
 						// 标记价格<min，且当前差价>标记价格,则可平仓
 						BigDecimal min = req.getMinAgio();
-						flagPice = extendMax.add(drawPrice);
+						flagPice = extendMin.add(drawPrice);
 						if(flagPice.compareTo(min) <= 0 && agio.compareTo(flagPice)>=0){
 							flag = true;
 						}
 					}
 				}
 			}
-			msg = "平仓监控：当前差价："+pDF.format(agio)+",最小差价："+req.getMinAgio()+"标记差价："+flagPice+""+flag;
+			msg = "平仓监控：当前差价："+pDF.format(agio)+",最小差价："+req.getMinAgio()+"标记差价："
+					+flagPice+"，最小差价："+pDF.format(extendMin)+"，是否平仓："+flag;
 		}
 		long currTimeAccount = System.currentTimeMillis();
 		
@@ -664,6 +671,7 @@ public class HedgeAutoMainThread implements Runnable{
 			if(!flage){
 				// 设置健康状态
 				okOrderHealth = false;
+				Thread.sleep(HedgeUtils.sleepTime_30);
 			}
 		}
 		if(!flage){
@@ -724,9 +732,10 @@ public class HedgeAutoMainThread implements Runnable{
 			logMsg.append(",异常信息：").append(e.getMessage());
 			log.error(">> postMex Biz_error :",e.getMessage());
 		} catch (Exception e) {
-			log.info(">> !!okex Post isAgain = "+isAgain);
 			log.error(">> postMex error :",e);
 			logMsg.append(",重试前异常信息：").append(e.getMessage());
+			// 记录保证金变化
+			checkOrder(BitMexInterConstants.PLATFORM_CODE,flage);
 			// 网络异常，重试一次
 			if(!isAgain){
 				Thread.sleep(HedgeUtils.sleepTime_15); // 休眠15秒防止频繁调用超过次数

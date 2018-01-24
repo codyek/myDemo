@@ -29,6 +29,8 @@ public class HedgeUtils {
 	public static final long sleepTime_6 = 6000;
 	// 休眠15秒防止频繁调用超过次数
 	public static final long sleepTime_15 = 15000;
+	public static final long sleepTime_30 = 30000;
+	public static final long sleepTime_60 = 60000;
 	/**
 	 * 计算收益率 
 	 * @return Double

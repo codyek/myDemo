@@ -5,6 +5,14 @@
 	<title>交易主表管理</title>
 	<meta name="decorator" content="default"/>
 	<script src="${ctxStatic}/jquery/jquery-1.9.1.min.js" type="text/javascript" ></script>
+	<style type="text/css">
+	.l_left{
+	float:left;
+	}
+	.l_right{
+	float:right;
+	}
+	</style>
 	<script type="text/javascript">
 	function getOkexOrders(){
 		var url = "getOkexOrders" ;
@@ -19,16 +27,16 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	$("#info").html("");//清空info内容
+		    	$("#Okexinfo").html("");//清空info内容
 		    	$.each(data, function(i, item) {
-		        	$("#info").append(
+		        	$("#Okexinfo").append(
 					"<tr><td>" + item.symbol + "</td>" +
 					"<td>" + item.type + "</td>" +
 					"<td>" + item.priceAvg + "</td>" +
 					"<td>" + item.dealAmount + "</td>" +
 					//"<td>" + item.fee + "</td>" +
 					"<td>" + item.createDate + "</td>" +
-					"<td>" + item.statusString + "</td></tr>");
+					"<td>" + item.orderId + "</td></tr>");
 		        });
 	    		top.$.jBox.tip('处理成功！','success');
 		    },
@@ -49,9 +57,9 @@
 		    type: 'POST',
 		    cache: false,
 		    success: function (data) {  
-		    	$("#info").html("");//清空info内容
+		    	$("#Mexinfo").html("");//清空info内容
 		    	$.each(data, function(i, item) {
-		        	$("#info").append(
+		        	$("#Mexinfo").append(
 					"<tr><td>" + item.symbol + "</td>" +
 					"<td>" + item.side + "</td>" +
 					"<td>" + item.avgPx + "</td>" +
@@ -77,11 +85,17 @@
 	<p>Mex:
 	<input id="mexSymbol"  type="text" value="XBT" /> XBTUSD\XBTZ17\XBTH18
 	</p>
+	<p>
 	<input class="btn" type="button" value="获取Okex订单Json"  onclick="getOkexOrders()"/>
 	<input class="btn" type="button" value="获取Mex订单"  onclick="getMexOrders()"/>
-	<table class="table">
-	<thead><tr><th>币种</th><th>方向</th><th>价格</th><th>数量（张）</th><th>时间</th><th>备注</th></tr></thead>
-	<tbody id="info" ></tbody>
+	</p>
+	<table class="l_left" width="46%">
+	<thead><tr><th>币种</th><th>方向</th><th>价格</th><th>数量</th><th>时间</th><th>单号</th></tr></thead>
+	<tbody id="Okexinfo" ></tbody>
+	</table>
+	<table class="l_right" width="50%">
+	<thead><tr><th>币种</th><th>方向</th><th>价格</th><th>数量</th><th>时间</th><th>备注</th></tr></thead>
+	<tbody id="Mexinfo" ></tbody>
 	</table>
 </body>
 </html>

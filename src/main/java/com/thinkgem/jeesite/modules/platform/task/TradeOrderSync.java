@@ -78,6 +78,7 @@ public class TradeOrderSync {
 									(time-8000 <= int_time || int_time <= time+8000)){ //存单时间在下单前后8秒内
 									// 保存成交价格、爆仓价格
 									bitTradeDetail.setTradePrice(priceAvg);
+									bitTradeDetail.setFee(okexOrder.getFee());
 									if(Constants.DIRECTION_BUY_UP.equals(type)){
 										// 开多  爆仓价格 = 成交价格 - 9.5%
 										BigDecimal area = priceAvg.multiply(new BigDecimal(0.095));
@@ -88,7 +89,7 @@ public class TradeOrderSync {
 										BigDecimal area = priceAvg.multiply(new BigDecimal(0.095));
 										BigDecimal burstPice = priceAvg.add(area);
 										bitTradeDetail.setBurstPice(burstPice);
-									}
+									}  
 									bitTradeDetailService.save(bitTradeDetail);
 									continue foop;
 								}
@@ -125,6 +126,7 @@ public class TradeOrderSync {
 									(time-8000 <= int_time || int_time <= time+8000)){ //存单时间在下单前后8秒内
 									// 保存成交价格、爆仓价格
 									bitTradeDetail.setTradePrice(priceAvg);
+									//bitTradeDetail.setFee(mexOrder);
 									//if(Constants.DIRECTION_BUY_UP.equals(type) || Constants.DIRECTION_SELL_DOWN.equals(type)){
 									if(Constants.DIRECTION_BUY_UP.equals(type)){
 										// 1开多,4平空  爆仓价格 = 成交价格 - 9.3%
