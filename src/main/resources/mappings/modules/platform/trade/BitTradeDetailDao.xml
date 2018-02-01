@@ -7,6 +7,7 @@
 		a.code AS "code",
 		a.use_id AS "useId",
 		a.trade_code AS "tradeCode",
+		a.order_id AS "orderId",
 		a.detail_type AS "detailType",
 		a.platform AS "platform",
 		a.symbol AS "symbol",
@@ -66,6 +67,9 @@
 			<if test="tradeCode != null and tradeCode != ''">
 				AND a.trade_code = #{tradeCode}
 			</if>
+			<if test="orderId != null and orderId != ''">
+				AND a.order_id = #{orderId}
+			</if>
 			<if test="tradePrice != null and tradePrice != ''">
 				AND a.trade_price = #{tradePrice}
 			</if>
@@ -111,6 +115,7 @@
 			code,
 			use_id,
 			trade_code,
+			order_id,
 			detail_type,
 			platform,
 			symbol,
@@ -138,6 +143,7 @@
 			#{code},
 			#{useId},
 			#{tradeCode},
+			#{orderId},
 			#{detailType},
 			#{platform},
 			#{symbol},
@@ -168,6 +174,7 @@
 			code = #{code},
 			use_id = #{useId},
 			trade_code = #{tradeCode},
+			order_id = #{orderId},
 			detail_type = #{detailType},
 			platform = #{platform},
 			symbol = #{symbol},

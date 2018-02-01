@@ -17,6 +17,7 @@ public class BitTradeDetail extends DataEntity<BitTradeDetail> {
 	private String code;				// 编码
 	private String useId;				// 用户id
 	private String tradeCode;			// 交易主表编码
+	private String orderId;				// 交易订单ID
 	private String detailType;			// 明细类型：1 宽开, 2 窄平, 3 窄开, 4 宽平
 	private String platform;			// 平台
 	private String symbol;				// 币种
@@ -202,6 +203,14 @@ public class BitTradeDetail extends DataEntity<BitTradeDetail> {
 
 	public void setFee(BigDecimal fee) {
 		this.fee = fee;
+	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
 	}
 	
 }

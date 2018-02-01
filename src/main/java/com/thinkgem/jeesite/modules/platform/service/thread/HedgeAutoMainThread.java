@@ -717,6 +717,7 @@ public class HedgeAutoMainThread implements Runnable{
 				if(jobJ.containsKey("orderID")){
 					String orderId = jobJ.getString("orderID");
 					log.info(">> Bitmex Post success oId = "+orderId);
+					detailEty.setOrderId(orderId);
 					detailEty.setRemarks(orderId);
 					flage = true;
 				}
@@ -787,6 +788,7 @@ public class HedgeAutoMainThread implements Runnable{
 				if(jobJ.containsKey("result") && jobJ.containsKey("order_id") && jobJ.getBooleanValue("result")){
 					Long orderId = jobJ.getLong("order_id");
 					log.info(">> okex Post success oId = "+orderId);
+					detailEty.setOrderId(orderId.toString());
 					detailEty.setRemarks(orderId.toString());
 					flage = true;
 					//againTime = 0;

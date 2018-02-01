@@ -280,6 +280,8 @@ public class HttpUtils {
 			if (statusCode == HttpStatus.SC_OK) {
 				result = EntityUtils.toString(httpResponse.getEntity(),
 						UTF8);
+			}else{
+				logger.error(">> post statusCode="+statusCode);
 			}
 			httpPost.releaseConnection();
 		} catch (Exception e) {
