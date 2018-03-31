@@ -1,6 +1,8 @@
 package com.thinkgem.jeesite.test;
 
-import com.alibaba.fastjson.JSONObject;
+import java.math.BigDecimal;
+
+//import com.alibaba.fastjson.JSONObject;
 
 public class TestTemp {
 
@@ -18,9 +20,10 @@ public class TestTemp {
 			}
 			System.out.println();// 用来换行
 		}*/
-		
-		Integer all = 790;
-		System.out.println("aa = "+ all/100);
+		BigDecimal deposit = new BigDecimal(669);
+		deposit = new BigDecimal((deposit.intValue()/10)*10);
+		Integer all = 392;
+		System.out.println("aa = "+ deposit);
 	}
 
 }

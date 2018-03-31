@@ -1,14 +1,13 @@
-package com.thinkgem.jeesite.modules.platform.task;
+package com.thinkgem.jeesite.modules.platform.service.thread;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
+import com.thinkgem.jeesite.common.utils.SpringContextHolder;
 import com.thinkgem.jeesite.modules.log.entity.BitMonitorLog;
 import com.thinkgem.jeesite.modules.log.service.BitMonitorLogService;
 import com.thinkgem.jeesite.modules.platform.constants.Constants;
@@ -20,33 +19,39 @@ import com.thinkgem.jeesite.modules.platform.entity.trade.BitTradeDetail;
 import com.thinkgem.jeesite.modules.platform.service.bitmex.MexOrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.okex.OrderInterfaceService;
 import com.thinkgem.jeesite.modules.platform.service.trade.BitTradeDetailService;
+import com.thinkgem.jeesite.modules.platform.task.MexTask;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 
-@Service("tradeOrderSync")
-public class TradeOrderSync {
-	private Logger log = LoggerFactory.getLogger(getClass());
+/**
+ * 
+* @ClassName: HedgeAutoTask 
+* @Description: 对冲监控定时子任务：同步当前用户的订单成交价格并计算收益
+* @author EK huangone 
+* @date 2018-1-1 下午10:50:53 
+*
+ */
+public class HedgeAutoTask extends TimerTask {
 
-	@Autowired
-	private BitTradeDetailService bitTradeDetailService;
+	protected Logger log = LoggerFactory.getLogger(getClass());
 	
-	@Autowired
-	private BitMonitorLogService bitMonitorLogService;
+	private User user;
 	
-	@Autowired
-	private OrderInterfaceService orderService;
+	public HedgeAutoTask(User user) {
+		log.info(">>HedgeAutoTask TimerTask is starting...");
+		this.user=user;
+	}
 	
-	@Autowired
-	private MexOrderInterfaceService mexOrderService;
-	/**
-	* 同步交易后的订单价格
-	* @throws
-	 */
-	@Async
-	public void tradeOrderSync(){
+	@Override
+	public void run() {
 		log.info(">>>>> syncOrderTradePrice    <<< ");
-		// TODO 同步交易价格：10分钟内  交易价格为空的订单
+		// 同步交易价格：10分钟内  交易价格为空的订单
 		// 查询所有下单价格是0的订单明细
 		BitTradeDetail detail = new BitTradeDetail();
 		detail.setTradePrice(new BigDecimal(0));
+		detail.setUseId(user.getId());
+		//detail.set
+		BitMonitorLogService bitMonitorLogService = SpringContextHolder.getBean(BitMonitorLogService.class);
+		BitTradeDetailService bitTradeDetailService = SpringContextHolder.getBean(BitTradeDetailService.class);
 		List<BitTradeDetail> details = bitTradeDetailService.findList(detail);
 		if(null != details && !details.isEmpty()){
 			boolean okexPlat = false;
@@ -63,6 +68,7 @@ public class TradeOrderSync {
 			if(okexPlat){
 				List<OkexOrder> list = null;
 				try {
+					OrderInterfaceService orderService = SpringContextHolder.getBean(OrderInterfaceService.class);
 					list = orderService.getOrderInfo(Constants.SYMBOL_BTC_USD, "quarter", "-1", "2", "0", "20");
 					if(null != list && !list.isEmpty()){
 						foop:for (OkexOrder okexOrder : list) {
@@ -78,7 +84,6 @@ public class TradeOrderSync {
 									(time-8000 <= int_time || int_time <= time+8000)){ //存单时间在下单前后8秒内
 									// 保存成交价格、爆仓价格
 									bitTradeDetail.setTradePrice(priceAvg);
-									bitTradeDetail.setFee(okexOrder.getFee());
 									if(Constants.DIRECTION_BUY_UP.equals(type)){
 										// 开多  爆仓价格 = 成交价格 - 9.5%
 										BigDecimal area = priceAvg.multiply(new BigDecimal(0.095));
@@ -89,7 +94,7 @@ public class TradeOrderSync {
 										BigDecimal area = priceAvg.multiply(new BigDecimal(0.095));
 										BigDecimal burstPice = priceAvg.add(area);
 										bitTradeDetail.setBurstPice(burstPice);
-									}  
+									}
 									bitTradeDetailService.save(bitTradeDetail);
 									continue foop;
 								}
@@ -98,7 +103,7 @@ public class TradeOrderSync {
 						// 保存操作记录
 						String msg = "同步okex成交价格，同步数量："+list.size();
 						BitMonitorLog log = new BitMonitorLog();
-						log.setUseId("all");
+						log.setUseId(user.getId());
 						log.setLogContent(msg);
 						log.setTypeFlag(Constants.LOG_TYPE_SYNCORDER);
 						log.setStatusFlag("1");
@@ -111,6 +116,7 @@ public class TradeOrderSync {
 			if(mexPlat){
 				List<MexOrder> list = null;
 				try {
+					MexOrderInterfaceService mexOrderService = SpringContextHolder.getBean(MexOrderInterfaceService.class);
 					list = mexOrderService.getOrderInfo(Constants.SYMBOL_XBTQAE, 20D);
 					if(null != list && !list.isEmpty()){
 						foop:for (MexOrder mexOrder : list) {
@@ -126,7 +132,6 @@ public class TradeOrderSync {
 									(time-8000 <= int_time || int_time <= time+8000)){ //存单时间在下单前后8秒内
 									// 保存成交价格、爆仓价格
 									bitTradeDetail.setTradePrice(priceAvg);
-									//bitTradeDetail.setFee(mexOrder);
 									//if(Constants.DIRECTION_BUY_UP.equals(type) || Constants.DIRECTION_SELL_DOWN.equals(type)){
 									if(Constants.DIRECTION_BUY_UP.equals(type)){
 										// 1开多,4平空  爆仓价格 = 成交价格 - 9.3%
@@ -148,7 +153,7 @@ public class TradeOrderSync {
 						// 保存操作记录
 						String msg = "同步bitmex成交价格，同步数量："+list.size();
 						BitMonitorLog log = new BitMonitorLog();
-						log.setUseId("all");
+						log.setUseId(user.getId());
 						log.setLogContent(msg);
 						log.setTypeFlag(Constants.LOG_TYPE_SYNCORDER);
 						log.setStatusFlag("1");
@@ -160,4 +165,5 @@ public class TradeOrderSync {
 			}
 		}
 	}
+
 }
