@@ -321,7 +321,7 @@ public class InterTestController extends BaseController {
 				Double curPrice = (Double)EhCacheUtils.get(Constants.PRICE_CACHE,Constants.CACHE_BTCOKEX_PRICE_KEY);
 				// okex
 				msg = orderService.future_trade(symbol, "quarter", curPrice.toString(), req.getAmountA().toString(), dir, "1", "10");
-			}else if("XBTUSD".equals(symbol) || "XBTH18".equals(symbol)){
+			}else if("XBTUSD".equals(symbol) || "XBTM18".equals(symbol)){
 				// mex
 				// 设置杠杆倍数
 				//msg = mexOrderService.post_leverage(symbol,10D);

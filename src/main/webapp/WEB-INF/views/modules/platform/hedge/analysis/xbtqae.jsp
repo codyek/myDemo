@@ -54,7 +54,7 @@
 	var myChartDepthOne = echarts.init(domDepthOne);
 	var myChartDepthTwo = echarts.init(domDepthTwo);
 	var symbolA = "btc_usd";
-	var symbolB = "XBTH18";
+	var symbolB = "XBTM18";
 	var app = {};
 	option = null;
 	var priceData = null;
@@ -88,7 +88,7 @@
 	
 	// BitMex 定义订阅信息
 	function initAddSubscribe() {
-		doMexSend('{"op":"subscribe","args":["instrument:XBTH18","orderBook10:XBTH18"]}');
+		doMexSend('{"op":"subscribe","args":["instrument:XBTM18","orderBook10:XBTM18"]}');
 	}
 	
 	// 间隔时间，20分钟内出现只算一次

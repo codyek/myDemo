@@ -39,7 +39,7 @@
 						</tr>
 						<tr>
 							<td >币种A：<form:input path="symbolA" htmlEscape="false" style="width: 140px;" value="btc_usd" /></td>
-							<td >币种B：<form:input path="symbolB" htmlEscape="false" style="width: 140px;" value="XBTH18" /></td>
+							<td >币种B：<form:input path="symbolB" htmlEscape="false" style="width: 140px;" value="XBTM18" /></td>
 						</tr>
 						<tr>
 							<td >最大差价：<form:input path="maxAgio" htmlEscape="false" class="inputWidth"  value="80" /></td>
@@ -118,7 +118,7 @@
 
 	<script type="text/javascript">
 	var symbolA = "btc_usd";
-	var symbolB = "XBTH18";
+	var symbolB = "XBTM18";
 	var accountBTC = "XBTUSD";
 	
 	$(document).ready(function() {

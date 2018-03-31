@@ -43,7 +43,7 @@
    			var url = "${ctx}/hedge/stopJob" ;
    			var obj = new Object();
    			var symbolA = "btc_usd";
-   			var symbolB = "XBTH18";
+   			var symbolB = "XBTM18";
    			obj.symbolA=symbolA;
    			obj.symbolB=symbolB;
    			$.ajax({

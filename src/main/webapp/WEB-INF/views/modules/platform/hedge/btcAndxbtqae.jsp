@@ -58,7 +58,7 @@
 			<form:form id="inputForm" modelAttribute="TradeTaskReq" action="${ctx}/trade/startJob" method="post" class="form-horizontal">
 				<form:hidden path="type"  value="1"  />
 				<form:hidden path="symbolA"  value="btc_usd" />
-				<form:hidden path="symbolB"  value="XBTH18" />
+				<form:hidden path="symbolB"  value="XBTM18" />
 				<sys:message content="${message}"/>	
 				<div class="control-group">
 						<span style="width: 50%; display: block;" class="floatLeft">
@@ -148,7 +148,7 @@
 
 	<script type="text/javascript">
 	var symbolA = "btc_usd";
-	var symbolB = "XBTH18";
+	var symbolB = "XBTM18";
 	var accountBTC = "XBTUSD";
 	
 	$(document).ready(function() {
@@ -180,7 +180,7 @@
 	}
 	// BitMex 定义订阅信息
 	function initAddSubscribe() {
-		doMexSend('{"op":"subscribe","args":["instrument:XBTH18","orderBook10:XBTH18"]}');
+		doMexSend('{"op":"subscribe","args":["instrument:XBTM18","orderBook10:XBTM18"]}');
 	}
 	
 	// 遮罩效果

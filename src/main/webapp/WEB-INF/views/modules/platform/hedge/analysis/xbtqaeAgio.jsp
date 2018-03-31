@@ -48,7 +48,7 @@
 	var myChart = echarts.init(dom);
 	var myChartAgio = echarts.init(domAgio);
 	var symbolA = "btc_usd";
-	var symbolB = "XBTH18";
+	var symbolB = "XBTM18";
 	var app = {};
 	option = null;
 	var priceData = null;

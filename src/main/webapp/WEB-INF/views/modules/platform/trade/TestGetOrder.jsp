@@ -83,7 +83,7 @@
 	<input id="status"   type="text" value="2" />   1或2
 	</p>
 	<p>Mex:
-	<input id="mexSymbol"  type="text" value="XBT" /> XBTUSD\XBTZ17\XBTH18
+	<input id="mexSymbol"  type="text" value="XBTM18" /> XBTUSD\XBTZ17\XBTH18\XBTM18
 	</p>
 	<p>
 	<input class="btn" type="button" value="获取Okex订单Json"  onclick="getOkexOrders()"/>
